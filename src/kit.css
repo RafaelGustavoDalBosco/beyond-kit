@@ -182,7 +182,13 @@
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--texto-3);
+}
+
+/* A cor padrão do rótulo fica abaixo das utilities: `rotulo text-cobalto` ganha sempre, em qualquer ordem. */
+@layer components {
+  .rotulo {
+    color: var(--texto-3);
+  }
 }
 
 /* O filete cobalto no alto de uma ficha, de um registro e de um modal. */

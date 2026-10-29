@@ -1,8 +1,15 @@
 "use client";
 
-import { flexRender, getCoreRowModel, useReactTable, type ColumnDef, type RowData } from "@tanstack/react-table";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { Fragment, type ReactNode } from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type ColumnMeta,
+  type RowData,
+} from "@tanstack/react-table";
+import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Fragment, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { contagem } from "../lib/formato";
@@ -20,7 +27,19 @@ declare module "@tanstack/react-table" {
     quebra?: boolean;
     /** Presa à esquerda quando a tabela rola de lado (o nome, numa tabela larga). */
     fixa?: boolean;
+    /** Some abaixo do breakpoint (a coluna secundária no celular). */
+    esconderAbaixo?: "sm" | "md" | "lg";
+    /** Alinhada ao centro (um ícone, um selo). */
+    centro?: boolean;
   }
+}
+
+// Classes literais por breakpoint, para o Tailwind achar.
+const ESCONDER = { sm: "hidden sm:table-cell", md: "hidden md:table-cell", lg: "hidden lg:table-cell" } as const;
+
+// O que vale igual no th, no td e no rodapé de uma coluna: some abaixo do breakpoint e centraliza.
+function classeDaColuna(meta: ColumnMeta<any, any> | undefined) {
+  return cn(meta?.esconderAbaixo && ESCONDER[meta.esconderAbaixo], meta?.centro && "text-center");
 }
 
 export type Pagina = { page: number; page_size: number; total: number };
@@ -28,7 +47,9 @@ export type Pagina = { page: number; page_size: number; total: number };
 /**
  * A lista: cabeçalho fixo, linha inteira clicável quando abre a ficha. `classeDaLinha` marca a linha (a inativa
  * apagada, a atrasada em aviso); `grupo` abre uma faixa de título quando o valor muda de uma linha para a outra
- * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total).
+ * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total). `expandir` dá à linha um botão que
+ * abre embaixo dela o detalhe (uma sub-tabela); `podeAbrir` diz quais linhas abrem a ficha; `atributosDaLinha` põe
+ * data-*, aria-* ou id no <tr>.
  */
 export function Tabela<T>({
   dados,
@@ -40,6 +61,9 @@ export function Tabela<T>({
   vazio,
   classeDaLinha,
   grupo,
+  expandir,
+  podeAbrir,
+  atributosDaLinha,
 }: {
   dados: T[] | undefined;
   colunas: ColumnDef<T, any>[];
@@ -47,15 +71,34 @@ export function Tabela<T>({
   carregando?: boolean;
   pagina?: Pagina;
   aoMudarPagina?: (page: number) => void;
-  vazio?: string;
+  vazio?: ReactNode;
   classeDaLinha?: (linha: T) => string | false | undefined;
   grupo?: (linha: T) => ReactNode;
+  expandir?: (linha: T) => ReactNode | null;
+  podeAbrir?: (linha: T) => boolean;
+  atributosDaLinha?: (linha: T) => Record<string, string | number | boolean | undefined>;
 }) {
   const tabela = useReactTable({ data: dados ?? [], columns: colunas, getCoreRowModel: getCoreRowModel() });
+  const [abertas, setAbertas] = useState<Set<string>>(() => new Set());
+  // Dados novos (outra página, outro filtro): as linhas abertas fecham, porque a chave é a posição da linha.
+  const [dadosDasAbertas, setDadosDasAbertas] = useState(dados);
+  if (dados !== dadosDasAbertas) {
+    setDadosDasAbertas(dados);
+    setAbertas(new Set());
+  }
   const paginas = pagina ? Math.max(1, Math.ceil(pagina.total / pagina.page_size)) : 1;
-  const largura = tabela.getVisibleLeafColumns().length + (aoAbrir ? 1 : 0);
+  const largura = tabela.getVisibleLeafColumns().length + (aoAbrir ? 1 : 0) + (expandir ? 1 : 0);
   const comRodape = tabela.getAllLeafColumns().some((c) => c.columnDef.footer);
   const linhas = tabela.getRowModel().rows;
+
+  // Abre ou fecha o detalhe de uma linha.
+  const alternar = (id: string) =>
+    setAbertas((atual) => {
+      const nova = new Set(atual);
+      if (nova.has(id)) nova.delete(id);
+      else nova.add(id);
+      return nova;
+    });
 
   return (
     <div className="flex flex-col">
@@ -64,6 +107,7 @@ export function Tabela<T>({
           <thead>
             {tabela.getHeaderGroups().map((g) => (
               <tr key={g.id}>
+                {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie" />}
                 {g.headers.map((h) => (
                   <th
                     key={h.id}
@@ -72,6 +116,7 @@ export function Tabela<T>({
                       h.column.columnDef.meta?.numero && "text-right",
                       h.column.columnDef.meta?.principal && "w-full",
                       h.column.columnDef.meta?.fixa && "left-0 z-10",
+                      classeDaColuna(h.column.columnDef.meta),
                     )}
                   >
                     {flexRender(h.column.columnDef.header, h.getContext())}
@@ -87,6 +132,9 @@ export function Tabela<T>({
                 const titulo = grupo?.(r.original);
                 const anterior = linhas[i - 1];
                 const novoGrupo = grupo && (!anterior || titulo !== grupo(anterior.original));
+                const clicavel = !!aoAbrir && (podeAbrir?.(r.original) ?? true);
+                const detalhe = expandir?.(r.original) ?? null;
+                const aberta = detalhe !== null && abertas.has(r.id);
                 return (
                   <Fragment key={r.id}>
                     {novoGrupo && (
@@ -97,13 +145,32 @@ export function Tabela<T>({
                       </tr>
                     )}
                     <tr
-                      onClick={aoAbrir ? () => aoAbrir(r.original) : undefined}
+                      {...atributosDaLinha?.(r.original)}
+                      onClick={clicavel ? () => aoAbrir?.(r.original) : undefined}
                       className={cn(
                         "group border-b border-linha last:border-0",
-                        aoAbrir && "cursor-pointer transition-colors hover:bg-superficie-2",
+                        clicavel && "cursor-pointer transition-colors hover:bg-superficie-2",
                         classeDaLinha?.(r.original),
                       )}
                     >
+                      {expandir && (
+                        <td className="w-8 pl-2">
+                          {detalhe !== null && (
+                            <Botao
+                              tipo="fantasma"
+                              tamanho="icone-sm"
+                              aria-expanded={aberta}
+                              aria-label={aberta ? "Esconder detalhes" : "Mostrar detalhes"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alternar(r.id);
+                              }}
+                            >
+                              <ChevronDown className={cn("transition-transform", !aberta && "-rotate-90")} />
+                            </Botao>
+                          )}
+                        </td>
+                      )}
                       {r.getVisibleCells().map((c) => (
                         <td
                           key={c.id}
@@ -113,6 +180,7 @@ export function Tabela<T>({
                             c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
                             c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
                             c.column.columnDef.meta?.fixa && "sticky left-0 z-[1] bg-superficie",
+                            classeDaColuna(c.column.columnDef.meta),
                           )}
                         >
                           {flexRender(c.column.columnDef.cell, c.getContext())}
@@ -120,10 +188,19 @@ export function Tabela<T>({
                       ))}
                       {aoAbrir && (
                         <td className="pr-3 text-texto-3">
-                          <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                          {clicavel && (
+                            <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                          )}
                         </td>
                       )}
                     </tr>
+                    {aberta && (
+                      <tr className="border-b border-linha last:border-0">
+                        <td colSpan={largura} className="bg-superficie-2/40 p-0">
+                          {detalhe}
+                        </td>
+                      </tr>
+                    )}
                   </Fragment>
                 );
               })}
@@ -132,10 +209,15 @@ export function Tabela<T>({
             <tfoot>
               {tabela.getFooterGroups().map((g) => (
                 <tr key={g.id} className="border-t border-linha-forte bg-superficie-2/60">
+                  {expandir && <td />}
                   {g.headers.map((h) => (
                     <td
                       key={h.id}
-                      className={cn("h-11 px-4 font-semibold whitespace-nowrap", h.column.columnDef.meta?.numero && "numero text-right")}
+                      className={cn(
+                        "h-11 px-4 font-semibold whitespace-nowrap",
+                        h.column.columnDef.meta?.numero && "numero text-right",
+                        classeDaColuna(h.column.columnDef.meta),
+                      )}
                     >
                       {h.isPlaceholder ? null : flexRender(h.column.columnDef.footer, h.getContext())}
                     </td>

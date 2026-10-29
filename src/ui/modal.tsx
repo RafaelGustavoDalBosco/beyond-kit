@@ -61,12 +61,12 @@ export function Modal({
   );
 }
 
-/** O Cancelar do rodapé, que fecha o modal. */
-export function Cancelar({ disabled }: { disabled?: boolean }) {
+/** O Cancelar do rodapé, que fecha o modal; `rotulo` troca o texto ("Voltar" ao lado de "Cancelar cobrança"). */
+export function Cancelar({ disabled, rotulo = "Cancelar" }: { disabled?: boolean; rotulo?: ReactNode }) {
   return (
     <Dialog.Close asChild>
       <Botao tipo="fantasma" disabled={disabled}>
-        Cancelar
+        {rotulo}
       </Botao>
     </Dialog.Close>
   );

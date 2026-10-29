@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 
 import { Botao, type BotaoProps } from "./botao";
 import { Cancelar, Modal } from "./modal";
@@ -13,6 +13,7 @@ export function BotaoDeConfirmar({
   confirmar,
   aoConfirmar,
   tipoDoConfirmar = "perigo",
+  rotuloDoCancelar,
   ...props
 }: Omit<BotaoProps, "onClick" | "asChild"> & {
   titulo: string;
@@ -20,6 +21,7 @@ export function BotaoDeConfirmar({
   confirmar: ReactNode;
   aoConfirmar: () => void;
   tipoDoConfirmar?: "perigo" | "primario";
+  rotuloDoCancelar?: ReactNode;
 }) {
   const [aberto, setAberto] = useState(false);
   return (
@@ -33,7 +35,7 @@ export function BotaoDeConfirmar({
         titulo={titulo}
         rodape={
           <>
-            <Cancelar />
+            <Cancelar rotulo={rotuloDoCancelar} />
             <Botao
               tipo={tipoDoConfirmar}
               onClick={() => {
@@ -50,4 +52,59 @@ export function BotaoDeConfirmar({
       </Modal>
     </>
   );
+}
+
+export type OpcoesDaConfirmacao = {
+  titulo: ReactNode;
+  frase?: ReactNode;
+  /** O texto do botão de confirmar (padrão "Confirmar"). */
+  confirmar?: ReactNode;
+  tipo?: "perigo" | "primario";
+  rotuloDoCancelar?: ReactNode;
+};
+
+/**
+ * A confirmação imperativa, para quando ela não nasce de um botão só:
+ * `if (await confirmar({ titulo, frase })) ...`; o `dialogo` vai no JSX do consumidor.
+ * Confirmar resolve true; Cancelar e × resolvem false.
+ */
+export function useConfirmar() {
+  const [opcoes, setOpcoes] = useState<OpcoesDaConfirmacao | null>(null);
+  const [aberto, setAberto] = useState(false);
+  const resolver = useRef<((sim: boolean) => void) | null>(null);
+
+  const responder = useCallback((sim: boolean) => {
+    resolver.current?.(sim);
+    resolver.current = null;
+    setAberto(false);
+  }, []);
+
+  const confirmar = useCallback((novas: OpcoesDaConfirmacao) => {
+    resolver.current?.(false);
+    setOpcoes(novas);
+    setAberto(true);
+    return new Promise<boolean>((resolve) => {
+      resolver.current = resolve;
+    });
+  }, []);
+
+  const dialogo = opcoes && (
+    <Modal
+      aberto={aberto}
+      aoMudar={(a) => !a && responder(false)}
+      titulo={opcoes.titulo}
+      rodape={
+        <>
+          <Cancelar rotulo={opcoes.rotuloDoCancelar} />
+          <Botao tipo={opcoes.tipo ?? "perigo"} onClick={() => responder(true)}>
+            {opcoes.confirmar ?? "Confirmar"}
+          </Botao>
+        </>
+      }
+    >
+      {opcoes.frase && <p className="m-0 text-[13px] leading-relaxed text-texto-2">{opcoes.frase}</p>}
+    </Modal>
+  );
+
+  return { confirmar, dialogo };
 }

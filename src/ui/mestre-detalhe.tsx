@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Slot } from "radix-ui";
 import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -14,6 +15,7 @@ export function MestreDetalhe({
   rodape,
   detalhe,
   largura = 380,
+  embutido = false,
   className,
 }: {
   cabeca?: ReactNode;
@@ -21,12 +23,15 @@ export function MestreDetalhe({
   rodape?: ReactNode;
   detalhe: ReactNode;
   largura?: number;
+  /** Sem o contorno, o fundo e a sombra do bloco (dentro de um `Bloco` ou de uma ficha). */
+  embutido?: boolean;
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        "grid grid-cols-1 overflow-hidden rounded-bloco border border-linha bg-superficie shadow-1 lg:grid-cols-[var(--largura-da-lista)_minmax(0,1fr)]",
+        "grid grid-cols-1 overflow-hidden lg:grid-cols-[var(--largura-da-lista)_minmax(0,1fr)]",
+        !embutido && "rounded-bloco border border-linha bg-superficie shadow-1",
         className,
       )}
       style={{ "--largura-da-lista": `${largura}px` } as CSSProperties}
@@ -44,19 +49,47 @@ export function MestreDetalhe({
   );
 }
 
-/** Uma linha da lista do master/detail; a escolhida leva a barra cobalto. */
-export function ItemDaLista({ ativo, aoEscolher, children }: { ativo: boolean; aoEscolher: () => void; children: ReactNode }) {
+/** Uma linha da lista do master/detail; a escolhida leva a barra cobalto. Com `href` vira `<a>`; com `asChild`, o filho
+ * único (o `Link` do roteador) leva o visual e a barra. */
+export function ItemDaLista({
+  ativo,
+  aoEscolher,
+  href,
+  asChild,
+  children,
+}: {
+  ativo: boolean;
+  aoEscolher?: () => void;
+  href?: string;
+  asChild?: boolean;
+  children: ReactNode;
+}) {
+  const comum = {
+    onClick: aoEscolher,
+    "aria-current": ativo || undefined,
+    className: cn(
+      "relative flex w-full cursor-pointer flex-col gap-1 border-b border-linha px-4 py-3 text-left transition-colors",
+      ativo ? "bg-cobalto-suave" : "hover:bg-superficie-2",
+    ),
+  };
+  const barra = ativo && <span className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-cobalto" />;
+  if (asChild)
+    return (
+      <Slot.Root {...comum}>
+        {barra}
+        <Slot.Slottable>{children}</Slot.Slottable>
+      </Slot.Root>
+    );
+  if (href)
+    return (
+      <a href={href} {...comum}>
+        {barra}
+        {children}
+      </a>
+    );
   return (
-    <button
-      type="button"
-      onClick={aoEscolher}
-      aria-current={ativo || undefined}
-      className={cn(
-        "relative flex w-full cursor-pointer flex-col gap-1 border-b border-linha px-4 py-3 text-left transition-colors",
-        ativo ? "bg-cobalto-suave" : "hover:bg-superficie-2",
-      )}
-    >
-      {ativo && <span className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-cobalto" />}
+    <button type="button" {...comum}>
+      {barra}
       {children}
     </button>
   );

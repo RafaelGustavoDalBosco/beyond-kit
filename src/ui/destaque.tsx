@@ -7,28 +7,29 @@ import { cn } from "../lib/cn";
 
 import type { Tom } from "./selo";
 
-/** O bloco de destaque, "Cobalto claro": o número que abre a tela. */
+/** O bloco de destaque, "Cobalto claro": o número que abre a tela. Com `aoAbrir`, o bloco todo vira botão. */
 export function BlocoDestaque({
   rotulo,
   valor,
   selo,
   children,
+  aoAbrir,
   className,
 }: {
   rotulo: ReactNode;
   valor: ReactNode;
   selo?: ReactNode;
   children?: ReactNode;
+  aoAbrir?: () => void;
   className?: string;
 }) {
-  return (
-    <div
-      className={cn(
-        "relative isolate overflow-hidden rounded-bloco bg-gradient-to-br from-destaque-de via-destaque-meio to-destaque-ate p-6 text-destaque-texto shadow-2 ring-1 ring-destaque-anel",
-        "",
-        className,
-      )}
-    >
+  const caixa = cn(
+    "relative isolate overflow-hidden rounded-bloco bg-gradient-to-br from-destaque-de via-destaque-meio to-destaque-ate p-6 text-destaque-texto shadow-2 ring-1 ring-destaque-anel",
+    aoAbrir && "block w-full cursor-pointer text-left transition-[box-shadow] hover:shadow-3 hover:ring-cobalto/40",
+    className,
+  );
+  const conteudo = (
+    <>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(420px_180px_at_90%_-30px,rgb(29_78_216/0.18),transparent_70%)]"
@@ -39,7 +40,14 @@ export function BlocoDestaque({
         {selo}
       </div>
       {children && <div className="mt-6">{children}</div>}
-    </div>
+    </>
+  );
+  return aoAbrir ? (
+    <button type="button" onClick={aoAbrir} className={caixa}>
+      {conteudo}
+    </button>
+  ) : (
+    <div className={caixa}>{conteudo}</div>
   );
 }
 
@@ -86,6 +94,7 @@ export function Indicador({
   icone: Icone,
   tom = "cobalto",
   aoAbrir,
+  ativo,
   className,
 }: {
   rotulo: ReactNode;
@@ -94,11 +103,14 @@ export function Indicador({
   icone: LucideIcon;
   tom?: Tom;
   aoAbrir?: () => void;
+  /** Com `aoAbrir`, o indicador vira filtro: `ativo` liga o aria-pressed e o contorno cobalto. */
+  ativo?: boolean;
   className?: string;
 }) {
   const caixa = cn(
     "flex w-full flex-col overflow-hidden rounded-bloco border border-linha bg-superficie text-left shadow-1",
-    aoAbrir && "cursor-pointer transition-[box-shadow,border] hover:border-linha-forte hover:shadow-2",
+    aoAbrir && "cursor-pointer transition-[box-shadow,border,background] hover:border-linha-forte hover:shadow-2",
+    aoAbrir && ativo && "border-cobalto bg-cobalto-suave hover:border-cobalto",
     className,
   );
   const conteudo = (
@@ -117,7 +129,7 @@ export function Indicador({
     </>
   );
   return aoAbrir ? (
-    <button type="button" onClick={aoAbrir} className={caixa}>
+    <button type="button" onClick={aoAbrir} aria-pressed={ativo} className={caixa}>
       {conteudo}
     </button>
   ) : (

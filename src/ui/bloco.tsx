@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -7,9 +8,25 @@ export function Bloco({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("rounded-bloco border border-linha bg-superficie shadow-1", className)} {...props} />;
 }
 
-export function CabecaDoBloco({ titulo, detalhe, acao }: { titulo: ReactNode; detalhe?: ReactNode; acao?: ReactNode }) {
+/** O alto do bloco: o ícone do assunto (opcional), o título, o detalhe e a ação à direita. */
+export function CabecaDoBloco({
+  titulo,
+  detalhe,
+  acao,
+  icone: Icone,
+}: {
+  titulo: ReactNode;
+  detalhe?: ReactNode;
+  acao?: ReactNode;
+  icone?: LucideIcon;
+}) {
   return (
     <div className="flex min-h-12 items-center gap-3 border-b border-linha px-5 py-3">
+      {Icone && (
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-cobalto-suave text-cobalto">
+          <Icone className="size-4" />
+        </div>
+      )}
       <div className="min-w-0 flex-1">
         <div className="text-[13px] font-semibold">{titulo}</div>
         {detalhe && <div className="text-xs text-texto-3">{detalhe}</div>}
@@ -27,6 +44,7 @@ export function Destaque({
   detalhe,
   tom = "texto",
   grande = false,
+  emCaixa = false,
 }: {
   rotulo: ReactNode;
   valor: ReactNode;
@@ -34,10 +52,12 @@ export function Destaque({
   detalhe?: ReactNode;
   tom?: "texto" | "cobalto" | "ganho" | "aviso" | "risco";
   grande?: boolean;
+  /** Com borda, fundo e respiro, como um mini bloco. */
+  emCaixa?: boolean;
 }) {
   const cor = { texto: "text-texto", cobalto: "text-cobalto", ganho: "text-ganho", aviso: "text-aviso", risco: "text-risco" }[tom];
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
+    <div className={cn("flex min-w-0 flex-col gap-1.5", emCaixa && "rounded-xl border border-linha bg-superficie px-4 py-3")}>
       <span className="rotulo">{rotulo}</span>
       <div className="flex flex-wrap items-center gap-2">
         <span

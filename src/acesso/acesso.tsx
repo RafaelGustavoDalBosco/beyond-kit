@@ -13,6 +13,7 @@ import { cn } from "../lib/cn";
 import { Botao } from "../ui/botao";
 import { Brasao, SeloDalBosco } from "../marca/marca";
 import { Campo, Rotulado } from "../ui/campo";
+import { CampoDeSenha } from "../ui/campo-de-senha";
 
 /**
  * A tela sem menu: o painel à esquerda e o cartão do formulário à direita,
@@ -116,16 +117,27 @@ function Recusa({ frase }: { frase: string | null }) {
   );
 }
 
-/** O formulário que espera a promessa do consumidor: guarda o "enviando" e a recusa. */
+/** O texto de um campo do formulário enviado (pelo `name`). */
+function lido(dados: FormData, nome: string) {
+  const v = dados.get(nome);
+  return typeof v === "string" ? v : "";
+}
+
+/**
+ * O formulário que espera a promessa do consumidor: guarda o "enviando" e a
+ * recusa. Os valores saem do FormData do form, não do estado: o gerenciador
+ * de senhas preenche e envia antes de o React ver o que entrou.
+ */
 function useEnvio() {
   const [enviando, setEnviando] = useState(false);
   const [recusa, setRecusa] = useState<string | null>(null);
-  const enviar = (fazer: () => unknown, depois?: () => void) => async (e: FormEvent) => {
+  const enviar = (fazer: (dados: FormData) => unknown, depois?: () => void) => async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const dados = new FormData(e.currentTarget);
     setRecusa(null);
     setEnviando(true);
     try {
-      await fazer();
+      await fazer(dados);
       depois?.();
     } catch (erro) {
       setRecusa(fraseDoErro(erro));
@@ -164,31 +176,34 @@ function problemaDaSenha(senha: string, repetida: string, minimo: number) {
   return null;
 }
 
-/** Entrar: o login (e-mail, por padrão) e a senha. `links` leva o "Esqueci a senha" e o "Criar conta". */
+/**
+ * Entrar: o login (e-mail, por padrão) e a senha. `links` leva o "Esqueci a
+ * senha" e o "Criar conta"; `linkEsqueci` põe o link à direita do rótulo da senha.
+ */
 export function Entrar({
   aoEntrar,
   rotuloDoLogin = "E-mail",
   tipoDoLogin = "email",
   titulo = "Entrar",
   links,
+  linkEsqueci,
 }: {
   aoEntrar: (dados: { login: string; senha: string }) => unknown;
   rotuloDoLogin?: string;
   tipoDoLogin?: "email" | "text";
   titulo?: ReactNode;
   links?: ReactNode;
+  linkEsqueci?: ReactNode;
 }) {
-  const [login, setLogin] = useState("");
-  const [senha, setSenha] = useState("");
   const { enviando, recusa, enviar } = useEnvio();
   return (
     <CartaoDeAcesso titulo={titulo} links={links}>
-      <form onSubmit={enviar(() => aoEntrar({ login, senha }))} className="flex flex-col gap-4">
+      <form method="post" onSubmit={enviar((d) => aoEntrar({ login: lido(d, "login"), senha: lido(d, "senha") }))} className="flex flex-col gap-4">
         <Rotulado rotulo={rotuloDoLogin}>
-          <Campo type={tipoDoLogin} autoComplete="username" value={login} onChange={(e) => setLogin(e.target.value)} required autoFocus />
+          <Campo name="login" type={tipoDoLogin} autoComplete="username" required autoFocus />
         </Rotulado>
-        <Rotulado rotulo="Senha">
-          <Campo type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+        <Rotulado rotulo="Senha" acao={linkEsqueci}>
+          <CampoDeSenha name="senha" autoComplete="current-password" required />
         </Rotulado>
         <Recusa frase={recusa} />
         <BotaoDeEnviar enviando={enviando}>Entrar</BotaoDeEnviar>
@@ -207,7 +222,6 @@ export function EsqueciASenha({
   links?: ReactNode;
   frasePronto?: ReactNode;
 }) {
-  const [email, setEmail] = useState("");
   const [pronto, setPronto] = useState(false);
   const { enviando, recusa, enviar } = useEnvio();
   return (
@@ -215,9 +229,9 @@ export function EsqueciASenha({
       {pronto ? (
         <Pronto frase={frasePronto} />
       ) : (
-        <form onSubmit={enviar(() => aoPedir(email), () => setPronto(true))} className="flex flex-col gap-4">
+        <form method="post" onSubmit={enviar((d) => aoPedir(lido(d, "email")), () => setPronto(true))} className="flex flex-col gap-4">
           <Rotulado rotulo="E-mail">
-            <Campo type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+            <Campo name="email" type="email" autoComplete="email" required autoFocus />
           </Rotulado>
           <Recusa frase={recusa} />
           <BotaoDeEnviar enviando={enviando}>Enviar o link</BotaoDeEnviar>
@@ -253,22 +267,24 @@ export function RedefinirASenha({
         <Pronto frase="Senha trocada. Já dá para entrar com ela." acao={acaoPronto} />
       ) : (
         <form
+          method="post"
           onSubmit={(e) => {
-            const p = problemaDaSenha(senha, repetida, minimo);
+            const dados = new FormData(e.currentTarget);
+            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo);
             if (p) {
               e.preventDefault();
               setRecusa(p);
               return;
             }
-            void enviar(() => aoRedefinir(senha), () => setPronto(true))(e);
+            void enviar((d) => aoRedefinir(lido(d, "senha")), () => setPronto(true))(e);
           }}
           className="flex flex-col gap-4"
         >
           <Rotulado rotulo="Senha nova" ajuda={ajuda ?? `Pelo menos ${minimo} caracteres.`}>
-            <Campo type="password" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} required autoFocus />
+            <CampoDeSenha name="senha" autoComplete="new-password" onChange={(e) => setSenha(e.target.value)} required autoFocus />
           </Rotulado>
           <Rotulado rotulo="Repita a senha" erro={problema ?? undefined}>
-            <Campo type="password" autoComplete="new-password" value={repetida} onChange={(e) => setRepetida(e.target.value)} required />
+            <CampoDeSenha name="senha_repetida" autoComplete="new-password" onChange={(e) => setRepetida(e.target.value)} required />
           </Rotulado>
           <Recusa frase={recusa} />
           <BotaoDeEnviar enviando={enviando}>Trocar a senha</BotaoDeEnviar>
@@ -300,8 +316,6 @@ export function CriarConta({
   frasePronto?: ReactNode;
   acaoPronto?: ReactNode;
 }) {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [repetida, setRepetida] = useState("");
   const [pronto, setPronto] = useState(false);
@@ -313,28 +327,33 @@ export function CriarConta({
         <Pronto frase={frasePronto} acao={acaoPronto} />
       ) : (
         <form
+          method="post"
           onSubmit={(e) => {
-            const p = problemaDaSenha(senha, repetida, minimo);
+            const dados = new FormData(e.currentTarget);
+            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo);
             if (p) {
               e.preventDefault();
               setRecusa(p);
               return;
             }
-            void enviar(() => aoCriar({ nome, email, senha }), () => setPronto(true))(e);
+            void enviar(
+              (d) => aoCriar({ nome: lido(d, "nome"), email: lido(d, "email"), senha: lido(d, "senha") }),
+              () => setPronto(true),
+            )(e);
           }}
           className="flex flex-col gap-4"
         >
           <Rotulado rotulo="Nome">
-            <Campo autoComplete="name" value={nome} onChange={(e) => setNome(e.target.value)} required autoFocus />
+            <Campo name="nome" autoComplete="name" required autoFocus />
           </Rotulado>
           <Rotulado rotulo="E-mail">
-            <Campo type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Campo name="email" type="email" autoComplete="email" required />
           </Rotulado>
           <Rotulado rotulo="Senha" ajuda={ajuda ?? `Pelo menos ${minimo} caracteres.`}>
-            <Campo type="password" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+            <CampoDeSenha name="senha" autoComplete="new-password" onChange={(e) => setSenha(e.target.value)} required />
           </Rotulado>
           <Rotulado rotulo="Repita a senha" erro={problema ?? undefined}>
-            <Campo type="password" autoComplete="new-password" value={repetida} onChange={(e) => setRepetida(e.target.value)} required />
+            <CampoDeSenha name="senha_repetida" autoComplete="new-password" onChange={(e) => setRepetida(e.target.value)} required />
           </Rotulado>
           {extras}
           <Recusa frase={recusa} />

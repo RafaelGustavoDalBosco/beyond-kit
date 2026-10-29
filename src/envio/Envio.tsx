@@ -20,10 +20,13 @@ export function SoltarArquivos({
   titulo,
   dica,
   aoJuntar,
+  "aria-label": rotulo,
   className,
 }: {
   aceitar: string;
   titulo: string;
+  /** O nome acessível da área (padrão: o título). */
+  "aria-label"?: string;
   dica?: ReactNode;
   aoJuntar: (arquivos: File[]) => void;
   className?: string;
@@ -45,6 +48,7 @@ export function SoltarArquivos({
       />
       <button
         type="button"
+        aria-label={rotulo}
         onClick={() => campo.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
