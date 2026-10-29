@@ -52,6 +52,9 @@
   --destaque-texto: #0f1a3d;
   --destaque-texto-2: #3a4a7a;
 
+  /* o dourado do brasão da Dal Bosco Systems (o fio da assinatura) */
+  --brasao-ouro: #b08a4a;
+
   /* as séries de um gráfico, na ordem (sem sentido: o verde, o laranja e o vermelho ficam para ganho, aviso e risco) */
   --serie-1: #1d4ed8;
   --serie-2: #60a5fa;
@@ -104,6 +107,7 @@
   --color-destaque-anel: var(--destaque-anel);
   --color-destaque-texto: var(--destaque-texto);
   --color-destaque-texto-2: var(--destaque-texto-2);
+  --color-brasao-ouro: var(--brasao-ouro);
   --color-serie-1: var(--serie-1);
   --color-serie-2: var(--serie-2);
   --color-serie-3: var(--serie-3);
@@ -157,6 +161,14 @@
     outline: 2px solid var(--cobalto);
     outline-offset: 2px;
   }
+}
+
+/* O brasão da Dal Bosco Systems (o `Brasao` do kit): inteiro, com o nome e o lema, ou só o escudo com os animais. */
+.brasao-inteiro {
+  background-image: url("./marca/brasao.webp");
+}
+.brasao-escudo {
+  background-image: url("./marca/escudo.webp");
 }
 
 /* Número de tabela e código (CNPJ, NCM, CFOP, chave): a Sora com algarismos

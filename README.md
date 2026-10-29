@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.5.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.6.0.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -77,7 +77,8 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 - `BotaoDeConfirmar`: o botão do que não se desfaz, com a confirmação em modal (`tipoDoConfirmar="primario"` quando não é risco).
 - `SemValor`, `Esqueleto`, `Carregando`, `Erro`, `Vazio` (`solto`, `icone`, `filete`): os estados (o rótulo e a frase vêm por prop).
 - `Avisos`, `avisar`, `configurarAvisos`, `fraseDoErro`: o toast (e a frase da recusa que fica na tela).
-- `MolduraPublica`, `CartaoDeAcesso`, `Entrar`, `EsqueciASenha`, `RedefinirASenha`, `CriarConta`, `ConfirmarEmail`: as telas de acesso, prontas e iguais em todo projeto. O kit só desenha: o consumidor passa a chamada à API (`aoEntrar`, `aoPedir`, `aoRedefinir`, `aoCriar`, que devolvem a promessa; a recusa aparece no cartão com a `fraseDoErro`) e os links do roteador dele em `links`. O token do link, o e-mail, o limite de tentativas e quem pode criar conta são do backend de cada projeto.
+- `Brasao` (`inteiro` ou `escudo`), `AssinaturaDalBosco` e `SeloDalBosco`: a marca da Dal Bosco Systems (as imagens vêm no pacote). Toda tela inicial leva a `AssinaturaDalBosco` no pé; todo login, a `MolduraPublica` com o painel do produto e o selo embaixo do cartão (o hub usa `painel="brasao"`).
+- `MolduraPublica` (`painel` produto ou brasao, `selo`), `CartaoDeAcesso`, `Entrar`, `EsqueciASenha`, `RedefinirASenha`, `CriarConta`, `ConfirmarEmail`: as telas de acesso, prontas e iguais em todo projeto. O kit só desenha: o consumidor passa a chamada à API (`aoEntrar`, `aoPedir`, `aoRedefinir`, `aoCriar`, que devolvem a promessa; a recusa aparece no cartão com a `fraseDoErro`) e os links do roteador dele em `links`. O token do link, o e-mail, o limite de tentativas e quem pode criar conta são do backend de cada projeto.
 - `CabecaDaFicha` (com `acoes`), `Codigo`, `Pares`, `Par` (`longo` não corta, `ocupa` estende), `Entidade`: as partes de uma ficha.
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.
 - `Paleta`, `useAtalhoDaBusca`, `usePausa`: a paleta Ctrl K (os grupos vêm do consumidor) e os tipos `GrupoDaPaleta`, `ItemDaPaleta`.

@@ -11,11 +11,15 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { fraseDoErro } from "../aviso/aviso";
 import { cn } from "../lib/cn";
 import { Botao } from "../ui/botao";
+import { Brasao, SeloDalBosco } from "../marca/marca";
 import { Campo, Rotulado } from "../ui/campo";
 
 /**
- * A tela sem menu: o painel cobalto à esquerda (a marca, o rótulo, o título e
- * a frase do produto) e o cartão do formulário à direita. Abaixo de `lg` o
+ * A tela sem menu: o painel à esquerda e o cartão do formulário à direita,
+ * com o selo "Um produto Dal Bosco Systems" embaixo. O painel `produto`
+ * (padrão) é cobalto e fala do produto (a marca, o rótulo, o título e a
+ * frase); o painel `brasao` é o cobalto escuro do menu com o brasão grande (o
+ * da própria Dal Bosco Systems, no hub), e aí o selo sai. Abaixo de `lg` o
  * painel some e fica só a marca no alto do cartão.
  */
 export function MolduraPublica({
@@ -24,29 +28,46 @@ export function MolduraPublica({
   titulo,
   frase,
   rodape,
+  painel = "produto",
+  selo = painel === "produto",
   children,
 }: {
   marca: ReactNode;
   rotulo?: ReactNode;
-  titulo: ReactNode;
+  titulo?: ReactNode;
   frase?: ReactNode;
   rodape?: ReactNode;
+  painel?: "produto" | "brasao";
+  selo?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="flex min-h-screen">
-      <div className="hidden w-1/2 flex-col justify-between bg-cobalto p-12 text-sobre-cobalto lg:flex">
-        <div className="flex items-center gap-3 text-xl font-semibold">{marca}</div>
-        <div>
-          {rotulo && <div className="rotulo mb-3 text-sobre-cobalto/80">{rotulo}</div>}
-          <h1 className="m-0 text-5xl leading-tight font-semibold tracking-[-0.02em] text-sobre-cobalto">{titulo}</h1>
-          {frase && <p className="mt-4 max-w-md text-sobre-cobalto/70">{frase}</p>}
+      {painel === "produto" ? (
+        <div className="hidden w-1/2 flex-col justify-between bg-cobalto p-12 text-sobre-cobalto lg:flex">
+          <div className="flex items-center gap-3 text-xl font-semibold">{marca}</div>
+          <div>
+            {rotulo && <div className="rotulo mb-3 text-sobre-cobalto/80">{rotulo}</div>}
+            {titulo && <h1 className="m-0 text-5xl leading-tight font-semibold tracking-[-0.02em] text-sobre-cobalto">{titulo}</h1>}
+            {frase && <p className="mt-4 max-w-md text-sobre-cobalto/70">{frase}</p>}
+          </div>
+          <div className="text-xs text-sobre-cobalto/70">{rodape}</div>
         </div>
-        <div className="text-xs text-sobre-cobalto/70">{rodape}</div>
-      </div>
+      ) : (
+        <div className="hidden w-1/2 flex-col items-center justify-between bg-lateral p-12 text-lateral-ativo lg:flex">
+          {rotulo ? <div className="rotulo self-start text-lateral-texto">{rotulo}</div> : <span />}
+          <div className="flex flex-col items-center gap-6 text-center">
+            <Brasao className="w-[min(360px,80%)] drop-shadow-[0_8px_24px_rgb(0_0_0/0.35)]" />
+            {titulo && <h1 className="m-0 max-w-md text-3xl leading-tight font-semibold tracking-[-0.02em]">{titulo}</h1>}
+            {frase && <p className="m-0 max-w-md text-lateral-texto">{frase}</p>}
+          </div>
+          <div className="self-start text-xs text-lateral-texto">{rodape}</div>
+        </div>
+      )}
       <div className="flex w-full flex-col items-center justify-center gap-6 bg-fundo p-6 lg:w-1/2">
         <div className="flex items-center gap-3 text-lg font-semibold lg:hidden">{marca}</div>
         {children}
+        {selo && <SeloDalBosco />}
       </div>
     </div>
   );
