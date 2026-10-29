@@ -5,12 +5,15 @@ import { Slot } from "radix-ui";
 import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { contagem as emContagem } from "../lib/formato";
 
 import { Botao } from "./botao";
 
 /** A lista à esquerda, o detalhe do escolhido à direita (o padrão de toda lista), em cartões como no cadastro do
  * ArchFlow: cada item é um cartão e o detalhe vem num cartão com o filete; abaixo de `lg`, um embaixo do outro. */
 export function MestreDetalhe({
+  titulo,
+  contagem,
   cabeca,
   lista,
   rodape,
@@ -19,6 +22,9 @@ export function MestreDetalhe({
   embutido = false,
   className,
 }: {
+  /** O título de seção da lista, com a `contagem` à direita; a `cabeca` (busca, filtros) vem embaixo. */
+  titulo?: ReactNode;
+  contagem?: number | null;
   cabeca?: ReactNode;
   lista: ReactNode;
   rodape?: ReactNode;
@@ -35,6 +41,12 @@ export function MestreDetalhe({
       style={{ "--largura-da-lista": `${largura}px` } as CSSProperties}
     >
       <div className="flex min-h-0 min-w-0 flex-col gap-3">
+        {(titulo || contagem != null) && (
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="titulo-secao m-0">{titulo}</h2>
+            {contagem != null && <span className="numero text-xs text-texto-3">{emContagem(contagem)}</span>}
+          </div>
+        )}
         {cabeca && <div className="flex flex-col gap-3">{cabeca}</div>}
         {/* o respiro de 4px deixa o contorno do escolhido aparecer inteiro na rolagem */}
         <div className="-m-1 min-h-0 flex-1 overflow-y-auto p-1">
@@ -91,6 +103,16 @@ export function ItemDaLista({
     <button type="button" {...comum}>
       {children}
     </button>
+  );
+}
+
+/** O rótulo de um grupo entre os cartões da lista (o CFOP, o mês), com o valor opcional à direita. */
+export function GrupoDaLista({ titulo, valor }: { titulo: ReactNode; valor?: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 px-1 pt-3 first:pt-0">
+      <span className="rotulo">{titulo}</span>
+      {valor != null && <span className="numero text-xs font-semibold text-texto-2">{valor}</span>}
+    </div>
   );
 }
 

@@ -100,11 +100,29 @@ export function Rotulado({
   );
 }
 
+const COLUNAS_DA_GRADE = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-4",
+  5: "sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5",
+  6: "sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6",
+  7: "sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7",
+  8: "sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8",
+};
+
 /** Os campos de um formulário em grade (duas colunas por padrão; uma só abaixo de `sm`); o `Rotulado` estende com
- * `ocupa`. */
-export function GradeDoFormulario({ colunas = 2, className, children }: { colunas?: 2 | 3 | 4; className?: string; children: ReactNode }) {
+ * `ocupa`. De 5 colunas para cima, a grade chega a elas só no `xl` (2 no `sm`, 4 no `lg`). */
+export function GradeDoFormulario({
+  colunas = 2,
+  className,
+  children,
+}: {
+  colunas?: keyof typeof COLUNAS_DA_GRADE;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
-    <div className={cn("grid grid-cols-1 gap-4", { 2: "sm:grid-cols-2", 3: "sm:grid-cols-3", 4: "sm:grid-cols-4" }[colunas], className)}>
+    <div className={cn("grid grid-cols-1 gap-4", COLUNAS_DA_GRADE[colunas], className)}>
       {children}
     </div>
   );

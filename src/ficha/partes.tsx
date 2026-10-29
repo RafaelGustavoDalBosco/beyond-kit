@@ -30,13 +30,40 @@ export function CabecaDaFicha({
       <div className="min-w-0 flex-1">
         <div className="rotulo flex items-center gap-2">{tipo}</div>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <h2 className="m-0 min-w-0 text-xl leading-tight font-bold tracking-tight [overflow-wrap:anywhere]">{titulo}</h2>
+          <h2 className="m-0 min-w-0 text-xl leading-tight font-bold tracking-tight uppercase [overflow-wrap:anywhere]">{titulo}</h2>
           {selos}
         </div>
         {codigos && <div className="mt-3 flex flex-wrap items-center gap-1.5">{codigos}</div>}
       </div>
       {acoes && <div className="flex shrink-0 flex-wrap items-start gap-2">{acoes}</div>}
     </div>
+  );
+}
+
+/** Uma seção dentro da ficha ou do detalhe: o título de seção, os selos ao lado dele e a ação à direita (o botão,
+ * o detalhe em texto). */
+export function SecaoDaFicha({
+  titulo,
+  selos,
+  acao,
+  className,
+  children,
+}: {
+  titulo: ReactNode;
+  selos?: ReactNode;
+  acao?: ReactNode;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className={cn("flex flex-col gap-3", className)}>
+      <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1.5">
+        <h3 className="titulo-secao m-0">{titulo}</h3>
+        {selos}
+        {acao && <div className="ml-auto flex items-center gap-2 text-xs text-texto-3">{acao}</div>}
+      </div>
+      {children}
+    </section>
   );
 }
 
