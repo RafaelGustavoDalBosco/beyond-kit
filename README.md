@@ -55,7 +55,8 @@ O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só clar
 ## Componentes
 
 - `Botao` (primario, secundario, fantasma, ganho, perigo; md, sm, icone, icone-sm) e `Tecla` (o kbd).
-- `Campo`, `Busca`, `Rotulado`, `AreaDeTexto`, `Escolha`, `SimNao`, `Caixa`: os controles de formulário.
+- `Campo`, `Busca`, `Rotulado`, `AreaDeTexto`, `Escolha`, `SimNao`, `Caixa`: os controles de formulário; `CampoMoeda` (o R$ fixo, formata ao sair, vazio é null).
+- `Segredo` e `SenhaGerada`: o que aparece uma vez só (a chave, o link, a senha), destacado e copiável.
 - `Bloco`, `CabecaDoBloco`, `Destaque`: a unidade da tela e o número de destaque dentro dela.
 - `BlocoDestaque`, `SeloDoDestaque`, `LinhaDoDestaque`: o "Cobalto claro", o número que abre a tela; `Indicador`: o cartão de número com ícone e filete.
 - `Selo` (neutro, cobalto, ganho, aviso, risco, contorno; `comPonto`) e o tipo `Tom`.
@@ -70,6 +71,7 @@ O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só clar
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.
 - `Paleta`, `useAtalhoDaBusca`, `usePausa`: a paleta Ctrl K (os grupos vêm do consumidor) e os tipos `GrupoDaPaleta`, `ItemDaPaleta`.
 - `CartaoDoFormulario`, `CampoDoFormulario`, `Mes`, `BarraDeSalvar`: o formulário de parâmetros e a barra presa no pé.
+- `SoltarArquivos`, `ListaDeArquivos`, `BarraDeProgresso`: a tela de envio de arquivos; `fetchComProgresso` (o `fetch` sobre XHR, com o progresso do envio e a resposta em stream) e `lerNdjson` (a resposta linha a linha, até o `resumo`), com `juntarArquivos`, `eZip`, `megabytes` e `tamanhoDoArquivo`.
 - `cn` e a formatação pt-BR (`moeda`, `moedaUnitaria`, `numero`, `contagem`, `percentual`, `documento`, `ncm`, `data`, `dataHora`, `periodo`, `periodoLongo`, `iniciais`).
 
 Adaptadores: `@dalbosco/kit/tanstack` e `@dalbosco/kit/next` exportam `useAdaptadorDaPilha` e o `usePilha` pronto.

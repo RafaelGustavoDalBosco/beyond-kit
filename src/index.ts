@@ -6,11 +6,13 @@ export * from "./ui/abas";
 export * from "./ui/bloco";
 export * from "./ui/botao";
 export * from "./ui/campo";
+export * from "./ui/campo-moeda";
 export * from "./ui/confirmacao";
 export * from "./ui/destaque";
 export * from "./ui/estados";
 export * from "./ui/mestre-detalhe";
 export * from "./ui/modal";
+export * from "./ui/segredo";
 export * from "./ui/selo";
 export * from "./ui/tabela";
 
@@ -23,6 +25,9 @@ export * from "./ficha/PilhaDeFichas";
 export * from "./busca/Paleta";
 
 export * from "./formulario/formulario";
+
+export * from "./envio/envio";
+export * from "./envio/Envio";
 
 export * from "./lib/cn";
 export * from "./lib/formato";
