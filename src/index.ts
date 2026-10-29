@@ -26,7 +26,7 @@ export * from "./busca/Paleta";
 
 export * from "./formulario/formulario";
 
-export * from "./envio/envio";
+export * from "./envio/fluxo";
 export * from "./envio/Envio";
 
 export * from "./lib/cn";

@@ -9,7 +9,7 @@ import { cn } from "../lib/cn";
 import { contagem, numero } from "../lib/formato";
 import { Botao } from "../ui/botao";
 
-import { eZip, megabytes } from "./envio";
+import { eZip, megabytes } from "./fluxo";
 
 /** A área de soltar arquivos, que também abre o escolher do sistema. `aceitar` é o `accept` do input; `dica`, a linha
  * dos formatos e do teto. */
