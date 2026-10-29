@@ -1,13 +1,15 @@
 # @dalbosco/kit
 
-O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só claro, só Sora. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 (Next.js 15/16 ou Vite).
+O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só claro, só Sora. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 e Tailwind 4 (Next.js 15/16 ou Vite); projeto em React 18 ou Tailwind 3 sobe antes de adotar.
+
+Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, beyond-rewards e ethos-integra. Fora: Dor3D e beyond-archflow.
 
 ## Adoção
 
 1. **Instalar** o pacote por tag do git e os peers que faltarem:
 
    ```sh
-   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.3.1
+   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.3.2
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -35,7 +37,7 @@ O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só clar
 4. **Pilha de fichas** (o modal empilhado que mora na URL, `?ficha=produto:1001|nota:196`): o `usePilha` vem do adaptador do roteador e a moldura recebe o registro das fichas:
 
    ```tsx
-   import { usePilha } from "@dalbosco/kit/next"; // ou "@dalbosco/kit/tanstack"
+   import { usePilha } from "@dalbosco/kit/next"; // ou /tanstack, /react-router, /url
    import { PilhaDeFichas } from "@dalbosco/kit";
 
    <PilhaDeFichas
@@ -78,8 +80,14 @@ O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só clar
 - `SoltarArquivos`, `ListaDeArquivos`, `BarraDeProgresso`: a tela de envio de arquivos; `fetchComProgresso` (o `fetch` sobre XHR, com o progresso do envio e a resposta em stream) e `lerNdjson` (a resposta linha a linha, até o `resumo`), com `juntarArquivos`, `eZip`, `megabytes` e `tamanhoDoArquivo`.
 - `cn` e a formatação pt-BR (`moeda`, `moedaUnitaria`, `numero`, `contagem`, `percentual`, `documento`, `ncm`, `data`, `dataHora`, `periodo`, `periodoLongo`, `iniciais`).
 
-Adaptadores: `@dalbosco/kit/tanstack` e `@dalbosco/kit/next` exportam `useAdaptadorDaPilha` e o `usePilha` pronto.
+Adaptadores: `@dalbosco/kit/tanstack` (TanStack Router), `@dalbosco/kit/next` (App Router), `@dalbosco/kit/react-router` (React Router 6.4+ e 7) e `@dalbosco/kit/url` (app sem roteador: `pushState` e `popstate` direto) exportam `useAdaptadorDaPilha` e o `usePilha` pronto.
 
 ## O que não está no kit
 
 O seletor de mês, as fichas da plataforma (produto, nota, fornecedor), os rótulos do `/rotulos`, o cliente da API e os erros dele (`ErroApi`, `ErroRede`): isso é de cada projeto, montado em cima do kit.
+
+## Mudar o kit
+
+- A sessão de um projeto nunca edita o kit: o que falta ela escreve no próprio projeto, no padrão do kit, e registra no ticket como candidato. Uma sessão só do kit junta os candidatos e solta a versão.
+- Antes de cada tag: `npm i` e `npm run tipos` (o TypeScript mais novo dos projetos e o 5.7); a tag só sai com os dois limpos.
+- Versão: o que só acrescenta sobe o patch ou o minor; o que muda a tela de quem já usa (como o `MestreDetalhe` empilhar no celular) sobe o minor e vai dito no commit, para os projetos saberem no bump.
