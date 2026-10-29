@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.3.2.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.4.0.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -57,7 +57,9 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
    - os arquivos do kit com estado ou evento já trazem `"use client"`; a moldura que monta a pilha e a paleta é client component;
    - o `useSearchParams` do adaptador pede um `<Suspense>` por volta (um só, em volta do conteúdo, da pilha e da paleta, basta).
 
-5. **A gramática**: cobalto é ação e seleção, verde ganho, laranja o que pede ação, vermelho risco. Toda lista é master/detail (`MestreDetalhe`); formulário e confirmação abrem em modal (`Modal`, `BotaoDeConfirmar`); o resultado de uma ação vai ao toast (`avisar`); número e código levam a classe `numero`; `titulo-secao` e `filete` nas fichas, nos detalhes e nos modais; `rotulo` no texto em caixa alta apagado; `aurora` no alto da área de conteúdo.
+5. **As cores**: só por token (`bg-superficie`, `text-texto-2`, `text-cobalto`...), nunca hex. Sobre o `BlocoDestaque`, o texto é `text-destaque-texto` e o apagado `text-destaque-texto-2`; as séries de um gráfico são `serie-1` a `serie-5`, na ordem; o estado sobre o menu escuro é `lateral-aviso` e `lateral-ganho`.
+
+6. **A gramática**: cobalto é ação e seleção, verde ganho, laranja o que pede ação, vermelho risco. Toda lista é master/detail (`MestreDetalhe`); formulário e confirmação abrem em modal (`Modal`, `BotaoDeConfirmar`); o resultado de uma ação vai ao toast (`avisar`); número e código levam a classe `numero`; `titulo-secao` e `filete` nas fichas, nos detalhes e nos modais; `rotulo` no texto em caixa alta apagado; `aurora` no alto da área de conteúdo.
 
 ## Componentes
 
@@ -73,7 +75,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 - `Tabela` (TanStack Table; `meta.numero` alinha à direita, `meta.principal` fica com a sobra, `meta.quebra` deixa o texto em várias linhas, `meta.fixa` prende a coluna à esquerda; `classeDaLinha`, `grupo` para a faixa de título e o `footer` das colunas no rodapé) e o tipo `Pagina`.
 - `Modal` e `Cancelar`: o modal de ação (filete, título de seção, rodapé; fecha só pelo × ou Cancelar).
 - `BotaoDeConfirmar`: o botão do que não se desfaz, com a confirmação em modal (`tipoDoConfirmar="primario"` quando não é risco).
-- `SemValor`, `Esqueleto`, `Carregando`, `Erro`, `Vazio`: os estados (o rótulo e a frase vêm por prop).
+- `SemValor`, `Esqueleto`, `Carregando`, `Erro`, `Vazio` (`solto`, `icone`, `filete`): os estados (o rótulo e a frase vêm por prop).
 - `Avisos`, `avisar`, `configurarAvisos`: o toast.
 - `CabecaDaFicha` (com `acoes`), `Codigo`, `Pares`, `Par` (`longo` não corta, `ocupa` estende), `Entidade`: as partes de uma ficha.
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.

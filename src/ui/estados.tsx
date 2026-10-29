@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, type LucideIcon } from "lucide-react";
 
 import type { ReactNode } from "react";
 
@@ -47,18 +47,38 @@ export function Erro({ frase, referencia, tentar }: { frase: string; referencia?
   );
 }
 
-/** A lista sem item: o título, a frase e a ação para começar. `solto` tira o contorno (dentro de um bloco). */
-export function Vazio({ titulo, descricao, acao, solto }: { titulo: ReactNode; descricao?: ReactNode; acao?: ReactNode; solto?: boolean }) {
+/**
+ * A lista sem item: o título, a frase e a ação para começar. `solto` tira o contorno (dentro de um bloco);
+ * `icone` põe o ícone do assunto no quadrado cobalto e `filete`, o filete no alto (o vazio que ocupa a tela).
+ */
+export function Vazio({
+  titulo,
+  descricao,
+  acao,
+  solto,
+  icone: Icone,
+  filete,
+}: {
+  titulo: ReactNode;
+  descricao?: ReactNode;
+  acao?: ReactNode;
+  solto?: boolean;
+  icone?: LucideIcon;
+  filete?: boolean;
+}) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center px-6 py-12 text-center",
-        !solto && "rounded-bloco border border-linha bg-superficie shadow-1",
-      )}
-    >
-      <div className="text-[15px] font-semibold">{titulo}</div>
-      {descricao && <p className="m-0 mt-1 max-w-sm text-[13px] text-texto-2">{descricao}</p>}
-      {acao && <div className="mt-4">{acao}</div>}
+    <div className={cn("overflow-hidden", !solto && "rounded-bloco border border-linha bg-superficie shadow-1")}>
+      {filete && <div className="filete" />}
+      <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+        {Icone && (
+          <span className="mb-3 flex size-12 items-center justify-center rounded-xl bg-cobalto-suave text-cobalto">
+            <Icone className="size-5" />
+          </span>
+        )}
+        <div className="text-[15px] font-semibold">{titulo}</div>
+        {descricao && <p className="m-0 mt-1 max-w-[56ch] text-[13px] text-texto-2">{descricao}</p>}
+        {acao && <div className="mt-4">{acao}</div>}
+      </div>
     </div>
   );
 }

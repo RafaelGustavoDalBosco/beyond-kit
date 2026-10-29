@@ -24,7 +24,7 @@ export function BlocoDestaque({
   return (
     <div
       className={cn(
-        "relative isolate overflow-hidden rounded-bloco bg-gradient-to-br from-[#eef3ff] via-[#e3ebff] to-[#d4e1ff] p-6 text-[#0f1a3d] shadow-2 ring-1 ring-[#c5d5ff]",
+        "relative isolate overflow-hidden rounded-bloco bg-gradient-to-br from-destaque-de via-destaque-meio to-destaque-ate p-6 text-destaque-texto shadow-2 ring-1 ring-destaque-anel",
         "",
         className,
       )}
@@ -33,7 +33,7 @@ export function BlocoDestaque({
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(420px_180px_at_90%_-30px,rgb(29_78_216/0.18),transparent_70%)]"
       />
-      <div className="text-[11px] font-semibold tracking-[0.1em] text-[#1d4ed8] uppercase">{rotulo}</div>
+      <div className="text-[11px] font-semibold tracking-[0.1em] text-cobalto uppercase">{rotulo}</div>
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <span className="text-[34px] leading-none font-semibold tracking-[-0.03em] tabular-nums">{valor}</span>
         {selo}
@@ -46,7 +46,7 @@ export function BlocoDestaque({
 /** O selo dentro do bloco de destaque (a estimativa, por exemplo). */
 export function SeloDoDestaque({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full border border-dashed border-[#1d4ed8]/40 px-2 py-0.5 text-[11px] text-[#1d4ed8]">
+    <span className="rounded-full border border-dashed border-cobalto/40 px-2 py-0.5 text-[11px] text-cobalto">
       {children}
     </span>
   );
@@ -57,12 +57,12 @@ export function LinhaDoDestaque({ rotulo, valor, fatia }: { rotulo: ReactNode; v
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
-        <span className="text-[#3a4a7a]">{rotulo}</span>
+        <span className="text-destaque-texto-2">{rotulo}</span>
         <span className="numero font-medium">{valor}</span>
       </div>
       {fatia != null && (
-        <div className="h-1 overflow-hidden rounded-full bg-[#1d4ed8]/12">
-          <div className="h-full rounded-full bg-[#1d4ed8]" style={{ width: `${fatia}%` }} />
+        <div className="h-1 overflow-hidden rounded-full bg-cobalto/12">
+          <div className="h-full rounded-full bg-cobalto" style={{ width: `${fatia}%` }} />
         </div>
       )}
     </div>

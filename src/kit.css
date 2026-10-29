@@ -40,6 +40,24 @@
   --lateral-texto: #c3cbe0;
   --lateral-ativo: #ffffff;
   --lateral-cheio: #2447b8;
+  /* o estado sobre o menu escuro: o aviso e o ganho do claro somem no cobalto escuro */
+  --lateral-aviso: #fbbf24;
+  --lateral-ganho: #34d399;
+
+  /* o "Cobalto claro" do BlocoDestaque: o degradê, o anel e os dois textos sobre ele */
+  --destaque-de: #eef3ff;
+  --destaque-meio: #e3ebff;
+  --destaque-ate: #d4e1ff;
+  --destaque-anel: #c5d5ff;
+  --destaque-texto: #0f1a3d;
+  --destaque-texto-2: #3a4a7a;
+
+  /* as séries de um gráfico, na ordem (sem sentido: o verde, o laranja e o vermelho ficam para ganho, aviso e risco) */
+  --serie-1: #1d4ed8;
+  --serie-2: #60a5fa;
+  --serie-3: #a5b4fc;
+  --serie-4: #1e3a8a;
+  --serie-5: #8b92a0;
 
   --sombra-1: 0 1px 2px rgb(13 17 23 / 0.05);
   --sombra-2: 0 2px 4px rgb(13 17 23 / 0.04), 0 8px 24px rgb(13 17 23 / 0.06);
@@ -78,6 +96,19 @@
   --color-lateral-texto: var(--lateral-texto);
   --color-lateral-ativo: var(--lateral-ativo);
   --color-lateral-cheio: var(--lateral-cheio);
+  --color-lateral-aviso: var(--lateral-aviso);
+  --color-lateral-ganho: var(--lateral-ganho);
+  --color-destaque-de: var(--destaque-de);
+  --color-destaque-meio: var(--destaque-meio);
+  --color-destaque-ate: var(--destaque-ate);
+  --color-destaque-anel: var(--destaque-anel);
+  --color-destaque-texto: var(--destaque-texto);
+  --color-destaque-texto-2: var(--destaque-texto-2);
+  --color-serie-1: var(--serie-1);
+  --color-serie-2: var(--serie-2);
+  --color-serie-3: var(--serie-3);
+  --color-serie-4: var(--serie-4);
+  --color-serie-5: var(--serie-5);
 
   --shadow-1: var(--sombra-1);
   --shadow-2: var(--sombra-2);
