@@ -1,0 +1,38 @@
+{
+  "name": "@dalbosco/kit",
+  "version": "0.1.0",
+  "description": "Kit de UI da Dal Bosco Systems (Cobalto com a gramática do ArchFlow): fonte TypeScript e CSS, sem build.",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": "./src/index.ts",
+    "./css": "./src/kit.css",
+    "./tanstack": "./src/adaptadores/tanstack.ts",
+    "./next": "./src/adaptadores/next.ts",
+    "./ui/*": "./src/ui/*.tsx",
+    "./src/*": "./src/*"
+  },
+  "files": ["src", "README.md"],
+  "peerDependencies": {
+    "@tanstack/react-router": "^1",
+    "@tanstack/react-table": "^8",
+    "class-variance-authority": "^0.7",
+    "clsx": "^2",
+    "lucide-react": "^1",
+    "next": ">=15",
+    "radix-ui": "^1.8",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwind-merge": "^3"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-router": { "optional": true },
+    "@tanstack/react-table": { "optional": true },
+    "next": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "~5.8"
+  }
+}

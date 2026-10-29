@@ -1,0 +1,174 @@
+/* @dalbosco/kit: os tokens, o tema, a base e as utilities. Não importa o Tailwind: o projeto faz
+   `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`. */
+
+@font-face {
+  font-family: "Sora";
+  src: url("./fonts/Sora-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+/* Cobalto, só claro; o menu lateral é cobalto escuro. Cor só com sentido: cobalto é ação e seleção, verde é
+   ganho, laranja é o que pede ação ou ressalva o número, vermelho é risco. */
+:root {
+  --fundo: #f4f5f8;
+  --superficie: #ffffff;
+  --superficie-2: #f0f2f6;
+  --superficie-3: #e8ebf1;
+  --linha: #e4e7ee;
+  --linha-forte: #cdd2dc;
+  --texto: #0d1117;
+  --texto-2: #545c6b;
+  --texto-3: #8b92a0;
+
+  --cobalto: #1d4ed8;
+  --cobalto-forte: #1e40af;
+  --cobalto-suave: #ebf0fe;
+  --cobalto-tinta: #1d3fb0;
+  --sobre-cobalto: #ffffff;
+
+  --ganho: #0f7b4a;
+  --ganho-suave: #e7f5ee;
+  --aviso: #b45309;
+  --aviso-suave: #fdf1e3;
+  --risco: #c0362c;
+  --risco-suave: #fcedeb;
+
+  --lateral: #0f1d4a;
+  --lateral-2: rgb(255 255 255 / 0.08);
+  --lateral-linha: rgb(255 255 255 / 0.1);
+  --lateral-texto: #c3cbe0;
+  --lateral-ativo: #ffffff;
+  --lateral-cheio: #2447b8;
+
+  --sombra-1: 0 1px 2px rgb(13 17 23 / 0.05);
+  --sombra-2: 0 2px 4px rgb(13 17 23 / 0.04), 0 8px 24px rgb(13 17 23 / 0.06);
+  --sombra-3: 0 12px 32px rgb(13 17 23 / 0.14), 0 2px 6px rgb(13 17 23 / 0.06);
+  --veu: rgb(13 17 23 / 0.32);
+  --brilho: rgb(29 78 216 / 0.06);
+  --filete: linear-gradient(90deg, #1e3a8a, #1d4ed8 45%, #60a5fa);
+}
+
+@theme inline {
+  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-superficie-3: var(--superficie-3);
+  --color-linha: var(--linha);
+  --color-linha-forte: var(--linha-forte);
+  --color-texto: var(--texto);
+  --color-texto-2: var(--texto-2);
+  --color-texto-3: var(--texto-3);
+  --color-cobalto: var(--cobalto);
+  --color-cobalto-forte: var(--cobalto-forte);
+  --color-cobalto-suave: var(--cobalto-suave);
+  --color-cobalto-tinta: var(--cobalto-tinta);
+  --color-sobre-cobalto: var(--sobre-cobalto);
+  --color-ganho: var(--ganho);
+  --color-ganho-suave: var(--ganho-suave);
+  --color-aviso: var(--aviso);
+  --color-aviso-suave: var(--aviso-suave);
+  --color-risco: var(--risco);
+  --color-risco-suave: var(--risco-suave);
+  --color-lateral: var(--lateral);
+  --color-lateral-2: var(--lateral-2);
+  --color-lateral-linha: var(--lateral-linha);
+  --color-lateral-texto: var(--lateral-texto);
+  --color-lateral-ativo: var(--lateral-ativo);
+  --color-lateral-cheio: var(--lateral-cheio);
+
+  --shadow-1: var(--sombra-1);
+  --shadow-2: var(--sombra-2);
+  --shadow-3: var(--sombra-3);
+
+  --radius-controle: 10px;
+  --radius-bloco: 16px;
+  --radius-ficha: 20px;
+
+  --animate-entrar: entrar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-subir: subir 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-brilhar: brilhar 1.4s ease-in-out infinite;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes subir {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes brilhar {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01";
+  }
+  ::selection {
+    background: var(--cobalto-suave);
+  }
+  :focus-visible {
+    outline: 2px solid var(--cobalto);
+    outline-offset: 2px;
+  }
+}
+
+/* Número de tabela e código (CNPJ, NCM, CFOP, chave): a Sora com algarismos
+   de largura fixa, para as colunas alinharem. Uma fonte só no front. */
+@utility numero {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility rotulo {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+/* O filete cobalto no alto de uma ficha, de um registro e de um modal. */
+@utility filete {
+  background-image: var(--filete);
+  height: 3px;
+}
+
+/* Título de seção: caixa alta com a barra cobalto à esquerda. */
+@utility titulo-secao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+  &::before {
+    content: "";
+    width: 4px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--cobalto);
+    flex-shrink: 0;
+  }
+}
+
+/* O brilho cobalto no alto da área de conteúdo. */
+@utility aurora {
+  background-image: radial-gradient(1200px 320px at 30% -120px, var(--brilho), transparent 70%);
+}

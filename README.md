@@ -1,0 +1,79 @@
+# @dalbosco/kit
+
+O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só claro, só Sora. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 (Next.js 15/16 ou Vite).
+
+## Adoção
+
+1. **Instalar** o pacote por tag do git e os peers que faltarem:
+
+   ```sh
+   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.1.0
+   npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
+   npm i @tanstack/react-table   # se usar a Tabela
+   ```
+
+   `import { ... } from "@dalbosco/kit"` traz o núcleo inteiro (inclusive a `Tabela`, que pede o `@tanstack/react-table`); quem não a usa importa componente a componente por `@dalbosco/kit/ui/botao`, `@dalbosco/kit/ui/modal` etc.
+
+2. **CSS**: no `globals.css` (Next) ou `index.css` (Vite):
+
+   ```css
+   @import "tailwindcss";
+   @import "@dalbosco/kit/css";
+   @source "../node_modules/@dalbosco/kit/src";
+   ```
+
+   Ajuste o caminho do `@source` à pasta do CSS. Sem Google Fonts: a Sora vem no pacote (`@font-face` no `kit.css`).
+
+3. **Avisos** (o toast): `<Avisos />` uma vez na raiz e, se a API tiver um erro próprio, a frase dele:
+
+   ```ts
+   import { Avisos, avisar, configurarAvisos } from "@dalbosco/kit";
+   configurarAvisos({ fraseDoErro: (erro) => (erro instanceof ErroApi ? erro.message : "A plataforma não respondeu.") });
+   avisar.sucesso("Salvo."); avisar.erro(erro);
+   ```
+
+4. **Pilha de fichas** (o modal empilhado que mora na URL, `?ficha=produto:1001|nota:196`): o `usePilha` vem do adaptador do roteador e a moldura recebe o registro das fichas:
+
+   ```tsx
+   import { usePilha } from "@dalbosco/kit/next"; // ou "@dalbosco/kit/tanstack"
+   import { PilhaDeFichas } from "@dalbosco/kit";
+
+   <PilhaDeFichas
+     usePilha={usePilha}
+     fichas={{
+       produto: { icone: Package, rotulo: "Produto", titulo: (id) => <TituloDoProduto codigo={id} />, render: (id) => <FichaProduto codigo={id} /> },
+     }}
+   />
+   ```
+
+   Abrir de qualquer lugar: `usePilha().abrir({ tipo: "produto", id: "1001" })`; `abrirSo` abre do zero (uma linha de lista); `voltar`, `voltarPara(i)` e `fechar` descem a pilha, pelo histórico do navegador enquanto ele cobrir. Para restringir os tipos que a URL pode abrir: `criarUsePilha(useAdaptadorDaPilha, ["produto", "nota"] as const)`.
+
+   No Next, a pilha, a paleta e os componentes com estado vivem em client components (`"use client"` no arquivo que os usa); o `useSearchParams` do adaptador pede um `<Suspense>` por volta na renderização estática.
+
+5. **A gramática**: cobalto é ação e seleção, verde ganho, laranja o que pede ação, vermelho risco. Toda lista é master/detail (`MestreDetalhe`); formulário e confirmação abrem em modal (`Modal`, `BotaoDeConfirmar`); o resultado de uma ação vai ao toast (`avisar`); número e código levam a classe `numero`; `titulo-secao` e `filete` nas fichas, nos detalhes e nos modais; `rotulo` no texto em caixa alta apagado; `aurora` no alto da área de conteúdo.
+
+## Componentes
+
+- `Botao` (primario, secundario, fantasma, ganho, perigo; md, sm, icone, icone-sm) e `Tecla` (o kbd).
+- `Campo`, `Busca`, `Rotulado`, `AreaDeTexto`, `Escolha`, `SimNao`, `Caixa`: os controles de formulário.
+- `Bloco`, `CabecaDoBloco`, `Destaque`: a unidade da tela e o número de destaque dentro dela.
+- `BlocoDestaque`, `SeloDoDestaque`, `LinhaDoDestaque`: o "Cobalto claro", o número que abre a tela; `Indicador`: o cartão de número com ícone e filete.
+- `Selo` (neutro, cobalto, ganho, aviso, risco, contorno; `comPonto`) e o tipo `Tom`.
+- `Abas`, `TrilhoDeAbas`, `Aba`, `ConteudoDaAba`: as abas segmentadas, com contagem.
+- `MestreDetalhe`, `ItemDaLista`, `PaginasDaLista`: a lista à esquerda, o detalhe à direita.
+- `Tabela` (TanStack Table; `meta.numero` alinha à direita, `meta.principal` fica com a sobra) e o tipo `Pagina`.
+- `Modal` e `Cancelar`: o modal de ação (filete, título de seção, rodapé; fecha só pelo × ou Cancelar).
+- `BotaoDeConfirmar`: o botão do que não se desfaz, com a confirmação em modal.
+- `SemValor`, `Esqueleto`, `Carregando`, `Erro`: os estados (o rótulo e a frase vêm por prop).
+- `Avisos`, `avisar`, `configurarAvisos`: o toast.
+- `CabecaDaFicha`, `Codigo`, `Pares`, `Par`, `Entidade`: as partes de uma ficha.
+- `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.
+- `Paleta`, `useAtalhoDaBusca`, `usePausa`: a paleta Ctrl K (os grupos vêm do consumidor) e os tipos `GrupoDaPaleta`, `ItemDaPaleta`.
+- `CartaoDoFormulario`, `CampoDoFormulario`, `Mes`, `BarraDeSalvar`: o formulário de parâmetros e a barra presa no pé.
+- `cn` e a formatação pt-BR (`moeda`, `moedaUnitaria`, `numero`, `contagem`, `percentual`, `documento`, `ncm`, `data`, `dataHora`, `periodo`, `periodoLongo`, `iniciais`).
+
+Adaptadores: `@dalbosco/kit/tanstack` e `@dalbosco/kit/next` exportam `useAdaptadorDaPilha` e o `usePilha` pronto.
+
+## O que não está no kit
+
+O seletor de mês, as fichas da plataforma (produto, nota, fornecedor), os rótulos do `/rotulos`, o cliente da API e os erros dele (`ErroApi`, `ErroRede`): isso é de cada projeto, montado em cima do kit.
