@@ -19,6 +19,8 @@ export * from "./ui/tela";
 
 export * from "./aviso/aviso";
 
+export * from "./acesso/acesso";
+
 export * from "./ficha/partes";
 export * from "./ficha/pilha";
 export * from "./ficha/PilhaDeFichas";

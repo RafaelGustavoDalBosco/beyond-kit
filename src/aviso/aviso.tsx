@@ -38,6 +38,9 @@ export function configurarAvisos(opcoes: { fraseDoErro?: (erro: unknown) => stri
   if (opcoes.fraseDoErro) config.fraseDoErro = opcoes.fraseDoErro;
 }
 
+/** A frase de uma recusa, a mesma que o `avisar.erro` mostraria (para a recusa que fica na tela, como a do login). */
+export const fraseDoErro = (erro: unknown) => config.fraseDoErro(erro);
+
 export const avisar = {
   sucesso: (texto: string) => mostrar("sucesso", texto),
   erro: (erro: unknown) => mostrar("erro", config.fraseDoErro(erro)),
