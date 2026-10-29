@@ -43,7 +43,7 @@ export function Nota({
   return (
     <div
       role={tom === "risco" ? "alert" : "status"}
-      className={cn("flex items-start gap-3 rounded-xl border px-4 py-3 text-[13px] leading-relaxed", COR[tom], className)}
+      className={cn("flex items-start gap-3 rounded-xl border px-4 py-3 text-sm leading-relaxed", COR[tom], className)}
     >
       <Icone className="mt-[3px] size-4 shrink-0" aria-hidden />
       <div className="min-w-0 flex-1">

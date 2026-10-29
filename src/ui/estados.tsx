@@ -21,7 +21,7 @@ export function Esqueleto({ className }: { className?: string }) {
 export function Carregando({ linhas = 4, rotulo }: { linhas?: number; rotulo?: string }) {
   return (
     <div className="flex flex-col gap-3 p-5">
-      {rotulo && <span className="text-[13px] text-texto-3">{rotulo}</span>}
+      {rotulo && <span className="text-sm text-texto-3">{rotulo}</span>}
       {Array.from({ length: linhas }, (_, i) => (
         <Esqueleto key={i} className="h-4" />
       ))}
@@ -32,7 +32,7 @@ export function Carregando({ linhas = 4, rotulo }: { linhas?: number; rotulo?: s
 /** A recusa: a frase pronta e, quando houver, a referência (o request id) ao lado. */
 export function Erro({ frase, referencia, tentar }: { frase: string; referencia?: string | null; tentar?: () => void }) {
   return (
-    <div className="flex items-center gap-3 p-5 text-[13px]">
+    <div className="flex items-center gap-3 p-5 text-sm">
       <CircleAlert className="size-4 shrink-0 text-risco" />
       <div className="flex-1">
         {frase}
@@ -76,7 +76,7 @@ export function Vazio({
           </span>
         )}
         <div className="text-[15px] font-semibold">{titulo}</div>
-        {descricao && <p className="m-0 mt-1 max-w-[56ch] text-[13px] text-texto-2">{descricao}</p>}
+        {descricao && <p className="m-0 mt-1 max-w-[56ch] text-sm text-texto-2">{descricao}</p>}
         {acao && <div className="mt-4">{acao}</div>}
       </div>
     </div>

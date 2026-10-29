@@ -90,7 +90,7 @@ export function CampoMoeda(props: PropsDoCampoMoeda) {
 
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[13px] text-texto-3">R$</span>
+      <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-texto-3">R$</span>
       <Campo
         inputMode="decimal"
         className={cn("numero pl-10 text-right", className)}

@@ -126,13 +126,13 @@ export function Paleta({
             />
           </div>
           <div id={idDaLista} role="listbox" className="min-h-0 flex-1 overflow-y-auto pb-2">
-            {!vale && <p className="m-0 px-6 py-6 text-center text-[13px] text-texto-3">Digite para buscar</p>}
+            {!vale && <p className="m-0 px-6 py-6 text-center text-sm text-texto-3">Digite para buscar</p>}
             {vale && erro && <Erro frase={erro.frase} referencia={erro.referencia} tentar={erro.tentar} />}
             {vale && !erro && carregando && lista.length === 0 && (
-              <p className="m-0 px-6 py-6 text-center text-[13px] text-texto-3">Buscando…</p>
+              <p className="m-0 px-6 py-6 text-center text-sm text-texto-3">Buscando…</p>
             )}
             {vale && !erro && !carregando && lista.length === 0 && (
-              <p className="m-0 px-6 py-6 text-center text-[13px] text-texto-3">Nada encontrado</p>
+              <p className="m-0 px-6 py-6 text-center text-sm text-texto-3">Nada encontrado</p>
             )}
             {visiveis.map((g) => (
               <section key={g.titulo} className="pt-3">
@@ -153,7 +153,7 @@ export function Paleta({
                       onMouseEnter={() => setAtivo(i)}
                       onClick={() => escolher(r)}
                       className={cn(
-                        "relative flex w-full cursor-pointer items-center gap-3 px-6 py-2 text-left text-[13px] text-texto transition-colors",
+                        "relative flex w-full cursor-pointer items-center gap-3 px-6 py-2 text-left text-sm text-texto transition-colors",
                         marcado ? "bg-cobalto-suave" : "hover:bg-superficie-2",
                       )}
                     >
@@ -166,7 +166,7 @@ export function Paleta({
               </section>
             ))}
           </div>
-          <div className="flex shrink-0 items-center gap-4 border-t border-linha bg-superficie-2/60 px-6 py-2 text-[11.5px] text-texto-3">
+          <div className="flex shrink-0 items-center gap-4 border-t border-linha bg-superficie-2/60 px-6 py-2 text-xs text-texto-3">
             <span className="flex items-center gap-1">
               <Tecla>↑</Tecla>
               <Tecla>↓</Tecla> navegar

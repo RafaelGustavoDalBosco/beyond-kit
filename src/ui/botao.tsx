@@ -8,7 +8,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 const estilo = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-controle font-medium whitespace-nowrap transition-[background,box-shadow,color] select-none disabled:cursor-default disabled:opacity-45 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-controle font-medium whitespace-nowrap transition-[background,box-shadow,color] select-none disabled:cursor-default disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       tipo: {
@@ -21,7 +21,7 @@ const estilo = cva(
         lateral: "text-lateral-texto hover:bg-lateral-2 hover:text-lateral-ativo",
       },
       tamanho: {
-        md: "h-9 px-3.5 text-[13px]",
+        md: "h-9 px-3.5 text-sm",
         sm: "h-7 px-2.5 text-xs [&_svg]:size-3.5",
         icone: "size-9",
         "icone-sm": "size-7 [&_svg]:size-3.5",

@@ -24,13 +24,13 @@ export function CabecaDaFicha({
 }) {
   return (
     <div className="flex gap-4 px-6 pt-6 pb-5">
-      <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-cobalto-suave text-cobalto">
+      <div className="icone-cheio flex size-11 shrink-0 items-center justify-center rounded-xl">
         <Icone className="size-5" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="rotulo flex items-center gap-2">{tipo}</div>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <h2 className="m-0 min-w-0 text-xl leading-tight font-semibold tracking-[-0.015em] [overflow-wrap:anywhere]">{titulo}</h2>
+          <h2 className="m-0 min-w-0 text-xl leading-tight font-bold tracking-tight [overflow-wrap:anywhere]">{titulo}</h2>
           {selos}
         </div>
         {codigos && <div className="mt-3 flex flex-wrap items-center gap-1.5">{codigos}</div>}
@@ -91,7 +91,7 @@ export function Par({ rotulo, longo, ocupa, children }: { rotulo: string; longo?
       style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
     >
       <dt className="text-xs text-texto-3">{rotulo}</dt>
-      <dd className={cn("m-0 text-[13px] font-medium", longo ? "whitespace-pre-line [overflow-wrap:anywhere]" : "truncate")}>{children}</dd>
+      <dd className={cn("m-0 text-sm font-medium", longo ? "whitespace-pre-line [overflow-wrap:anywhere]" : "truncate")}>{children}</dd>
     </div>
   );
 }

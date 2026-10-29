@@ -28,7 +28,7 @@ export function CabecaDoBloco({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <div className="text-[13px] font-semibold">{titulo}</div>
+        <div className="text-sm font-semibold">{titulo}</div>
         {detalhe && <div className="text-xs text-texto-3">{detalhe}</div>}
       </div>
       {acao}

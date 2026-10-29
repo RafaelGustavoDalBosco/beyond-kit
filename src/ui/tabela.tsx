@@ -111,16 +111,16 @@ export function Tabela<T>({
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-[13px]">
+        <table className="w-full border-collapse text-sm">
           <thead>
             {tabela.getHeaderGroups().map((g) => (
               <tr key={g.id}>
-                {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie" />}
+                {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
                 {g.headers.map((h) => (
                   <th
                     key={h.id}
                     className={cn(
-                      "rotulo sticky top-0 h-9 border-b border-linha bg-superficie px-4 text-left font-medium whitespace-nowrap",
+                      "rotulo sticky top-0 h-10 border-b border-linha bg-superficie-2 px-4 text-left whitespace-nowrap",
                       h.column.columnDef.meta?.numero && "text-right",
                       h.column.columnDef.meta?.principal && "w-full",
                       h.column.columnDef.meta?.fixa && "left-0 z-10",
@@ -130,7 +130,7 @@ export function Tabela<T>({
                     {flexRender(h.column.columnDef.header, h.getContext())}
                   </th>
                 ))}
-                {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie" />}
+                {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
               </tr>
             ))}
           </thead>

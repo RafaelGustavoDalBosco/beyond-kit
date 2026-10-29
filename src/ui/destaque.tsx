@@ -78,7 +78,7 @@ export function SeloDoDestaque({ children }: { children: ReactNode }) {
 export function LinhaDoDestaque({ rotulo, valor, fatia }: { rotulo: ReactNode; valor: ReactNode; fatia?: number | null }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
+      <div className="flex items-baseline justify-between gap-3 text-[13px]">
         <span className="text-destaque-texto-2">{rotulo}</span>
         <span className="numero font-medium">{valor}</span>
       </div>

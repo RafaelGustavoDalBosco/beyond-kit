@@ -48,7 +48,7 @@ export function BotaoDeConfirmar({
           </>
         }
       >
-        {frase && <div className="m-0 text-[13px] leading-relaxed text-texto-2">{frase}</div>}
+        {frase && <div className="m-0 text-sm leading-relaxed text-texto-2">{frase}</div>}
       </Modal>
     </>
   );
@@ -102,7 +102,7 @@ export function useConfirmar() {
         </>
       }
     >
-      {opcoes.frase && <div className="m-0 text-[13px] leading-relaxed text-texto-2">{opcoes.frase}</div>}
+      {opcoes.frase && <div className="m-0 text-sm leading-relaxed text-texto-2">{opcoes.frase}</div>}
     </Modal>
   );
 

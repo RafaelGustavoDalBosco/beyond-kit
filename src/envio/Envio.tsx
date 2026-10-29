@@ -71,7 +71,7 @@ export function SoltarArquivos({
         </span>
         <span className="text-[14px] font-semibold">{arrastando ? "Solte para juntar" : titulo}</span>
         {dica && <span className="text-xs text-texto-3">{dica}</span>}
-        <span className="mt-1 text-[12.5px] font-medium text-cobalto">Escolher arquivos</span>
+        <span className="mt-1 text-[13px] font-medium text-cobalto">Escolher arquivos</span>
       </button>
     </>
   );
@@ -108,7 +108,7 @@ export function ListaDeArquivos({
           const Icone = eZip(a) ? FileArchive : FileText;
           const linha = aviso?.(a);
           return (
-            <li key={`${a.name}-${a.size}`} className="flex items-center gap-3 border-b border-linha px-4 py-2 text-[13px] last:border-b-0">
+            <li key={`${a.name}-${a.size}`} className="flex items-center gap-3 border-b border-linha px-4 py-2 text-sm last:border-b-0">
               <Icone className="size-4 shrink-0 text-texto-3" />
               <div className="min-w-0 flex-1">
                 <div className="numero truncate">{a.name}</div>
@@ -130,7 +130,7 @@ export function ListaDeArquivos({
 export function BarraDeProgresso({ rotulo, valor, parte, esperando }: { rotulo: string; valor: string; parte: number; esperando?: boolean }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex justify-between text-[12.5px]">
+      <div className="flex justify-between text-[13px]">
         <span className="font-medium">{rotulo}</span>
         <span className="numero text-texto-3">{valor}</span>
       </div>

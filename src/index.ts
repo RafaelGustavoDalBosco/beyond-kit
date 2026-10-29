@@ -15,6 +15,8 @@ export * from "./ui/estados";
 export * from "./ui/mestre-detalhe";
 export * from "./ui/modal";
 export * from "./ui/nota";
+export * from "./ui/quadro";
+export * from "./ui/registro";
 export * from "./ui/segredo";
 export * from "./ui/selo";
 export * from "./ui/tabela";

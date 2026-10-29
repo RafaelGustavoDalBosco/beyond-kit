@@ -71,7 +71,7 @@ export function Avisos() {
             className="pointer-events-auto flex animate-entrar items-start gap-3 rounded-xl border border-linha bg-superficie px-4 py-3 shadow-3"
           >
             <Icone className={cn("mt-px size-[18px] shrink-0", COR[a.tipo])} />
-            <span className="flex-1 text-[13px] leading-snug font-medium">{a.texto}</span>
+            <span className="flex-1 text-sm leading-snug font-medium">{a.texto}</span>
             <button
               type="button"
               aria-label="Fechar"

@@ -31,7 +31,7 @@ export function Segredo({
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="rotulo">{nome}</div>
         <div className="flex items-start gap-2 rounded-lg border border-linha bg-superficie px-3 py-2">
-          <span className="numero min-w-0 flex-1 text-[13px] leading-relaxed [overflow-wrap:anywhere] select-all">{valor}</span>
+          <span className="numero min-w-0 flex-1 text-sm leading-relaxed [overflow-wrap:anywhere] select-all">{valor}</span>
           <Botao
             tipo="fantasma"
             tamanho="icone-sm"
@@ -60,7 +60,7 @@ export function Segredo({
 export function SenhaGerada({ usuario, senha, aviso }: { usuario: string; senha: string; aviso?: ReactNode }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-cobalto/30 bg-cobalto-suave px-4 py-3">
-      <div className="flex items-center gap-2 text-[13px] font-semibold text-cobalto-tinta">
+      <div className="flex items-center gap-2 text-sm font-semibold text-cobalto-tinta">
         <KeyRound className="size-4" />
         Senha de <span className="numero">{usuario}</span>
       </div>

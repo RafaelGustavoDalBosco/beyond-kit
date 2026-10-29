@@ -92,13 +92,13 @@ export function CampoDoFormulario({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium text-texto-2">
+      <label htmlFor={id} className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.06em] text-texto-3 uppercase">
         {rotulo}
         {mudou && <span className="size-1.5 rounded-full bg-cobalto" aria-hidden />}
       </label>
       {children}
       {rodape && <div className="text-xs text-texto-2">{rodape}</div>}
-      {ajuda && <p className="m-0 text-[11.5px] leading-relaxed text-texto-3">{ajuda}</p>}
+      {ajuda && <p className="m-0 text-xs leading-relaxed text-texto-3">{ajuda}</p>}
     </div>
   );
 }
@@ -127,7 +127,7 @@ export function BarraDeSalvar({
         grupos ? "border-cobalto/50" : "border-linha",
       )}
     >
-      <span className="flex flex-1 items-center gap-2 text-[13px]">
+      <span className="flex flex-1 items-center gap-2 text-sm">
         {grupos > 0 ? (
           <>
             <span className="size-2 rounded-full bg-cobalto" aria-hidden />

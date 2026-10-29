@@ -5,7 +5,7 @@ import { cn } from "../lib/cn";
 
 // Selo: o estado de um valor ou de um item. O ponto dá a cor; o fundo é leve.
 const estilo = cva(
-  "inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-full px-2 text-[11.5px] font-medium whitespace-nowrap [&_svg]:size-3",
+  "inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-full px-2 text-xs font-medium whitespace-nowrap [&_svg]:size-3",
   {
     variants: {
       tom: {

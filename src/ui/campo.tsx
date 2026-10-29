@@ -1,10 +1,11 @@
 "use client";
 
-import { Check, Search } from "lucide-react";
+import { Check, Search, type LucideIcon } from "lucide-react";
 import {
   createContext,
   useContext,
   useId,
+  type CSSProperties,
   type InputHTMLAttributes,
   type ReactNode,
   type SelectHTMLAttributes,
@@ -14,7 +15,7 @@ import {
 import { cn } from "../lib/cn";
 
 const base =
-  "h-9 w-full rounded-controle border border-linha bg-superficie px-3 text-[13px] text-texto shadow-1 outline-none transition-[border,box-shadow] placeholder:text-texto-3 enabled:hover:border-linha-forte focus:border-cobalto focus:ring-3 focus:ring-cobalto-suave disabled:cursor-default disabled:bg-superficie-2 disabled:text-texto-2";
+  "h-9 w-full rounded-controle border border-linha bg-superficie px-3 text-sm text-texto shadow-1 outline-none transition-[border,box-shadow] placeholder:text-texto-3 enabled:hover:border-linha-forte focus:border-cobalto focus:ring-3 focus:ring-cobalto-suave disabled:cursor-default disabled:bg-superficie-2 disabled:text-texto-2";
 
 /** O id que o `Rotulado` dá ao controle de dentro (o `htmlFor` do rótulo). */
 const IdDoRotulado = createContext<string | undefined>(undefined);
@@ -54,6 +55,7 @@ export function Rotulado({
   obrigatorio,
   opcional,
   acao,
+  ocupa,
   className,
   children,
 }: {
@@ -64,6 +66,8 @@ export function Rotulado({
   obrigatorio?: boolean;
   opcional?: boolean;
   acao?: ReactNode;
+  /** Dentro da `GradeDoFormulario`: quantas colunas o campo ocupa (a observação, o caminho do arquivo). */
+  ocupa?: number;
   /** Aceito por compatibilidade: o rótulo já não envolve o controle. */
   como?: "label" | "div";
   className?: string;
@@ -72,9 +76,12 @@ export function Rotulado({
   const gerado = useId();
   const id = htmlFor ?? gerado;
   return (
-    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
+    <div
+      className={cn("flex min-w-0 flex-col gap-1.5", ocupa && "sm:col-span-(--ocupa)", className)}
+      style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
+    >
       <div className="flex items-baseline gap-1.5">
-        <label htmlFor={id} className="text-xs font-medium text-texto-2">
+        <label htmlFor={id} className="text-xs font-semibold tracking-[0.06em] text-texto-3 uppercase">
           {rotulo}
           {obrigatorio && (
             <>
@@ -87,9 +94,42 @@ export function Rotulado({
         {acao && <div className="ml-auto text-xs [&_a]:text-cobalto [&_a:hover]:underline">{acao}</div>}
       </div>
       <IdDoRotulado.Provider value={id}>{children}</IdDoRotulado.Provider>
-      {ajuda && !erro && <span className="text-[11.5px] leading-relaxed text-texto-3">{ajuda}</span>}
-      {erro && <span className="text-[11.5px] text-risco">{erro}</span>}
+      {ajuda && !erro && <span className="text-xs leading-relaxed text-texto-3">{ajuda}</span>}
+      {erro && <span className="text-xs text-risco">{erro}</span>}
     </div>
+  );
+}
+
+/** Os campos de um formulário em grade (duas colunas por padrão; uma só abaixo de `sm`); o `Rotulado` estende com
+ * `ocupa`. */
+export function GradeDoFormulario({ colunas = 2, className, children }: { colunas?: 2 | 3 | 4; className?: string; children: ReactNode }) {
+  return (
+    <div className={cn("grid grid-cols-1 gap-4", { 2: "sm:grid-cols-2", 3: "sm:grid-cols-3", 4: "sm:grid-cols-4" }[colunas], className)}>
+      {children}
+    </div>
+  );
+}
+
+/** Um grupo do formulário: a caixa cinza com o título de seção (opcionalmente com ícone) e os campos dentro. */
+export function SecaoDoFormulario({
+  titulo,
+  icone: Icone,
+  children,
+  className,
+}: {
+  titulo: ReactNode;
+  icone?: LucideIcon;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn("rounded-xl border border-linha bg-superficie-2/60 p-4", className)}>
+      <h3 className="titulo-secao m-0 mb-4">
+        {Icone && <Icone className="size-3.5 text-cobalto" />}
+        {titulo}
+      </h3>
+      {children}
+    </section>
   );
 }
 
@@ -99,7 +139,7 @@ export function AreaDeTexto({ className, id, ...props }: TextareaHTMLAttributes<
 }
 
 const ESTILO_DA_ESCOLHA =
-  "h-9 w-full cursor-pointer rounded-controle border border-linha bg-superficie px-2.5 text-[13px] text-texto shadow-1 outline-none transition-[border,box-shadow] hover:border-linha-forte focus:border-cobalto focus:ring-3 focus:ring-cobalto-suave disabled:cursor-default disabled:bg-superficie-2 disabled:opacity-70";
+  "h-9 w-full cursor-pointer rounded-controle border border-linha bg-superficie px-2.5 text-sm text-texto shadow-1 outline-none transition-[border,box-shadow] hover:border-linha-forte focus:border-cobalto focus:ring-3 focus:ring-cobalto-suave disabled:cursor-default disabled:bg-superficie-2 disabled:opacity-70";
 
 /**
  * A escolha entre opções. A vazia é o traço (o campo sem resposta); `vazio`
@@ -139,7 +179,7 @@ export function SimNao(props: Omit<SelectHTMLAttributes<HTMLSelectElement>, "chi
 /** A caixa de seleção: a marca cobalto quando ligada, com o rótulo ao lado. */
 export function Caixa({ children, className, ...props }: InputHTMLAttributes<HTMLInputElement> & { children?: ReactNode }) {
   return (
-    <label className={cn("group inline-flex cursor-pointer items-center gap-2 text-[13px] text-texto has-disabled:cursor-default has-disabled:opacity-60", className)}>
+    <label className={cn("group inline-flex cursor-pointer items-center gap-2 text-sm text-texto has-disabled:cursor-default has-disabled:opacity-60", className)}>
       <span className="relative flex size-4 shrink-0 items-center justify-center">
         <input type="checkbox" className="peer absolute inset-0 m-0 size-4 cursor-pointer appearance-none rounded-[5px] border border-linha-forte bg-superficie shadow-1 transition-[background,border] checked:border-cobalto checked:bg-cobalto hover:border-cobalto focus-visible:ring-3 focus-visible:ring-cobalto-suave disabled:cursor-default" {...props} />
         <Check className="pointer-events-none relative size-3 text-white opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
@@ -164,7 +204,7 @@ export function Alternativa({
   return (
     <label
       className={cn(
-        "group inline-flex cursor-pointer items-center gap-2 text-[13px] text-texto has-disabled:cursor-default has-disabled:opacity-60",
+        "group inline-flex cursor-pointer items-center gap-2 text-sm text-texto has-disabled:cursor-default has-disabled:opacity-60",
         cartao &&
           "flex items-start gap-3 rounded-controle border border-linha bg-superficie p-3 shadow-1 transition-[border,background] has-checked:border-cobalto has-checked:bg-cobalto-suave",
         className,

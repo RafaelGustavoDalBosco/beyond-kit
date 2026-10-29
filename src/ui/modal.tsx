@@ -5,7 +5,6 @@ import { Dialog } from "radix-ui";
 import type { ReactNode } from "react";
 
 import { avisar } from "../aviso/aviso";
-import { cn } from "../lib/cn";
 
 import { Botao } from "./botao";
 
@@ -53,7 +52,7 @@ export function Modal({
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>
           {rodape && (
-            <div className={cn("flex shrink-0 justify-end gap-2 border-t border-linha bg-superficie-2/60 px-6 py-3")}>{rodape}</div>
+            <div className="flex shrink-0 justify-end gap-2 border-t border-linha px-6 py-3.5">{rodape}</div>
           )}
         </Dialog.Content>
       </Dialog.Portal>
@@ -65,7 +64,7 @@ export function Modal({
 export function Cancelar({ disabled, rotulo = "Cancelar" }: { disabled?: boolean; rotulo?: ReactNode }) {
   return (
     <Dialog.Close asChild>
-      <Botao tipo="fantasma" disabled={disabled}>
+      <Botao disabled={disabled}>
         {rotulo}
       </Botao>
     </Dialog.Close>
