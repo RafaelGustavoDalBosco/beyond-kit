@@ -85,7 +85,8 @@ export function Tabela<T>({
             {!carregando &&
               linhas.map((r, i) => {
                 const titulo = grupo?.(r.original);
-                const novoGrupo = grupo && (i === 0 || titulo !== grupo(linhas[i - 1].original));
+                const anterior = linhas[i - 1];
+                const novoGrupo = grupo && (!anterior || titulo !== grupo(anterior.original));
                 return (
                   <Fragment key={r.id}>
                     {novoGrupo && (
