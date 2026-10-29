@@ -7,7 +7,7 @@ O kit de UI da Dal Bosco Systems: Cobalto com a gramática do ArchFlow, só clar
 1. **Instalar** o pacote por tag do git e os peers que faltarem:
 
    ```sh
-   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.3.0
+   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.3.1
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```

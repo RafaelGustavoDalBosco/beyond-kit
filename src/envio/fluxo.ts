@@ -62,7 +62,9 @@ export async function lerNdjson<L extends { tipo: string }>(
 ): Promise<L | null> {
   let resumo: L | null = null;
   if (!fluxo) return resumo;
-  const leitor = fluxo.pipeThrough(new TextDecoderStream()).getReader();
+  // TextDecoder no laço, não o TextDecoderStream: o pipeThrough dele não fecha os tipos no TypeScript 5.9.
+  const leitor = fluxo.getReader();
+  const decodificador = new TextDecoder();
   let resto = "";
   const ler = (texto: string) => {
     if (!texto.trim()) return;
@@ -73,12 +75,12 @@ export async function lerNdjson<L extends { tipo: string }>(
   for (;;) {
     const { value, done } = await leitor.read();
     if (done) break;
-    resto += value;
+    resto += decodificador.decode(value, { stream: true });
     const linhas = resto.split("\n");
     resto = linhas.pop() ?? "";
     linhas.forEach(ler);
   }
-  ler(resto);
+  ler(resto + decodificador.decode());
   return resumo;
 }
 
