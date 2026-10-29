@@ -1,3 +1,5 @@
+"use client";
+
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -84,6 +86,7 @@ export function Indicador({
   icone: Icone,
   tom = "cobalto",
   aoAbrir,
+  className,
 }: {
   rotulo: ReactNode;
   valor: ReactNode;
@@ -91,10 +94,12 @@ export function Indicador({
   icone: LucideIcon;
   tom?: Tom;
   aoAbrir?: () => void;
+  className?: string;
 }) {
   const caixa = cn(
     "flex w-full flex-col overflow-hidden rounded-bloco border border-linha bg-superficie text-left shadow-1",
     aoAbrir && "cursor-pointer transition-[box-shadow,border] hover:border-linha-forte hover:shadow-2",
+    className,
   );
   const conteudo = (
     <>

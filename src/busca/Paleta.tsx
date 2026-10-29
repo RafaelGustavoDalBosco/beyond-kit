@@ -1,3 +1,5 @@
+"use client";
+
 // A paleta de busca (Ctrl K): um texto e grupos de resultados; quem busca é o
 // consumidor, que passa os grupos, o carregando e o erro. A paleta cuida do
 // Dialog, das setas, do Enter, do Esc, dos estados e do rodapé com as teclas.

@@ -1,6 +1,8 @@
+"use client";
+
 // Os avisos de ação (o toast do ArchFlow): no canto superior direito, somem
-// sozinhos. O resultado de uma ação leva a frase do servidor; a recusa, a frase
-// do erro, que o consumidor pode trocar por `configurarAvisos`.
+// sozinhos. O resultado de uma ação leva a frase que o consumidor manda; a
+// recusa, a frase do erro, que o consumidor pode trocar por `configurarAvisos`.
 
 import { CircleAlert, CircleCheck, Info, X } from "lucide-react";
 import { useSyncExternalStore } from "react";

@@ -36,15 +36,17 @@ export function Selo({
   tom = "neutro",
   comPonto = false,
   className,
+  title,
   children,
 }: {
   tom?: Tom;
   comPonto?: boolean;
   className?: string;
+  title?: string;
   children: ReactNode;
 }) {
   return (
-    <span className={cn(estilo({ tom }), className)}>
+    <span title={title} className={cn(estilo({ tom }), className)}>
       {comPonto && <span className={cn("size-1.5 rounded-full", ponto[tom])} />}
       {children}
     </span>

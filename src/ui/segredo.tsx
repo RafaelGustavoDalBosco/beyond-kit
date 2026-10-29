@@ -1,3 +1,5 @@
+"use client";
+
 // O que aparece uma vez só (uma chave, um link, uma senha gerada): destacado,
 // copiável e com o aviso que o consumidor manda.
 

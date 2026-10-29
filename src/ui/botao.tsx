@@ -1,4 +1,7 @@
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -25,9 +28,13 @@ const estilo = cva(
   },
 );
 
-export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof estilo>;
+export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof estilo> & {
+  /** O filho único (o `Link` do roteador, um `<a>`) leva o visual do botão. */
+  asChild?: boolean;
+};
 
-export function Botao({ className, tipo, tamanho, type = "button", ...props }: BotaoProps) {
+export function Botao({ className, tipo, tamanho, type = "button", asChild, ...props }: BotaoProps) {
+  if (asChild) return <Slot.Root className={cn(estilo({ tipo, tamanho }), className)} {...props} />;
   return <button type={type} className={cn(estilo({ tipo, tamanho }), className)} {...props} />;
 }
 

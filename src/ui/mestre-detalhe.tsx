@@ -1,11 +1,13 @@
+"use client";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
 import { Botao } from "./botao";
 
-/** A lista à esquerda, o detalhe do escolhido à direita (o padrão de toda lista). */
+/** A lista à esquerda, o detalhe do escolhido à direita (o padrão de toda lista); abaixo de `lg`, um embaixo do outro. */
 export function MestreDetalhe({
   cabeca,
   lista,
@@ -14,7 +16,7 @@ export function MestreDetalhe({
   largura = 380,
   className,
 }: {
-  cabeca: ReactNode;
+  cabeca?: ReactNode;
   lista: ReactNode;
   rodape?: ReactNode;
   detalhe: ReactNode;
@@ -23,11 +25,14 @@ export function MestreDetalhe({
 }) {
   return (
     <div
-      className={cn("grid overflow-hidden rounded-bloco border border-linha bg-superficie shadow-1", className)}
-      style={{ gridTemplateColumns: `${largura}px 1fr` }}
+      className={cn(
+        "grid grid-cols-1 overflow-hidden rounded-bloco border border-linha bg-superficie shadow-1 lg:grid-cols-[var(--largura-da-lista)_minmax(0,1fr)]",
+        className,
+      )}
+      style={{ "--largura-da-lista": `${largura}px` } as CSSProperties}
     >
-      <div className="flex min-h-0 min-w-0 flex-col border-r border-linha">
-        <div className="flex flex-col gap-3 border-b border-linha p-4">{cabeca}</div>
+      <div className="flex min-h-0 min-w-0 flex-col border-b border-linha lg:border-r lg:border-b-0">
+        {cabeca && <div className="flex flex-col gap-3 border-b border-linha p-4">{cabeca}</div>}
         <div className="min-h-0 flex-1 overflow-y-auto">{lista}</div>
         {rodape}
       </div>

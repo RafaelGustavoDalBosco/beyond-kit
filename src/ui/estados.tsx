@@ -1,4 +1,8 @@
+"use client";
+
 import { CircleAlert } from "lucide-react";
+
+import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
@@ -13,9 +17,11 @@ export function Esqueleto({ className }: { className?: string }) {
   return <div className={cn("animate-brilhar rounded-md bg-superficie-3", className)} />;
 }
 
-export function Carregando({ linhas = 4 }: { linhas?: number }) {
+/** O esqueleto enquanto carrega; `rotulo` quando a espera tem nome ("Consultando o GitHub…"). */
+export function Carregando({ linhas = 4, rotulo }: { linhas?: number; rotulo?: string }) {
   return (
     <div className="flex flex-col gap-3 p-5">
+      {rotulo && <span className="text-[13px] text-texto-3">{rotulo}</span>}
       {Array.from({ length: linhas }, (_, i) => (
         <Esqueleto key={i} className="h-4" />
       ))}
@@ -37,6 +43,22 @@ export function Erro({ frase, referencia, tentar }: { frase: string; referencia?
           Tentar de novo
         </Botao>
       )}
+    </div>
+  );
+}
+
+/** A lista sem item: o título, a frase e a ação para começar. `solto` tira o contorno (dentro de um bloco). */
+export function Vazio({ titulo, descricao, acao, solto }: { titulo: ReactNode; descricao?: ReactNode; acao?: ReactNode; solto?: boolean }) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center px-6 py-12 text-center",
+        !solto && "rounded-bloco border border-linha bg-superficie shadow-1",
+      )}
+    >
+      <div className="text-[15px] font-semibold">{titulo}</div>
+      {descricao && <p className="m-0 mt-1 max-w-sm text-[13px] text-texto-2">{descricao}</p>}
+      {acao && <div className="mt-4">{acao}</div>}
     </div>
   );
 }

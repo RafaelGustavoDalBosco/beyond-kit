@@ -15,6 +15,7 @@ export * from "./ui/modal";
 export * from "./ui/segredo";
 export * from "./ui/selo";
 export * from "./ui/tabela";
+export * from "./ui/tela";
 
 export * from "./aviso/aviso";
 

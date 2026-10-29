@@ -19,12 +19,30 @@ export function Busca({ className, ...props }: InputHTMLAttributes<HTMLInputElem
   );
 }
 
-export function Rotulado({ rotulo, children }: { rotulo: string; children: ReactNode }) {
+/** O rótulo com o controle e, embaixo, a ajuda ou o erro da validação. `como="div"` quando o conteúdo tem botões ou uma `Caixa` (label dentro de label não vale). */
+export function Rotulado({
+  rotulo,
+  erro,
+  ajuda,
+  como = "label",
+  className,
+  children,
+}: {
+  rotulo: string;
+  erro?: string;
+  ajuda?: ReactNode;
+  como?: "label" | "div";
+  className?: string;
+  children: ReactNode;
+}) {
+  const Caixote = como;
   return (
-    <label className="flex flex-col gap-1.5">
+    <Caixote className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       <span className="text-xs font-medium text-texto-2">{rotulo}</span>
       {children}
-    </label>
+      {ajuda && !erro && <span className="text-[11.5px] leading-relaxed text-texto-3">{ajuda}</span>}
+      {erro && <span className="text-[11.5px] text-risco">{erro}</span>}
+    </Caixote>
   );
 }
 
@@ -36,25 +54,32 @@ export function AreaDeTexto({ className, ...props }: TextareaHTMLAttributes<HTML
 const ESTILO_DA_ESCOLHA =
   "h-9 w-full cursor-pointer rounded-controle border border-linha bg-superficie px-2.5 text-[13px] text-texto shadow-1 outline-none transition-[border,box-shadow] hover:border-linha-forte focus:border-cobalto focus:ring-3 focus:ring-cobalto-suave disabled:cursor-default disabled:bg-superficie-2 disabled:opacity-70";
 
-/** A escolha entre opções; a vazia é o traço (o campo sem resposta). */
+/**
+ * A escolha entre opções. A vazia é o traço (o campo sem resposta); `vazio`
+ * troca o rótulo dela ("Todos", "Sem projeto") e `vazio={false}` a tira (a
+ * escolha obrigatória). Os `children` entram depois das `opcoes` (os `optgroup`).
+ */
 export function Escolha({
-  opcoes,
+  opcoes = [],
+  vazio = "—",
   className,
+  children,
   ...props
-}: Omit<SelectHTMLAttributes<HTMLSelectElement>, "children"> & { opcoes: [string, string][] }) {
+}: SelectHTMLAttributes<HTMLSelectElement> & { opcoes?: ReadonlyArray<readonly [string, string]>; vazio?: string | false }) {
   return (
     <select className={cn(ESTILO_DA_ESCOLHA, className)} {...props}>
-      <option value="">—</option>
+      {vazio !== false && <option value="">{vazio}</option>}
       {opcoes.map(([valor, rotulo]) => (
         <option key={valor} value={valor}>
           {rotulo}
         </option>
       ))}
+      {children}
     </select>
   );
 }
 
-const SIM_NAO: [string, string][] = [
+const SIM_NAO: ReadonlyArray<readonly [string, string]> = [
   ["true", "Sim"],
   ["false", "Não"],
 ];
@@ -71,7 +96,20 @@ export function Caixa({ children, className, ...props }: InputHTMLAttributes<HTM
         <input type="checkbox" className="peer absolute inset-0 m-0 size-4 cursor-pointer appearance-none rounded-[5px] border border-linha-forte bg-superficie shadow-1 transition-[background,border] checked:border-cobalto checked:bg-cobalto hover:border-cobalto focus-visible:ring-3 focus-visible:ring-cobalto-suave disabled:cursor-default" {...props} />
         <Check className="pointer-events-none relative size-3 text-white opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
       </span>
-      {children && <span>{children}</span>}
+      {children && <span className="min-w-0 flex-1">{children}</span>}
+    </label>
+  );
+}
+
+/** A alternativa (o radio): uma entre várias do mesmo `name`, com o ponto cobalto quando marcada. */
+export function Alternativa({ children, className, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { children?: ReactNode }) {
+  return (
+    <label className={cn("group inline-flex cursor-pointer items-center gap-2 text-[13px] text-texto has-disabled:cursor-default has-disabled:opacity-60", className)}>
+      <span className="relative flex size-4 shrink-0 items-center justify-center">
+        <input type="radio" className="peer absolute inset-0 m-0 size-4 cursor-pointer appearance-none rounded-full border border-linha-forte bg-superficie shadow-1 transition-[border] checked:border-cobalto hover:border-cobalto focus-visible:ring-3 focus-visible:ring-cobalto-suave disabled:cursor-default" {...props} />
+        <span className="pointer-events-none relative size-2 rounded-full bg-cobalto opacity-0 transition-opacity peer-checked:opacity-100" />
+      </span>
+      {children && <span className="min-w-0 flex-1">{children}</span>}
     </label>
   );
 }

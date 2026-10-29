@@ -1,3 +1,5 @@
+"use client";
+
 import { Check, ChevronRight, Link, X, type LucideIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useState, type ReactNode } from "react";

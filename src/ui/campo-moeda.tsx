@@ -1,3 +1,5 @@
+"use client";
+
 // O campo de dinheiro: o "R$" fixo à esquerda, o texto livre enquanto se
 // digita e a formatação pt-BR ao sair do campo. Vazio é null; o que não se lê
 // volta ao valor gravado.

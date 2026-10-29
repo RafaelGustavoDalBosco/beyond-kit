@@ -1,17 +1,26 @@
+"use client";
+
 import { useState, type ReactNode } from "react";
 
 import { Botao, type BotaoProps } from "./botao";
 import { Cancelar, Modal } from "./modal";
 
-/** O botão do que não se desfaz: abre a confirmação, com a frase do backend. */
+/** O botão do que não se desfaz: abre a confirmação com a frase. `tipoDoConfirmar="primario"` quando o passo não é risco (virar contrato, publicar). */
 export function BotaoDeConfirmar({
   children,
   titulo,
   frase,
   confirmar,
   aoConfirmar,
+  tipoDoConfirmar = "perigo",
   ...props
-}: Omit<BotaoProps, "onClick"> & { titulo: string; frase?: ReactNode; confirmar: ReactNode; aoConfirmar: () => void }) {
+}: Omit<BotaoProps, "onClick" | "asChild"> & {
+  titulo: string;
+  frase?: ReactNode;
+  confirmar: ReactNode;
+  aoConfirmar: () => void;
+  tipoDoConfirmar?: "perigo" | "primario";
+}) {
   const [aberto, setAberto] = useState(false);
   return (
     <>
@@ -26,7 +35,7 @@ export function BotaoDeConfirmar({
           <>
             <Cancelar />
             <Botao
-              tipo="perigo"
+              tipo={tipoDoConfirmar}
               onClick={() => {
                 setAberto(false);
                 aoConfirmar();

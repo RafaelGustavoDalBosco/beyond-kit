@@ -1,3 +1,5 @@
+"use client";
+
 // As partes da tela de envio de arquivos: a área de soltar (com o escolher), a
 // lista do que foi escolhido e a barra de progresso. Os textos de regra (o
 // teto, o que fica fora) vêm do consumidor; o kit só desenha.

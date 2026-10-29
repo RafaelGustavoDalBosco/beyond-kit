@@ -1,5 +1,7 @@
+"use client";
+
 import { Check, Copy, type LucideIcon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
@@ -10,12 +12,15 @@ export function CabecaDaFicha({
   titulo,
   selos,
   codigos,
+  acoes,
 }: {
   icone: LucideIcon;
   tipo: ReactNode;
   titulo: ReactNode;
   selos?: ReactNode;
   codigos?: ReactNode;
+  /** Os botões da ficha, à direita do título. */
+  acoes?: ReactNode;
 }) {
   return (
     <div className="flex gap-4 px-6 pt-6 pb-5">
@@ -30,6 +35,7 @@ export function CabecaDaFicha({
         </div>
         {codigos && <div className="mt-3 flex flex-wrap items-center gap-1.5">{codigos}</div>}
       </div>
+      {acoes && <div className="flex shrink-0 flex-wrap items-start gap-2">{acoes}</div>}
     </div>
   );
 }
@@ -59,23 +65,30 @@ export function Codigo({ nome, valor, copiavel }: { nome: string; valor: ReactNo
   );
 }
 
-/** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco. */
+/** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco. No celular, uma coluna; até `lg`, duas. */
 export function Pares({ children, colunas = 3 }: { children: ReactNode; colunas?: 2 | 3 | 4 }) {
   return (
     <dl
-      className="m-0 grid gap-px overflow-hidden rounded-xl border border-linha bg-superficie"
-      style={{ gridTemplateColumns: `repeat(${colunas}, minmax(0, 1fr))` }}
+      className="m-0 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-linha bg-superficie sm:grid-cols-2 lg:grid-cols-[repeat(var(--colunas),minmax(0,1fr))]"
+      style={{ "--colunas": colunas } as CSSProperties}
     >
       {children}
     </dl>
   );
 }
 
-export function Par({ rotulo, children }: { rotulo: string; children: ReactNode }) {
+/** Um par; `longo` não corta o valor (o endereço, a descrição) e `ocupa` estende por mais colunas. */
+export function Par({ rotulo, longo, ocupa, children }: { rotulo: string; longo?: boolean; ocupa?: number; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha">
+    <div
+      className={cn(
+        "flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha",
+        ocupa && ocupa > 1 && "sm:col-span-2 lg:[grid-column:span_var(--ocupa)/span_var(--ocupa)]",
+      )}
+      style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
+    >
       <dt className="text-xs text-texto-3">{rotulo}</dt>
-      <dd className="m-0 truncate text-[13px] font-medium">{children}</dd>
+      <dd className={cn("m-0 text-[13px] font-medium", longo ? "whitespace-pre-line [overflow-wrap:anywhere]" : "truncate")}>{children}</dd>
     </div>
   );
 }

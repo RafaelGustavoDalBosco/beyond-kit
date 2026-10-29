@@ -1,3 +1,5 @@
+"use client";
+
 import { Tabs } from "radix-ui";
 import type { ReactNode } from "react";
 
@@ -16,11 +18,14 @@ export function TrilhoDeAbas({ children, className }: { children: ReactNode; cla
   );
 }
 
-export function Aba({ value, children, contagem }: { value: string; children: ReactNode; contagem?: number | null }) {
+export function Aba({ value, children, contagem, className }: { value: string; children: ReactNode; contagem?: number | null; className?: string }) {
   return (
     <Tabs.Trigger
       value={value}
-      className="inline-flex h-full cursor-pointer items-center gap-1.5 rounded-[7px] px-3 text-[12.5px] font-medium text-texto-2 transition-colors hover:text-texto data-[state=active]:bg-superficie data-[state=active]:text-texto data-[state=active]:shadow-1"
+      className={cn(
+        "inline-flex h-full cursor-pointer items-center gap-1.5 rounded-[7px] px-3 text-[12.5px] font-medium text-texto-2 transition-colors hover:text-texto data-[state=active]:bg-superficie data-[state=active]:text-texto data-[state=active]:shadow-1",
+        className,
+      )}
     >
       {children}
       {contagem != null && <span className="numero text-[11px] text-texto-3">{contagem}</span>}

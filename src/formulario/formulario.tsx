@@ -1,3 +1,5 @@
+"use client";
+
 // As partes de um formulário de parâmetros: o cartão de cada formulário (com a
 // marca de quem informou e as regras), o campo com a ajuda, o mês e a barra
 // presa no pé, que salva os grupos que mudaram.

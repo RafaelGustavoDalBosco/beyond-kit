@@ -1,3 +1,5 @@
+"use client";
+
 import { X } from "lucide-react";
 import { Dialog } from "radix-ui";
 import type { ReactNode } from "react";
@@ -60,10 +62,12 @@ export function Modal({
 }
 
 /** O Cancelar do rodapé, que fecha o modal. */
-export function Cancelar() {
+export function Cancelar({ disabled }: { disabled?: boolean }) {
   return (
     <Dialog.Close asChild>
-      <Botao tipo="fantasma">Cancelar</Botao>
+      <Botao tipo="fantasma" disabled={disabled}>
+        Cancelar
+      </Botao>
     </Dialog.Close>
   );
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import { flexRender, getCoreRowModel, useReactTable, type ColumnDef, type RowData } from "@tanstack/react-table";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Fragment, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { contagem } from "../lib/formato";
@@ -13,12 +16,20 @@ declare module "@tanstack/react-table" {
     numero?: boolean;
     /** A coluna que fica com a sobra da largura. */
     principal?: boolean;
+    /** Texto de várias linhas: quebra, com respiro em cima e embaixo, alinhado ao topo. */
+    quebra?: boolean;
+    /** Presa à esquerda quando a tabela rola de lado (o nome, numa tabela larga). */
+    fixa?: boolean;
   }
 }
 
 export type Pagina = { page: number; page_size: number; total: number };
 
-/** A lista: cabeçalho fixo, linha inteira clicável quando abre a ficha. */
+/**
+ * A lista: cabeçalho fixo, linha inteira clicável quando abre a ficha. `classeDaLinha` marca a linha (a inativa
+ * apagada, a atrasada em aviso); `grupo` abre uma faixa de título quando o valor muda de uma linha para a outra
+ * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total).
+ */
 export function Tabela<T>({
   dados,
   colunas,
@@ -27,6 +38,8 @@ export function Tabela<T>({
   pagina,
   aoMudarPagina,
   vazio,
+  classeDaLinha,
+  grupo,
 }: {
   dados: T[] | undefined;
   colunas: ColumnDef<T, any>[];
@@ -35,9 +48,14 @@ export function Tabela<T>({
   pagina?: Pagina;
   aoMudarPagina?: (page: number) => void;
   vazio?: string;
+  classeDaLinha?: (linha: T) => string | false | undefined;
+  grupo?: (linha: T) => ReactNode;
 }) {
   const tabela = useReactTable({ data: dados ?? [], columns: colunas, getCoreRowModel: getCoreRowModel() });
   const paginas = pagina ? Math.max(1, Math.ceil(pagina.total / pagina.page_size)) : 1;
+  const largura = tabela.getVisibleLeafColumns().length + (aoAbrir ? 1 : 0);
+  const comRodape = tabela.getAllLeafColumns().some((c) => c.columnDef.footer);
+  const linhas = tabela.getRowModel().rows;
 
   return (
     <div className="flex flex-col">
@@ -53,6 +71,7 @@ export function Tabela<T>({
                       "rotulo sticky top-0 h-9 border-b border-linha bg-superficie px-4 text-left font-medium whitespace-nowrap",
                       h.column.columnDef.meta?.numero && "text-right",
                       h.column.columnDef.meta?.principal && "w-full",
+                      h.column.columnDef.meta?.fixa && "left-0 z-10",
                     )}
                   >
                     {flexRender(h.column.columnDef.header, h.getContext())}
@@ -64,35 +83,67 @@ export function Tabela<T>({
           </thead>
           <tbody>
             {!carregando &&
-              tabela.getRowModel().rows.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={aoAbrir ? () => aoAbrir(r.original) : undefined}
-                  className={cn(
-                    "group border-b border-linha last:border-0",
-                    aoAbrir && "cursor-pointer transition-colors hover:bg-superficie-2",
-                  )}
-                >
-                  {r.getVisibleCells().map((c) => (
-                    <td
-                      key={c.id}
+              linhas.map((r, i) => {
+                const titulo = grupo?.(r.original);
+                const novoGrupo = grupo && (i === 0 || titulo !== grupo(linhas[i - 1].original));
+                return (
+                  <Fragment key={r.id}>
+                    {novoGrupo && (
+                      <tr>
+                        <th colSpan={largura} className="border-b border-linha bg-superficie-2/60 px-4 py-2 text-left">
+                          <span className="titulo-secao">{titulo}</span>
+                        </th>
+                      </tr>
+                    )}
+                    <tr
+                      onClick={aoAbrir ? () => aoAbrir(r.original) : undefined}
                       className={cn(
-                        "h-11 px-4 whitespace-nowrap",
-                        c.column.columnDef.meta?.numero && "numero text-right",
-                        c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
+                        "group border-b border-linha last:border-0",
+                        aoAbrir && "cursor-pointer transition-colors hover:bg-superficie-2",
+                        classeDaLinha?.(r.original),
                       )}
                     >
-                      {flexRender(c.column.columnDef.cell, c.getContext())}
+                      {r.getVisibleCells().map((c) => (
+                        <td
+                          key={c.id}
+                          className={cn(
+                            "h-11 px-4 whitespace-nowrap",
+                            c.column.columnDef.meta?.numero && "numero text-right",
+                            c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
+                            c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
+                            c.column.columnDef.meta?.fixa && "sticky left-0 z-[1] bg-superficie",
+                          )}
+                        >
+                          {flexRender(c.column.columnDef.cell, c.getContext())}
+                        </td>
+                      ))}
+                      {aoAbrir && (
+                        <td className="pr-3 text-texto-3">
+                          <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                        </td>
+                      )}
+                    </tr>
+                  </Fragment>
+                );
+              })}
+          </tbody>
+          {comRodape && !carregando && (
+            <tfoot>
+              {tabela.getFooterGroups().map((g) => (
+                <tr key={g.id} className="border-t border-linha-forte bg-superficie-2/60">
+                  {g.headers.map((h) => (
+                    <td
+                      key={h.id}
+                      className={cn("h-11 px-4 font-semibold whitespace-nowrap", h.column.columnDef.meta?.numero && "numero text-right")}
+                    >
+                      {h.isPlaceholder ? null : flexRender(h.column.columnDef.footer, h.getContext())}
                     </td>
                   ))}
-                  {aoAbrir && (
-                    <td className="pr-3 text-texto-3">
-                      <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </td>
-                  )}
+                  {aoAbrir && <td />}
                 </tr>
               ))}
-          </tbody>
+            </tfoot>
+          )}
         </table>
         {carregando && <Carregando linhas={5} />}
         {!carregando && dados?.length === 0 && vazio && <div className="p-8 text-center text-texto-3">{vazio}</div>}
