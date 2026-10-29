@@ -6,13 +6,15 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 
 ## Adoção
 
-1. **Instalar** o pacote por tag do git e os peers que faltarem:
+1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i github:RafaelGustavoDalBosco/beyond-kit#v0.3.2
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.3.2.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
+
+   Nunca `github:` nem `git+https:`: o npm grava `git+ssh://` no lock e o `npm ci` do CI cai sem chave SSH. O tarball grava HTTPS com `integrity` e não pede git. O bump é trocar a tag na URL.
 
    `import { ... } from "@dalbosco/kit"` traz o núcleo inteiro (inclusive a `Tabela`, que pede o `@tanstack/react-table`); quem não a usa importa componente a componente por `@dalbosco/kit/ui/botao`, `@dalbosco/kit/ui/modal` etc.
 
