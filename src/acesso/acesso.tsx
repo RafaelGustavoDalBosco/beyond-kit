@@ -21,10 +21,12 @@ import { CampoDeSenha } from "../ui/campo-de-senha";
  * (padrão) é cobalto e fala do produto (a marca, o rótulo, o título e a
  * frase); o painel `brasao` é o cobalto escuro do menu com o brasão grande (o
  * da própria Dal Bosco Systems, no hub), e aí o selo sai. Abaixo de `lg` o
- * painel some e fica só a marca no alto do cartão.
+ * painel some e fica só a marca no alto do cartão. `marcaDoPainel` troca a
+ * marca do painel cobalto (a versão clara), e `marca` fica no alto do cartão.
  */
 export function MolduraPublica({
   marca,
+  marcaDoPainel = marca,
   rotulo,
   titulo,
   frase,
@@ -34,6 +36,7 @@ export function MolduraPublica({
   children,
 }: {
   marca: ReactNode;
+  marcaDoPainel?: ReactNode;
   rotulo?: ReactNode;
   titulo?: ReactNode;
   frase?: ReactNode;
@@ -46,7 +49,7 @@ export function MolduraPublica({
     <div className="flex min-h-screen">
       {painel === "produto" ? (
         <div className="hidden w-1/2 flex-col justify-between bg-cobalto p-12 text-sobre-cobalto lg:flex">
-          <div className="flex items-center gap-3 text-xl font-semibold">{marca}</div>
+          <div className="flex items-center gap-3 text-xl font-semibold">{marcaDoPainel}</div>
           <div>
             {rotulo && <div className="rotulo mb-3 text-sobre-cobalto/80">{rotulo}</div>}
             {titulo && <h1 className="m-0 text-5xl leading-tight font-semibold tracking-[-0.02em] text-sobre-cobalto">{titulo}</h1>}
@@ -57,7 +60,7 @@ export function MolduraPublica({
       ) : (
         <div className="hidden w-1/2 flex-col items-center justify-between bg-lateral p-12 text-lateral-ativo lg:flex">
           {rotulo ? <div className="rotulo self-start text-lateral-texto">{rotulo}</div> : <span />}
-          <div className="flex flex-col items-center gap-6 text-center">
+          <div className="flex w-full flex-col items-center gap-6 text-center">
             <Brasao className="w-[min(360px,80%)] drop-shadow-[0_8px_24px_rgb(0_0_0/0.35)]" />
             {titulo && <h1 className="m-0 max-w-md text-3xl leading-tight font-semibold tracking-[-0.02em]">{titulo}</h1>}
             {frase && <p className="m-0 max-w-md text-lateral-texto">{frase}</p>}
@@ -169,10 +172,13 @@ function Pronto({ frase, acao }: { frase: ReactNode; acao?: ReactNode }) {
   );
 }
 
+/** As frases do problema da senha nova; o consumidor troca as duas. */
+type FrasesDaSenha = { fraseDoMinimo?: (minimo: number) => string; fraseDasSenhasDiferentes?: string };
+
 /** Confere a senha nova: o mínimo e a repetição. Devolve a frase do problema, ou null. */
-function problemaDaSenha(senha: string, repetida: string, minimo: number) {
-  if (senha.length < minimo) return `A senha precisa de pelo menos ${minimo} caracteres.`;
-  if (senha !== repetida) return "As senhas não conferem.";
+function problemaDaSenha(senha: string, repetida: string, minimo: number, frases: FrasesDaSenha) {
+  if (senha.length < minimo) return frases.fraseDoMinimo?.(minimo) ?? `A senha precisa de pelo menos ${minimo} caracteres.`;
+  if (senha !== repetida) return frases.fraseDasSenhasDiferentes ?? "As senhas não conferem.";
   return null;
 }
 
@@ -212,26 +218,39 @@ export function Entrar({
   );
 }
 
-/** Esqueci a senha: pede o link por e-mail. A resposta é a mesma exista ou não a conta (não revela quem está cadastrado). */
+/**
+ * Esqueci a senha: pede o link por e-mail. A resposta é a mesma exista ou não
+ * a conta (não revela quem está cadastrado). Com `tipoDoLogin="text"` o campo
+ * se chama `login` (com e-mail, `email`, como sempre).
+ */
 export function EsqueciASenha({
   aoPedir,
+  rotuloDoLogin = "E-mail",
+  tipoDoLogin = "email",
+  titulo = "Esqueci a senha",
+  frase = "Digite o e-mail da sua conta e enviamos um link para criar uma senha nova.",
   links,
   frasePronto = "Se o e-mail estiver cadastrado, o link para criar uma senha nova chega em instantes.",
 }: {
-  aoPedir: (email: string) => unknown;
+  aoPedir: (login: string) => unknown;
+  rotuloDoLogin?: string;
+  tipoDoLogin?: "email" | "text";
+  titulo?: ReactNode;
+  frase?: ReactNode;
   links?: ReactNode;
   frasePronto?: ReactNode;
 }) {
   const [pronto, setPronto] = useState(false);
   const { enviando, recusa, enviar } = useEnvio();
+  const nome = tipoDoLogin === "email" ? "email" : "login";
   return (
-    <CartaoDeAcesso titulo="Esqueci a senha" frase={!pronto && "Digite o e-mail da sua conta e enviamos um link para criar uma senha nova."} links={links}>
+    <CartaoDeAcesso titulo={titulo} frase={!pronto && frase} links={links}>
       {pronto ? (
         <Pronto frase={frasePronto} />
       ) : (
-        <form method="post" onSubmit={enviar((d) => aoPedir(lido(d, "email")), () => setPronto(true))} className="flex flex-col gap-4">
-          <Rotulado rotulo="E-mail">
-            <Campo name="email" type="email" autoComplete="email" required autoFocus />
+        <form method="post" onSubmit={enviar((d) => aoPedir(lido(d, nome)), () => setPronto(true))} className="flex flex-col gap-4">
+          <Rotulado rotulo={rotuloDoLogin}>
+            <Campo name={nome} type={tipoDoLogin} autoComplete={tipoDoLogin === "email" ? "email" : "username"} required autoFocus />
           </Rotulado>
           <Recusa frase={recusa} />
           <BotaoDeEnviar enviando={enviando}>Enviar o link</BotaoDeEnviar>
@@ -241,36 +260,52 @@ export function EsqueciASenha({
   );
 }
 
-/** Redefinir a senha: a senha nova duas vezes, pelo link do e-mail (o token fica com o consumidor). `ajuda` é a regra da senha. */
+/**
+ * Redefinir a senha: a senha nova duas vezes, pelo link do e-mail (o token fica
+ * com o consumidor). `ajuda` é a regra da senha. Serve também para aceitar o
+ * convite e criar a primeira senha (`titulo`, `frase`, `rotuloDoBotao`, `frasePronto`).
+ */
 export function RedefinirASenha({
   aoRedefinir,
   minimo = 8,
   ajuda,
+  titulo = "Senha nova",
+  frase,
+  rotuloDoBotao = "Trocar a senha",
+  frasePronto = "Senha trocada. Já dá para entrar com ela.",
+  fraseDasSenhasDiferentes,
+  fraseDoMinimo,
   links,
   acaoPronto,
 }: {
   aoRedefinir: (senha: string) => unknown;
   minimo?: number;
   ajuda?: ReactNode;
+  titulo?: ReactNode;
+  /** O texto acima dos campos. */
+  frase?: ReactNode;
+  rotuloDoBotao?: ReactNode;
+  frasePronto?: ReactNode;
   links?: ReactNode;
   /** O que aparece depois de trocar (o link para entrar). */
   acaoPronto?: ReactNode;
-}) {
+} & FrasesDaSenha) {
+  const frases = { fraseDoMinimo, fraseDasSenhasDiferentes };
   const [senha, setSenha] = useState("");
   const [repetida, setRepetida] = useState("");
   const [pronto, setPronto] = useState(false);
   const { enviando, recusa, setRecusa, enviar } = useEnvio();
-  const problema = repetida ? problemaDaSenha(senha, repetida, minimo) : null;
+  const problema = repetida ? problemaDaSenha(senha, repetida, minimo, frases) : null;
   return (
-    <CartaoDeAcesso titulo="Senha nova" links={!pronto && links}>
+    <CartaoDeAcesso titulo={titulo} frase={!pronto && frase} links={!pronto && links}>
       {pronto ? (
-        <Pronto frase="Senha trocada. Já dá para entrar com ela." acao={acaoPronto} />
+        <Pronto frase={frasePronto} acao={acaoPronto} />
       ) : (
         <form
           method="post"
           onSubmit={(e) => {
             const dados = new FormData(e.currentTarget);
-            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo);
+            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo, frases);
             if (p) {
               e.preventDefault();
               setRecusa(p);
@@ -287,7 +322,7 @@ export function RedefinirASenha({
             <CampoDeSenha name="senha_repetida" autoComplete="new-password" onChange={(e) => setRepetida(e.target.value)} required />
           </Rotulado>
           <Recusa frase={recusa} />
-          <BotaoDeEnviar enviando={enviando}>Trocar a senha</BotaoDeEnviar>
+          <BotaoDeEnviar enviando={enviando}>{rotuloDoBotao}</BotaoDeEnviar>
         </form>
       )}
     </CartaoDeAcesso>
@@ -296,31 +331,41 @@ export function RedefinirASenha({
 
 /**
  * Criar conta: nome, e-mail e senha duas vezes. `extras` entra antes do botão
- * (a empresa, o aceite dos termos), com o estado do consumidor. Depois de
- * criar, a frase manda confirmar o e-mail (`frasePronto` troca).
+ * (a empresa, o aceite dos termos); o `aoCriar` recebe o FormData como segundo
+ * argumento, para ler os campos dos `extras` pelo `name`. `contexto` vai no
+ * alto, acima dos campos (a conta de qual empresa). Depois de criar, a frase
+ * manda confirmar o e-mail (`frasePronto` troca).
  */
 export function CriarConta({
   aoCriar,
   minimo = 8,
   ajuda,
   extras,
+  valoresIniciais,
+  contexto,
+  fraseDasSenhasDiferentes,
+  fraseDoMinimo,
   links,
   frasePronto = "Conta criada. Enviamos um link para confirmar o seu e-mail.",
   acaoPronto,
 }: {
-  aoCriar: (dados: { nome: string; email: string; senha: string }) => unknown;
+  aoCriar: (dados: { nome: string; email: string; senha: string }, formulario: FormData) => unknown;
   minimo?: number;
   ajuda?: ReactNode;
   extras?: ReactNode;
+  /** O nome e o e-mail já preenchidos (o convite). */
+  valoresIniciais?: { nome?: string; email?: string };
+  contexto?: ReactNode;
   links?: ReactNode;
   frasePronto?: ReactNode;
   acaoPronto?: ReactNode;
-}) {
+} & FrasesDaSenha) {
+  const frases = { fraseDoMinimo, fraseDasSenhasDiferentes };
   const [senha, setSenha] = useState("");
   const [repetida, setRepetida] = useState("");
   const [pronto, setPronto] = useState(false);
   const { enviando, recusa, setRecusa, enviar } = useEnvio();
-  const problema = repetida ? problemaDaSenha(senha, repetida, minimo) : null;
+  const problema = repetida ? problemaDaSenha(senha, repetida, minimo, frases) : null;
   return (
     <CartaoDeAcesso titulo="Criar conta" links={!pronto && links}>
       {pronto ? (
@@ -330,24 +375,25 @@ export function CriarConta({
           method="post"
           onSubmit={(e) => {
             const dados = new FormData(e.currentTarget);
-            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo);
+            const p = problemaDaSenha(lido(dados, "senha"), lido(dados, "senha_repetida"), minimo, frases);
             if (p) {
               e.preventDefault();
               setRecusa(p);
               return;
             }
             void enviar(
-              (d) => aoCriar({ nome: lido(d, "nome"), email: lido(d, "email"), senha: lido(d, "senha") }),
+              (d) => aoCriar({ nome: lido(d, "nome"), email: lido(d, "email"), senha: lido(d, "senha") }, d),
               () => setPronto(true),
             )(e);
           }}
           className="flex flex-col gap-4"
         >
+          {contexto && <div className="rounded-controle bg-superficie-2 px-3 py-2 text-[13px] text-texto-2">{contexto}</div>}
           <Rotulado rotulo="Nome">
-            <Campo name="nome" autoComplete="name" required autoFocus />
+            <Campo name="nome" autoComplete="name" defaultValue={valoresIniciais?.nome} required autoFocus />
           </Rotulado>
           <Rotulado rotulo="E-mail">
-            <Campo name="email" type="email" autoComplete="email" required />
+            <Campo name="email" type="email" autoComplete="email" defaultValue={valoresIniciais?.email} required />
           </Rotulado>
           <Rotulado rotulo="Senha" ajuda={ajuda ?? `Pelo menos ${minimo} caracteres.`}>
             <CampoDeSenha name="senha" autoComplete="new-password" onChange={(e) => setSenha(e.target.value)} required />

@@ -21,7 +21,7 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     /** Número ou código: algarismos alinhados e à direita. */
     numero?: boolean;
-    /** A coluna que fica com a sobra da largura. */
+    /** A coluna que fica com a sobra da largura. Não leve `esconderAbaixo` nela: abaixo do breakpoint a sobra fica sem dono. */
     principal?: boolean;
     /** Texto de várias linhas: quebra, com respiro em cima e embaixo, alinhado ao topo. */
     quebra?: boolean;
@@ -49,7 +49,8 @@ export type Pagina = { page: number; page_size: number; total: number };
  * apagada, a atrasada em aviso); `grupo` abre uma faixa de título quando o valor muda de uma linha para a outra
  * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total). `expandir` dá à linha um botão que
  * abre embaixo dela o detalhe (uma sub-tabela); `podeAbrir` diz quais linhas abrem a ficha; `atributosDaLinha` põe
- * data-*, aria-* ou id no <tr>.
+ * data-*, aria-* ou id no <tr>. `idDaLinha` dá a chave de cada linha: com ela, as linhas abertas do `expandir` seguem
+ * abertas quando `dados` muda (o "Carregar mais", um refetch); sem ela, a chave é a posição e elas fecham.
  */
 export function Tabela<T>({
   dados,
@@ -64,6 +65,7 @@ export function Tabela<T>({
   expandir,
   podeAbrir,
   atributosDaLinha,
+  idDaLinha,
 }: {
   dados: T[] | undefined;
   colunas: ColumnDef<T, any>[];
@@ -77,12 +79,18 @@ export function Tabela<T>({
   expandir?: (linha: T) => ReactNode | null;
   podeAbrir?: (linha: T) => boolean;
   atributosDaLinha?: (linha: T) => Record<string, string | number | boolean | undefined>;
+  idDaLinha?: (linha: T) => string;
 }) {
-  const tabela = useReactTable({ data: dados ?? [], columns: colunas, getCoreRowModel: getCoreRowModel() });
+  const tabela = useReactTable({
+    data: dados ?? [],
+    columns: colunas,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: idDaLinha ? (linha) => idDaLinha(linha) : undefined,
+  });
   const [abertas, setAbertas] = useState<Set<string>>(() => new Set());
-  // Dados novos (outra página, outro filtro): as linhas abertas fecham, porque a chave é a posição da linha.
+  // Dados novos (outra página, outro filtro): sem `idDaLinha` as linhas abertas fecham, porque a chave é a posição.
   const [dadosDasAbertas, setDadosDasAbertas] = useState(dados);
-  if (dados !== dadosDasAbertas) {
+  if (!idDaLinha && dados !== dadosDasAbertas) {
     setDadosDasAbertas(dados);
     setAbertas(new Set());
   }

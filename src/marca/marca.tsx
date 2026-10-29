@@ -19,7 +19,7 @@ export function Brasao({ variante = "inteiro", className }: { variante?: "inteir
   );
 }
 
-/** A assinatura do pé da tela inicial: o brasão inteiro, o fio dourado e "Um produto Dal Bosco Systems". */
+/** A assinatura do pé da página pública (a home, fora do login; nunca dentro do app): o brasão inteiro, o fio dourado e "Um produto Dal Bosco Systems". */
 export function AssinaturaDalBosco({ ano = new Date().getFullYear(), className }: { ano?: number; className?: string }) {
   return (
     <footer className={cn("mt-10 flex flex-col items-center gap-1.5 pb-2 text-center", className)}>

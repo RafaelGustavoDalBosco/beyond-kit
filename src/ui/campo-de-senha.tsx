@@ -18,7 +18,8 @@ export function CampoDeSenha({ className, ...props }: Omit<InputHTMLAttributes<H
       <Campo type={visivel ? "text" : "password"} className={cn("pr-10", className)} {...props} />
       <button
         type="button"
-        aria-label={visivel ? "Esconder senha" : "Mostrar senha"}
+        aria-label={visivel ? "Esconder o que foi digitado" : "Mostrar o que foi digitado"}
+        title={visivel ? "Esconder o que foi digitado" : "Mostrar o que foi digitado"}
         aria-pressed={visivel}
         disabled={props.disabled}
         onClick={() => setVisivel((v) => !v)}

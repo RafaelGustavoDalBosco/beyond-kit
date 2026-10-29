@@ -36,10 +36,12 @@ export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<
   asChild?: boolean;
   /** Enquanto a ação corre: o Loader2 girando no lugar do ícone (ou antes do texto), desabilitado. Não vale com `asChild`. */
   carregando?: boolean;
+  /** Com `carregando`, o texto no lugar dos filhos (ex.: "Salvando…"); sem ele, os filhos ficam. */
+  textoCarregando?: ReactNode;
 };
 
 /** O botão do kit; desabilitado, guarda o `title` no hover e o clique não dispara. */
-export function Botao({ className, tipo, tamanho, type = "button", asChild, carregando, children, ...props }: BotaoProps) {
+export function Botao({ className, tipo, tamanho, type = "button", asChild, carregando, textoCarregando, children, ...props }: BotaoProps) {
   if (asChild)
     return (
       <Slot.Root className={cn(estilo({ tipo, tamanho }), className)} {...props}>
@@ -55,7 +57,7 @@ export function Botao({ className, tipo, tamanho, type = "button", asChild, carr
       aria-busy={carregando || undefined}
     >
       {carregando && <Loader2 data-girando="" className="animate-spin" aria-hidden />}
-      {children}
+      {carregando && textoCarregando !== undefined ? textoCarregando : children}
     </button>
   );
 }

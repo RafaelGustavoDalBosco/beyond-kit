@@ -66,12 +66,12 @@ export function Codigo({ nome, valor, copiavel }: { nome: string; valor: ReactNo
 }
 
 /** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco. As colunas seguem a largura do contêiner (não
- * a da tela), para a ficha estreita não espremer: uma coluna abaixo de 28rem, duas até 42rem, `colunas` daí para cima. */
+ * a da tela), para a ficha estreita não espremer: uma coluna abaixo de 24rem, duas até 42rem, `colunas` daí para cima. */
 export function Pares({ children, colunas = 3 }: { children: ReactNode; colunas?: 2 | 3 | 4 }) {
   return (
     <div className="@container">
       <dl
-        className="m-0 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-linha bg-superficie @md:grid-cols-2 @2xl:grid-cols-[repeat(var(--colunas),minmax(0,1fr))]"
+        className="m-0 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-linha bg-superficie @sm:grid-cols-2 @2xl:grid-cols-[repeat(var(--colunas),minmax(0,1fr))]"
         style={{ "--colunas": colunas } as CSSProperties}
       >
         {children}
@@ -86,7 +86,7 @@ export function Par({ rotulo, longo, ocupa, children }: { rotulo: string; longo?
     <div
       className={cn(
         "flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha",
-        ocupa && ocupa > 1 && "@md:col-span-2 @2xl:[grid-column:span_var(--ocupa)/span_var(--ocupa)]",
+        ocupa && ocupa > 1 && "@sm:col-span-2 @2xl:[grid-column:span_var(--ocupa)/span_var(--ocupa)]",
       )}
       style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
     >

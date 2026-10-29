@@ -6,6 +6,7 @@
 // decimal ("1234.56"), sem passar por float.
 
 import { useEffect, useState, type InputHTMLAttributes } from "react";
+import { flushSync } from "react-dom";
 
 import { cn } from "../lib/cn";
 
@@ -60,8 +61,11 @@ export function CampoMoeda(props: PropsDoCampoMoeda) {
     if (!focado) setTexto(gravado);
   }, [gravado, focado]);
 
-  /** Lê o texto e grava (ao sair do campo e no Enter); o ilegível volta ao gravado. */
-  function gravar() {
+  /**
+   * Lê o texto e grava (ao sair do campo e no Enter); o ilegível volta ao gravado.
+   * `emitir` envolve o aoMudar (no Enter, o flushSync: o estado do consumidor já renderizado antes do envio).
+   */
+  function gravar(emitir: (f: () => void) => void = (f) => f()) {
     if (props.comoTexto) {
       const d = interpretarDecimal(texto);
       if (d === undefined) {
@@ -70,7 +74,8 @@ export function CampoMoeda(props: PropsDoCampoMoeda) {
       }
       const novo = formatarDecimal(d);
       setTexto(novo);
-      if (novo !== gravado) props.aoMudar(d);
+      const aoMudar = props.aoMudar;
+      if (novo !== gravado) emitir(() => aoMudar(d));
       return;
     }
     const n = interpretar(texto);
@@ -79,7 +84,8 @@ export function CampoMoeda(props: PropsDoCampoMoeda) {
       return;
     }
     setTexto(formatar(n));
-    if (n !== (props.valor ?? null)) props.aoMudar(n);
+    const aoMudar = props.aoMudar;
+    if (n !== (props.valor ?? null)) emitir(() => aoMudar(n));
   }
 
   return (
@@ -96,8 +102,14 @@ export function CampoMoeda(props: PropsDoCampoMoeda) {
           gravar();
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") gravar();
           onKeyDown?.(e);
+          if (e.key !== "Enter") return;
+          // O envio nativo sairia com o valor antigo: grava, renderiza e só então envia
+          // (a não ser que o consumidor tenha barrado o Enter).
+          const enviar = !e.defaultPrevented;
+          e.preventDefault();
+          gravar(flushSync);
+          if (enviar) e.currentTarget.form?.requestSubmit();
         }}
         {...resto}
       />

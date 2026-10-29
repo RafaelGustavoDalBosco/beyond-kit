@@ -50,25 +50,28 @@ export function MestreDetalhe({
 }
 
 /** Uma linha da lista do master/detail; a escolhida leva a barra cobalto. Com `href` vira `<a>`; com `asChild`, o filho
- * único (o `Link` do roteador) leva o visual e a barra. */
+ * único (o `Link` do roteador) leva o visual e a barra. `em="linha"` põe o conteúdo lado a lado (ícone, texto, seta). */
 export function ItemDaLista({
   ativo,
   aoEscolher,
   href,
   asChild,
+  em = "coluna",
   children,
 }: {
   ativo: boolean;
   aoEscolher?: () => void;
   href?: string;
   asChild?: boolean;
+  em?: "coluna" | "linha";
   children: ReactNode;
 }) {
   const comum = {
     onClick: aoEscolher,
     "aria-current": ativo || undefined,
     className: cn(
-      "relative flex w-full cursor-pointer flex-col gap-1 border-b border-linha px-4 py-3 text-left transition-colors",
+      "relative flex w-full cursor-pointer border-b border-linha px-4 py-3 text-left transition-colors",
+      em === "linha" ? "flex-row items-center gap-3" : "flex-col gap-1",
       ativo ? "bg-cobalto-suave" : "hover:bg-superficie-2",
     ),
   };

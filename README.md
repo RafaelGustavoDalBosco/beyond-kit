@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.7.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.8.0.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -63,7 +63,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 
 ## Componentes
 
-- `Botao` (primario, secundario, fantasma, ganho, perigo, lateral; md, sm, icone, icone-sm; `asChild` dá o visual a um `Link` ou `<a>`; `carregando`), `Tecla` (o kbd) e `BotaoDeCopiar`.
+- `Botao` (primario, secundario, fantasma, ganho, perigo, lateral; md, sm, icone, icone-sm; `asChild` dá o visual a um `Link` ou `<a>`; `carregando` e `textoCarregando`), `Tecla` (o kbd) e `BotaoDeCopiar` (só ícone em `icone`/`icone-sm`, `avisoAoCopiar`, `onClick`).
 - `CabecaDaTela`: o alto da tela (rótulo, título, frase e ações).
 - `Campo`, `Busca`, `CampoDeSenha` (com o olho), `Rotulado` (o rótulo liga ao controle do kit por id, sem envolvê-lo; `erro`, `ajuda`, `obrigatorio`, `opcional`, `acao`; controle nativo dentro dele leva `htmlFor` e o mesmo `id`), `AreaDeTexto`, `Escolha` (`vazio` troca ou tira a opção vazia; `children` para `optgroup`), `SimNao`, `Caixa`, `Alternativa` (o radio; `variante="cartao"`): os controles de formulário; `CampoMoeda` (o R$ fixo, formata ao sair e no Enter, vazio é null; `comoTexto` para dinheiro em string decimal).
 - `Segredo` e `SenhaGerada`: o que aparece uma vez só (a chave, o link, a senha), destacado e copiável.
@@ -71,15 +71,15 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 - `BlocoDestaque`, `SeloDoDestaque`, `LinhaDoDestaque`: o "Cobalto claro", o número que abre a tela; `Indicador`: o cartão de número com ícone e filete.
 - `Selo` (neutro, cobalto, ganho, aviso, risco, contorno; `comPonto`) e o tipo `Tom`.
 - `Abas`, `TrilhoDeAbas`, `Aba`, `ConteudoDaAba`: as abas segmentadas, com contagem.
-- `MestreDetalhe`, `ItemDaLista`, `PaginasDaLista`: a lista à esquerda, o detalhe à direita (empilha abaixo de `lg`; `embutido` sem o bloco em volta; `ItemDaLista` com `href` ou `asChild` vira link).
-- `Tabela` (TanStack Table; `meta.numero` alinha à direita, `meta.principal` fica com a sobra, `meta.quebra` deixa o texto em várias linhas, `meta.fixa` prende a coluna à esquerda, `meta.centro` centraliza, `meta.esconderAbaixo` some abaixo de sm/md/lg; `expandir` abre uma linha de detalhe embaixo, `podeAbrir` limita quais linhas abrem, `atributosDaLinha` põe data-*/aria-* no `<tr>`, `vazio` aceita ReactNode; `classeDaLinha`, `grupo` para a faixa de título e o `footer` das colunas no rodapé) e o tipo `Pagina`.
+- `MestreDetalhe`, `ItemDaLista`, `PaginasDaLista`: a lista à esquerda, o detalhe à direita (empilha abaixo de `lg`; `embutido` sem o bloco em volta; `ItemDaLista` com `href` ou `asChild` vira link e `em="linha"` põe ícone, texto e seta lado a lado).
+- `Tabela` (TanStack Table; `meta.numero` alinha à direita, `meta.principal` fica com a sobra, `meta.quebra` deixa o texto em várias linhas, `meta.fixa` prende a coluna à esquerda, `meta.centro` centraliza, `meta.esconderAbaixo` some abaixo de sm/md/lg; `expandir` abre uma linha de detalhe embaixo, `podeAbrir` limita quais linhas abrem, `atributosDaLinha` põe data-*/aria-* no `<tr>`, `idDaLinha` mantém as linhas abertas quando os dados mudam, `vazio` aceita ReactNode; `classeDaLinha`, `grupo` para a faixa de título e o `footer` das colunas no rodapé) e o tipo `Pagina`.
 - `Modal` e `Cancelar` (`rotulo`): o modal de ação (filete, título de seção, rodapé; fecha só pelo × ou Cancelar).
 - `Nota`: o aviso que fica na tela, em linha (neutro, cobalto, ganho, aviso, risco); o resultado de uma ação continua no toast.
 - `BotaoDeConfirmar`: o botão do que não se desfaz, com a confirmação em modal (`tipoDoConfirmar="primario"` quando não é risco, `rotuloDoCancelar`); `useConfirmar` para a confirmação que não nasce de um botão só (`await confirmar({...})`).
 - `SemValor`, `Esqueleto`, `Carregando`, `Erro`, `Vazio` (`solto`, `icone`, `filete`): os estados (o rótulo e a frase vêm por prop).
 - `Avisos`, `avisar`, `configurarAvisos`, `fraseDoErro`: o toast (e a frase da recusa que fica na tela).
-- `Brasao` (`inteiro` ou `escudo`), `AssinaturaDalBosco` e `SeloDalBosco`: a marca da Dal Bosco Systems (as imagens vêm no pacote). Toda tela inicial leva a `AssinaturaDalBosco` no pé; todo login, a `MolduraPublica` com o painel do produto e o selo embaixo do cartão (o hub usa `painel="brasao"`).
-- `MolduraPublica` (`painel` produto ou brasao, `selo`), `CartaoDeAcesso`, `Entrar`, `EsqueciASenha`, `RedefinirASenha`, `CriarConta`, `ConfirmarEmail`: as telas de acesso, prontas e iguais em todo projeto. O kit só desenha: o consumidor passa a chamada à API (`aoEntrar`, `aoPedir`, `aoRedefinir`, `aoCriar`, que devolvem a promessa; a recusa aparece no cartão com a `fraseDoErro`) e os links do roteador dele em `links`. O token do link, o e-mail, o limite de tentativas e quem pode criar conta são do backend de cada projeto.
+- `Brasao` (`inteiro` ou `escudo`), `AssinaturaDalBosco` e `SeloDalBosco`: a marca da Dal Bosco Systems (as imagens vêm no pacote). A página pública (a home, fora do login) leva a `AssinaturaDalBosco` no pé, nunca as telas de dentro do app; todo login, a `MolduraPublica` com o painel do produto e o selo embaixo do cartão (o hub usa `painel="brasao"`).
+- `MolduraPublica` (`painel` produto ou brasao, `selo`, `marcaDoPainel`), `CartaoDeAcesso`, `Entrar`, `EsqueciASenha`, `RedefinirASenha`, `CriarConta`, `ConfirmarEmail`: as telas de acesso, prontas e iguais em todo projeto. O kit só desenha: o consumidor passa a chamada à API (`aoEntrar`, `aoPedir`, `aoRedefinir`, `aoCriar`, que devolvem a promessa; a recusa aparece no cartão com a `fraseDoErro`) e os links do roteador dele em `links`. Títulos, frases e rótulos têm padrão e se trocam por prop (o `RedefinirASenha` serve para aceitar convite; o `CriarConta` recebe o `FormData` com os `extras`, `valoresIniciais` e `contexto`; o `EsqueciASenha` aceita usuário com `tipoDoLogin="text"`). O token do link, o e-mail, o limite de tentativas e quem pode criar conta são do backend de cada projeto.
 - `CabecaDaFicha` (com `acoes`), `Codigo`, `Pares`, `Par` (`longo` não corta, `ocupa` estende), `Entidade`: as partes de uma ficha.
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.
 - `Paleta`, `useAtalhoDaBusca`, `usePausa`: a paleta Ctrl K (os grupos vêm do consumidor) e os tipos `GrupoDaPaleta`, `ItemDaPaleta`.
