@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.4.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.4.1.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -92,6 +92,8 @@ O seletor de mês, as fichas da plataforma (produto, nota, fornecedor), os rótu
 
 ## Mudar o kit
 
-- A sessão de um projeto nunca edita o kit: o que falta ela escreve no próprio projeto, no padrão do kit, e registra no ticket como candidato. Uma sessão só do kit junta os candidatos e solta a versão.
+- Uma linha de versão só: o projeto sempre sobe para a tag mais nova, nunca para um patch de versão antiga. Antes do bump, `gh release list -R RafaelGustavoDalBosco/beyond-kit` e o Release de cada tag desde a sua dizem o que muda para quem usa.
+- A sessão de um projeto nunca edita o kit: o que falta ela escreve no próprio projeto, no padrão do kit, e registra como candidato (ou como problema do kit) no ticket aberto do projeto **KIT** no hub (`ticket.py abertos KIT`), não no ticket do próprio projeto. Uma sessão só do kit lê esse ticket, junta os candidatos e solta a versão.
+- Toda tag sai com o Release no GitHub: o que muda para quem usa e o comando do bump.
 - Antes de cada tag: `npm i` e `npm run tipos` (o TypeScript mais novo dos projetos e o 5.7); a tag só sai com os dois limpos.
 - Versão: o que só acrescenta sobe o patch ou o minor; o que muda a tela de quem já usa (como o `MestreDetalhe` empilhar no celular) sobe o minor e vai dito no commit, para os projetos saberem no bump.
