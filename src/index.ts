@@ -26,6 +26,8 @@ export * from "./acesso/acesso";
 
 export * from "./marca/marca";
 
+export * from "./home/home";
+
 export * from "./ficha/partes";
 export * from "./ficha/pilha";
 export * from "./ficha/PilhaDeFichas";

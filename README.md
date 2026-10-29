@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.8.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.9.0.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -79,6 +79,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 - `SemValor`, `Esqueleto`, `Carregando`, `Erro`, `Vazio` (`solto`, `icone`, `filete`): os estados (o rótulo e a frase vêm por prop).
 - `Avisos`, `avisar`, `configurarAvisos`, `fraseDoErro`: o toast (e a frase da recusa que fica na tela).
 - `Brasao` (`inteiro` ou `escudo`), `AssinaturaDalBosco` e `SeloDalBosco`: a marca da Dal Bosco Systems (as imagens vêm no pacote). A página pública (a home, fora do login) leva a `AssinaturaDalBosco` no pé, nunca as telas de dentro do app; todo login, a `MolduraPublica` com o painel do produto e o selo embaixo do cartão (o hub usa `painel="brasao"`).
+- `CabecalhoPublico`, `HeroiDoProduto`, `TelaDoProduto`, `SecaoPublica`, `Passos`, `Recursos`, `ChamadaFinal`, `RodapePublico`: a página pública (a home, fora do login), no modelo "vitrine do produto". Toda home é montada com eles, nesta ordem: cabeçalho, herói com a tela do produto, como funciona (`Passos`), recursos, chamada final e rodapé (que já traz a `AssinaturaDalBosco`). Os textos, os links do roteador e a imagem da tela são do projeto; o SEO e a rota também.
 - `MolduraPublica` (`painel` produto ou brasao, `selo`, `marcaDoPainel`), `CartaoDeAcesso`, `Entrar`, `EsqueciASenha`, `RedefinirASenha`, `CriarConta`, `ConfirmarEmail`: as telas de acesso, prontas e iguais em todo projeto. O kit só desenha: o consumidor passa a chamada à API (`aoEntrar`, `aoPedir`, `aoRedefinir`, `aoCriar`, que devolvem a promessa; a recusa aparece no cartão com a `fraseDoErro`) e os links do roteador dele em `links`. Títulos, frases e rótulos têm padrão e se trocam por prop (o `RedefinirASenha` serve para aceitar convite; o `CriarConta` recebe o `FormData` com os `extras`, `valoresIniciais` e `contexto`; o `EsqueciASenha` aceita usuário com `tipoDoLogin="text"`). O token do link, o e-mail, o limite de tentativas e quem pode criar conta são do backend de cada projeto.
 - `CabecaDaFicha` (com `acoes`), `Codigo`, `Pares`, `Par` (`longo` não corta, `ocupa` estende), `Entidade`: as partes de uma ficha.
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.

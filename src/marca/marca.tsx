@@ -20,9 +20,19 @@ export function Brasao({ variante = "inteiro", className }: { variante?: "inteir
 }
 
 /** A assinatura do pé da página pública (a home, fora do login; nunca dentro do app): o brasão inteiro, o fio dourado e "Um produto Dal Bosco Systems". */
-export function AssinaturaDalBosco({ ano = new Date().getFullYear(), className }: { ano?: number; className?: string }) {
+export function AssinaturaDalBosco({
+  ano = new Date().getFullYear(),
+  como = "footer",
+  className,
+}: {
+  ano?: number;
+  /** `div` dentro de outro rodapé (o RodapePublico), que já é o <footer>. */
+  como?: "footer" | "div";
+  className?: string;
+}) {
+  const Caixa = como;
   return (
-    <footer className={cn("mt-10 flex flex-col items-center gap-1.5 pb-2 text-center", className)}>
+    <Caixa className={cn("mt-10 flex flex-col items-center gap-1.5 pb-2 text-center", className)}>
       <Brasao className="h-[72px]" />
       <span aria-hidden className="my-1 h-px w-[120px] bg-gradient-to-r from-transparent via-brasao-ouro to-transparent" />
       <small className="text-[11px] text-texto-3">
@@ -31,7 +41,7 @@ export function AssinaturaDalBosco({ ano = new Date().getFullYear(), className }
           dalboscosystems.com.br
         </a>
       </small>
-    </footer>
+    </Caixa>
   );
 }
 
