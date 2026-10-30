@@ -9,7 +9,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.11.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v0.12.0.tar.gz
    npm i radix-ui lucide-react class-variance-authority clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```
@@ -64,17 +64,17 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 ## Componentes
 
 - `Botao` (primario, secundario, fantasma, ganho, perigo, lateral; md, sm, icone, icone-sm; `asChild` dá o visual a um `Link` ou `<a>`; `carregando` e `textoCarregando`), `Tecla` (o kbd) e `BotaoDeCopiar` (só ícone em `icone`/`icone-sm`, `avisoAoCopiar`, `onClick`).
-- `BarraDoTopo`: a barra presa no alto da área de conteúdo (ícone, trilha, título em caixa alta, ações).
+- `BarraDoTopo`: a barra presa no alto da área de conteúdo (ícone, trilha, título em caixa alta, ações). `useLugaresDoTopo`, `ProvedorDoTopo` e `NoTopo`: a ponte para a tela pôr a frase, as ações e o título dela na barra da casca (o exemplo está em `ui/topo.tsx`).
 - `CabecaDaTela`: o alto da tela (rótulo, título em caixa alta, frase e ações).
-- `CabecaDoRegistro` (com `BotaoDeVoltar` e a faixa de `indicadores`, que aceita `tom` e `progresso`), `Informacoes` e `Informacao` (rótulo à esquerda, valor à direita), `Historico` (um cartão por evento: criação, alteração, exclusão, com o valor antigo riscado e o novo): a tela de um registro, como a obra e o cliente do ArchFlow.
+- `CabecaDoRegistro` (com `BotaoDeVoltar` e a faixa de `indicadores`, que aceita `tom` e `progresso`), `Informacoes` (`solto` sem o cartão) e `Informacao` (rótulo à esquerda, valor à direita), `Historico` (um cartão por evento: criação, alteração, exclusão ou a ação livre com rótulo e tom, com o valor antigo riscado e o novo): a tela de um registro, como a obra e o cliente do ArchFlow.
 - `Campo`, `Busca`, `CampoDeSenha` (com o olho), `Rotulado` (o rótulo liga ao controle do kit por id, sem envolvê-lo; `erro`, `ajuda`, `obrigatorio`, `opcional`, `acao`; controle nativo dentro dele leva `htmlFor` e o mesmo `id`), `AreaDeTexto`, `Escolha` (`vazio` troca ou tira a opção vazia; `children` para `optgroup`), `SimNao`, `Caixa`, `Alternativa` (o radio; `variante="cartao"`): os controles de formulário; `GradeDoFormulario` (2 a 8 colunas, de 5 para cima só no `xl`; o `Rotulado` estende com `ocupa`) e `SecaoDoFormulario` (o grupo na caixa cinza com título de seção); `CampoMoeda` (o R$ fixo, formata ao sair e no Enter, vazio é null; `comoTexto` para dinheiro em string decimal).
 - `Segredo` e `SenhaGerada`: o que aparece uma vez só (a chave, o link, a senha), destacado e copiável.
 - `Bloco`, `CabecaDoBloco`, `Destaque`: a unidade da tela e o número de destaque dentro dela.
 - `BlocoDestaque`, `SeloDoDestaque`, `LinhaDoDestaque`: o "Cobalto claro", o número que abre a tela; `Indicador`: o cartão de número com ícone e filete.
-- `Quadro`, `ColunaDoQuadro` (ponto da cor, contagem, legenda), `CartaoDoQuadro` (`href`, `aoAbrir`, `asChild`): o quadro por situação, como o de clientes do ArchFlow.
+- `Quadro`, `ColunaDoQuadro` (ponto da cor, contagem, legenda), `CartaoDoQuadro` (`href`, `aoAbrir`, `asChild`; `acoes` no pé, fora do clique): o quadro por situação (até 5 colunas), como o de clientes do ArchFlow.
 - `Selo` (neutro, cobalto, ganho, aviso, risco, contorno; `comPonto`) e o tipo `Tom`.
 - `Abas`, `TrilhoDeAbas` (`largo` ocupa a largura toda), `Aba` (`icone`, `contagem`), `ConteudoDaAba`: as abas segmentadas.
-- `MestreDetalhe`, `ItemDaLista`, `GrupoDaLista`, `PaginasDaLista`: a lista de cartões à esquerda, o detalhe num cartão à direita (empilha abaixo de `lg`; `titulo` e `contagem` fazem a cabeça padrão da lista, com a busca e os filtros na `cabeca` embaixo; `GrupoDaLista` é o rótulo de grupo entre os cartões, com o valor à direita; `embutido` tira o cartão do detalhe, para dentro de um bloco ou para o detalhe que monta os cartões dele; `ItemDaLista` com `href` ou `asChild` vira link e `em="linha"` põe ícone, texto e seta lado a lado).
+- `MestreDetalhe`, `ItemDaLista`, `GrupoDaLista`, `PaginasDaLista`: a lista de cartões à esquerda, o detalhe num cartão à direita (empilha abaixo de `lg`; `titulo` e `contagem` fazem a cabeça padrão da lista, com a busca e os filtros na `cabeca` embaixo; `GrupoDaLista` é o rótulo de grupo entre os cartões, com o valor à direita; `CarregarMais` é o pé da lista que vem aos pedaços, com `emBloco` no pé de um bloco; `embutido` tira o cartão do detalhe, para dentro de um bloco ou para o detalhe que monta os cartões dele; `ItemDaLista` com `href` ou `asChild` vira link e `em="linha"` põe ícone, texto e seta lado a lado).
 - `Tabela` (TanStack Table; `meta.numero` alinha à direita, `meta.principal` fica com a sobra, `meta.quebra` deixa o texto em várias linhas, `meta.fixa` prende a coluna à esquerda, `meta.centro` centraliza, `meta.esconderAbaixo` some abaixo de sm/md/lg; `expandir` abre uma linha de detalhe embaixo, `podeAbrir` limita quais linhas abrem, `atributosDaLinha` põe data-*/aria-* no `<tr>`, `idDaLinha` mantém as linhas abertas quando os dados mudam, `vazio` aceita ReactNode; `classeDaLinha`, `grupo` para a faixa de título e o `footer` das colunas no rodapé) e o tipo `Pagina`.
 - `Modal` e `Cancelar` (`rotulo`): o modal de ação (filete, título de seção, rodapé; fecha só pelo × ou Cancelar).
 - `Nota`: o aviso que fica na tela, em linha (neutro, cobalto, ganho, aviso, risco); o resultado de uma ação continua no toast.
@@ -88,7 +88,7 @@ Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, bey
 - `PilhaDeFichas`, `criarUsePilha`, `lerPilha`, `escreverPilha`, os tipos `Ficha`, `AdaptadorDaPilha`, `UsePilha`, `DefinicaoDaFicha`, `RegistroDeFichas`.
 - `Paleta`, `useAtalhoDaBusca`, `usePausa`: a paleta Ctrl K (os grupos vêm do consumidor) e os tipos `GrupoDaPaleta`, `ItemDaPaleta`.
 - `CartaoDoFormulario`, `CampoDoFormulario`, `Mes`, `BarraDeSalvar`: o formulário de parâmetros e a barra presa no pé.
-- `SoltarArquivos`, `ListaDeArquivos`, `BarraDeProgresso`: a tela de envio de arquivos; `fetchComProgresso` (o `fetch` sobre XHR, com o progresso do envio e a resposta em stream) e `lerNdjson` (a resposta linha a linha, até o `resumo`), com `juntarArquivos`, `eZip`, `megabytes` e `tamanhoDoArquivo`.
+- `SoltarArquivos`, `ListaDeArquivos`, `BarraDeProgresso` (`tom`), `LinhasComProblema` (as linhas recusadas da simulação de uma importação): a tela de envio de arquivos; `fetchComProgresso` (o `fetch` sobre XHR, com o progresso do envio e a resposta em stream) e `lerNdjson` (a resposta linha a linha, até o `resumo`), com `juntarArquivos`, `eZip`, `megabytes` e `tamanhoDoArquivo`.
 - `cn` e a formatação pt-BR (`moeda`, `moedaUnitaria`, `numero`, `contagem`, `percentual`, `documento`, `ncm`, `data`, `dataHora`, `periodo`, `periodoLongo`, `iniciais`).
 
 Adaptadores: `@dalbosco/kit/tanstack` (TanStack Router), `@dalbosco/kit/next` (App Router), `@dalbosco/kit/react-router` (React Router 6.4+ e 7) e `@dalbosco/kit/url` (app sem roteador: `pushState` e `popstate` direto) exportam `useAdaptadorDaPilha` e o `usePilha` pronto.

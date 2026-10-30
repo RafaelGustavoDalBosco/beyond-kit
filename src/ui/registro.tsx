@@ -132,7 +132,25 @@ export function CabecaDoRegistro({
 }
 
 /** O bloco de informações ao lado do registro: o título de seção (opcional) e as linhas rótulo → valor. */
-export function Informacoes({ titulo, children, className }: { titulo?: ReactNode; children: ReactNode; className?: string }) {
+export function Informacoes({
+  titulo,
+  solto,
+  children,
+  className,
+}: {
+  titulo?: ReactNode;
+  /** Sem o cartão em volta (dentro de um `Bloco` que já existe). */
+  solto?: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
+  if (solto)
+    return (
+      <div className={cn("flex flex-col gap-3 text-sm", className)}>
+        {titulo && <h3 className="titulo-secao m-0 mb-1">{titulo}</h3>}
+        <dl className="m-0 flex flex-col gap-3">{children}</dl>
+      </div>
+    );
   return (
     <Bloco className={cn("flex flex-col gap-3 p-5 text-sm", className)}>
       {titulo && <h3 className="titulo-secao m-0 mb-1">{titulo}</h3>}
@@ -151,16 +169,17 @@ export function Informacao({ rotulo, children }: { rotulo: ReactNode; children: 
   );
 }
 
-/** Um evento do histórico: o que houve, quem, quando e o que mudou (o campo, o valor antigo e o novo). */
+/** Um evento do histórico: o que houve, quem, quando e o que mudou (o campo, o valor antigo e o novo). A `acao` é uma
+ * das três ou livre, com o rótulo e o tom do selo (Aberta, Atribuída, Resolvida). */
 export type EventoDoHistorico = {
   id: string | number;
-  acao: "criacao" | "alteracao" | "exclusao";
+  acao: "criacao" | "alteracao" | "exclusao" | { rotulo: ReactNode; tom: Tom };
   autor?: ReactNode;
   quando: ReactNode;
   mudancas?: { campo: ReactNode; de?: ReactNode; para?: ReactNode }[];
 };
 
-const ACAO: Record<EventoDoHistorico["acao"], [string, Tom]> = {
+const ACAO: Record<"criacao" | "alteracao" | "exclusao", [ReactNode, Tom]> = {
   criacao: ["Criação", "ganho"],
   alteracao: ["Alteração", "cobalto"],
   exclusao: ["Exclusão", "risco"],
@@ -174,7 +193,7 @@ export function Historico({ eventos, vazio = "Nenhuma alteração registrada." }
   return (
     <ol className="m-0 flex list-none flex-col gap-3 p-0">
       {eventos.map((e) => {
-        const [rotulo, tom] = ACAO[e.acao];
+        const [rotulo, tom] = typeof e.acao === "string" ? ACAO[e.acao] : [e.acao.rotulo, e.acao.tom];
         return (
           <li key={e.id} className="rounded-bloco border border-linha bg-superficie p-5 shadow-1">
             <div className="flex items-center justify-between gap-3">

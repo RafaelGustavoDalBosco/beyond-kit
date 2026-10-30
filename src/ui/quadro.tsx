@@ -19,9 +19,9 @@ const PONTO: Record<Exclude<Tom, "contorno">, string> = {
 };
 
 /** As colunas do quadro, lado a lado a partir de `lg`. */
-export function Quadro({ colunas = 3, className, children }: { colunas?: 2 | 3 | 4; className?: string; children: ReactNode }) {
+export function Quadro({ colunas = 3, className, children }: { colunas?: 2 | 3 | 4 | 5; className?: string; children: ReactNode }) {
   return (
-    <div className={cn("grid grid-cols-1 gap-4", { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4" }[colunas], className)}>
+    <div className={cn("grid grid-cols-1 gap-4", { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5" }[colunas], className)}>
       {children}
     </div>
   );
@@ -63,37 +63,48 @@ export function ColunaDoQuadro({
 }
 
 /** Um cartão do quadro. Com `href` vira `<a>`, com `aoAbrir` vira botão e com `asChild` o filho único (o `Link` do
- * roteador) leva o visual. */
+ * roteador) leva o visual. `acoes` (o "Pagar", o copiar) vão no pé, fora do clique do cartão. */
 export function CartaoDoQuadro({
   href,
   aoAbrir,
   asChild,
+  acoes,
   className,
   children,
 }: {
   href?: string;
   aoAbrir?: () => void;
   asChild?: boolean;
+  acoes?: ReactNode;
   className?: string;
   children: ReactNode;
 }) {
-  const estilo = cn(
+  const cartao = cn(
     "block w-full rounded-xl border border-linha bg-superficie p-3.5 text-left shadow-1",
     (href || aoAbrir || asChild) && "cursor-pointer transition-[border,box-shadow] hover:border-cobalto/40 hover:shadow-2",
+    acoes && "relative",
     className,
   );
-  if (asChild) return <Slot.Root className={estilo}>{children}</Slot.Root>;
-  if (href)
-    return (
-      <a href={href} className={estilo}>
-        {children}
-      </a>
-    );
-  if (aoAbrir)
-    return (
-      <button type="button" onClick={aoAbrir} className={estilo}>
-        {children}
-      </button>
-    );
-  return <div className={estilo}>{children}</div>;
+  // Com ações, o clique é de um alvo esticado sobre o cartão inteiro e as ações ficam por cima dele.
+  const estilo = acoes ? "block w-full cursor-pointer text-left after:absolute after:inset-0 after:rounded-xl" : cartao;
+  const alvo = asChild ? (
+    <Slot.Root className={estilo}>{children}</Slot.Root>
+  ) : href ? (
+    <a href={href} className={estilo}>
+      {children}
+    </a>
+  ) : aoAbrir ? (
+    <button type="button" onClick={aoAbrir} className={estilo}>
+      {children}
+    </button>
+  ) : (
+    <div className={estilo}>{children}</div>
+  );
+  if (!acoes) return alvo;
+  return (
+    <div className={cartao}>
+      {alvo}
+      <div className="relative z-10 mt-3 flex flex-wrap items-center gap-2 border-t border-linha pt-2.5">{acoes}</div>
+    </div>
+  );
 }

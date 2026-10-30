@@ -4,12 +4,14 @@
 // lista do que foi escolhido e a barra de progresso. Os textos de regra (o
 // teto, o que fica fora) vêm do consumidor; o kit só desenha.
 
+import type { ColumnDef } from "@tanstack/react-table";
 import { FileArchive, FileText, FileUp, X } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { contagem, numero } from "../lib/formato";
 import { Botao } from "../ui/botao";
+import { Tabela } from "../ui/tabela";
 
 import { eZip, megabytes } from "./fluxo";
 
@@ -126,8 +128,23 @@ export function ListaDeArquivos({
   );
 }
 
-/** A barra de progresso do envio ou do processamento; `esperando` pulsa enquanto o total não chegou. */
-export function BarraDeProgresso({ rotulo, valor, parte, esperando }: { rotulo: string; valor: string; parte: number; esperando?: boolean }) {
+const COR_DA_BARRA = { cobalto: "bg-cobalto", ganho: "bg-ganho", aviso: "bg-aviso", risco: "bg-risco" };
+
+/** A barra de progresso do envio ou do processamento; `esperando` pulsa enquanto o total não chegou e `tom` pinta o
+ * preenchimento (o uso que chega ao limite fica aviso ou risco). */
+export function BarraDeProgresso({
+  rotulo,
+  valor,
+  parte,
+  esperando,
+  tom = "cobalto",
+}: {
+  rotulo: string;
+  valor: string;
+  parte: number;
+  esperando?: boolean;
+  tom?: keyof typeof COR_DA_BARRA;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-between text-[13px]">
@@ -136,9 +153,31 @@ export function BarraDeProgresso({ rotulo, valor, parte, esperando }: { rotulo: 
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-superficie-3">
         <div
-          className={cn("h-full rounded-full bg-cobalto transition-[width] duration-300", esperando && "animate-brilhar")}
+          className={cn("h-full rounded-full transition-[width] duration-300", COR_DA_BARRA[tom], esperando && "animate-brilhar")}
           style={{ width: `${Math.min(100, Math.round(parte * 100))}%` }}
         />
+      </div>
+    </div>
+  );
+}
+
+/** Uma linha de uma importação que foi recusada ou veio com ressalva; sem `linha` (ou 0), o traço. */
+export type LinhaComProblema = { linha?: number | null; motivo: ReactNode };
+
+const COLUNAS_DO_PROBLEMA: ColumnDef<LinhaComProblema>[] = [
+  { id: "linha", header: "Linha", meta: { numero: true }, cell: ({ row }) => row.original.linha || "—" },
+  { id: "motivo", header: "Motivo", meta: { principal: true, quebra: true }, cell: ({ row }) => row.original.motivo },
+];
+
+/** As linhas recusadas (ou as ressalvas) da simulação de uma importação: o título de seção e a tabela curta, que
+ * rola; nada quando não há. */
+export function LinhasComProblema({ titulo, linhas }: { titulo: ReactNode; linhas: LinhaComProblema[] }) {
+  if (linhas.length === 0) return null;
+  return (
+    <div>
+      <h3 className="titulo-secao m-0 mb-2">{titulo}</h3>
+      <div className="max-h-48 overflow-auto rounded-xl border border-linha">
+        <Tabela dados={linhas} colunas={COLUNAS_DO_PROBLEMA} />
       </div>
     </div>
   );

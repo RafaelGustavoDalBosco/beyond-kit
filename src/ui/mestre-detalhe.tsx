@@ -116,6 +116,31 @@ export function GrupoDaLista({ titulo, valor }: { titulo: ReactNode; valor?: Rea
   );
 }
 
+/** O "Carregar mais" da lista que vem aos pedaços (some quando não há mais); `emBloco` põe a linha em cima, para o pé
+ * de um `Bloco` ou de uma tabela. */
+export function CarregarMais({
+  temMais,
+  carregando,
+  aoCarregar,
+  emBloco,
+  rotulo = "Carregar mais",
+}: {
+  temMais: boolean;
+  carregando?: boolean;
+  aoCarregar: () => void;
+  emBloco?: boolean;
+  rotulo?: ReactNode;
+}) {
+  if (!temMais) return null;
+  return (
+    <div className={cn("flex justify-center", emBloco ? "border-t border-linha p-3" : "pt-4")}>
+      <Botao tamanho="sm" carregando={carregando} onClick={aoCarregar}>
+        {rotulo}
+      </Botao>
+    </div>
+  );
+}
+
 /** A paginação no pé da lista (a página vem do servidor). */
 export function PaginasDaLista({
   page,
