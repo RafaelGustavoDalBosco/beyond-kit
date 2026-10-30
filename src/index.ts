@@ -12,13 +12,17 @@ export * from "./ui/confirmacao";
 export * from "./ui/copiar";
 export * from "./ui/destaque";
 export * from "./ui/estados";
+export * from "./ui/interruptor";
+export * from "./ui/menu-lateral";
 export * from "./ui/mestre-detalhe";
 export * from "./ui/modal";
 export * from "./ui/nota";
+export * from "./ui/novidades";
 export * from "./ui/quadro";
 export * from "./ui/registro";
 export * from "./ui/segredo";
 export * from "./ui/selo";
+export * from "./ui/sino";
 export * from "./ui/tabela";
 export * from "./ui/tela";
 export * from "./ui/topo";
@@ -36,6 +40,8 @@ export * from "./ficha/pilha";
 export * from "./ficha/PilhaDeFichas";
 
 export * from "./busca/Paleta";
+
+export * from "./tv/painel";
 
 export * from "./formulario/formulario";
 

@@ -53,6 +53,26 @@ export function BarraDoTopo({
   );
 }
 
+const LARGURAS = {
+  estreita: "max-w-4xl",
+  media: "max-w-6xl",
+  larga: "max-w-7xl",
+};
+
+/** O conteúdo da tela no meio da área, com largura máxima, nunca esticado na tela toda (como o ArchFlow): `estreita`
+ * no formulário e no registro simples, `media` no registro com coluna lateral, `larga` (padrão) na lista e no início. */
+export function AreaDaTela({
+  largura = "larga",
+  className,
+  children,
+}: {
+  largura?: keyof typeof LARGURAS;
+  className?: string;
+  children: ReactNode;
+}) {
+  return <div className={cn("mx-auto w-full", LARGURAS[largura], className)}>{children}</div>;
+}
+
 /** O alto da tela: o rótulo do assunto, o título, a frase e as ações à direita. */
 export function CabecaDaTela({
   rotulo,

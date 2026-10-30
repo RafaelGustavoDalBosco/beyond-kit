@@ -229,3 +229,27 @@
 @utility aurora {
   background-image: radial-gradient(1200px 320px at 30% -120px, var(--brilho), transparent 70%);
 }
+
+/* O painel de TV (`PainelDeTv`): escuro como o menu lateral, um tom abaixo, para ler de longe. */
+:root {
+  --painel: #0a1538;
+  --painel-2: #0f1d4a;
+  --painel-3: rgb(255 255 255 / 0.06);
+  --painel-linha: rgb(255 255 255 / 0.1);
+  --painel-texto: #ffffff;
+  --painel-texto-2: #c3cbe0;
+  --painel-texto-3: #8792b3;
+  /* a barra e o realce sobre o escuro: o cobalto do claro some no fundo */
+  --painel-destaque: #60a5fa;
+}
+
+@theme inline {
+  --color-painel: var(--painel);
+  --color-painel-2: var(--painel-2);
+  --color-painel-3: var(--painel-3);
+  --color-painel-linha: var(--painel-linha);
+  --color-painel-texto: var(--painel-texto);
+  --color-painel-texto-2: var(--painel-texto-2);
+  --color-painel-texto-3: var(--painel-texto-3);
+  --color-painel-destaque: var(--painel-destaque);
+}
