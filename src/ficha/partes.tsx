@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Copy, type LucideIcon } from "lucide-react";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Dica, type ConteudoDaDica } from "../ui/dica";
@@ -93,10 +93,67 @@ export function Codigo({ nome, valor, copiavel }: { nome: string; valor: ReactNo
   );
 }
 
+/** Um valor da `Faixa`; `apagado` é o zero (em texto-3, peso normal), para o número com valor saltar aos olhos. */
+export type ItemDaFaixa = { rotulo: ReactNode; valor: ReactNode; apagado?: boolean };
+
+/** Uma linha de totais com lugar fixo para cada campo, como o quadro de totais do DANFE: o rótulo em cima, o valor
+ * embaixo. `grupos` é o tamanho de cada bloco, em ordem (`[7, 3]`: os tributos | desconto, frete e seguro), e um fio
+ * mais forte separa os blocos. Com largura de sobra as colunas dividem a linha; sem ela, a faixa rola de lado dentro
+ * do próprio contêiner, nunca a página. */
+export function Faixa({ itens, grupos }: { itens: ItemDaFaixa[]; grupos?: number[] }) {
+  const inicios = new Set<number>();
+  let n = 0;
+  for (const g of grupos ?? []) inicios.add((n += g));
+  return (
+    <div className="overflow-x-auto rounded-xl border border-linha">
+      <div className="grid auto-cols-[minmax(max-content,1fr)] grid-flow-col">
+        {itens.map((i, k) => (
+          <div
+            key={k}
+            className={cn(
+              "flex min-w-0 flex-col gap-0.5 px-3 py-2",
+              k > 0 && "border-l",
+              inicios.has(k) ? "border-linha-forte" : "border-linha",
+            )}
+          >
+            <span className="rotulo text-[10.5px] whitespace-nowrap">{i.rotulo}</span>
+            <span className={cn("numero text-[13.5px] whitespace-nowrap", i.apagado ? "text-texto-3" : "font-semibold text-texto")}>
+              {i.valor}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// O `Par` sabe se está num `Pares` denso.
+const Denso = createContext(false);
+
 /** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco. As colunas seguem a largura do contêiner (não
  * a da tela), para a ficha estreita não espremer: uma coluna abaixo de 24rem, duas até 42rem, `colunas` daí para cima.
- * `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista. */
-export function Pares({ children, colunas = 3, compacto }: { children: ReactNode; colunas?: 2 | 3 | 4; compacto?: boolean }) {
+ * `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista. `denso` é a lista de definição em
+ * duas colunas (uma abaixo de 32rem): o rótulo de 104px à esquerda, o valor à direita, linhas de 34px com um fio
+ * embaixo e sem caixa por par, para a ficha curta e cheia (o item da nota). */
+export function Pares({
+  children,
+  colunas = 3,
+  compacto,
+  denso,
+}: {
+  children: ReactNode;
+  colunas?: 2 | 3 | 4;
+  compacto?: boolean;
+  denso?: boolean;
+}) {
+  if (denso)
+    return (
+      <div className="@container">
+        <Denso.Provider value={true}>
+          <dl className="m-0 grid grid-cols-1 gap-x-7 border-t border-linha @lg:grid-cols-2">{children}</dl>
+        </Denso.Provider>
+      </div>
+    );
   return (
     <div className="@container">
       <dl
@@ -112,7 +169,8 @@ export function Pares({ children, colunas = 3, compacto }: { children: ReactNode
   );
 }
 
-/** Um par; `longo` não corta o valor (o endereço, a descrição) e `ocupa` estende por mais colunas, até as que o `Pares` tem abertas; `dica` põe o (i) que explica o termo. */
+/** Um par; `longo` não corta o valor (o endereço, a descrição) e `ocupa` estende por mais colunas, até as que o `Pares`
+ * tem abertas (`"inteiro"` é a linha toda: o CFOP com a descrição); `dica` põe o (i) que explica o termo. */
 export function Par({
   rotulo,
   longo,
@@ -122,17 +180,37 @@ export function Par({
 }: {
   rotulo: string;
   longo?: boolean;
-  ocupa?: number;
+  ocupa?: number | "inteiro";
   dica?: ConteudoDaDica;
   children: ReactNode;
 }) {
+  const denso = useContext(Denso);
+  const inteiro = ocupa === "inteiro";
+  if (denso)
+    return (
+      <div
+        className={cn(
+          "flex min-h-[34px] min-w-0 items-baseline gap-3 border-b border-linha px-0.5 py-[7px]",
+          (inteiro || (typeof ocupa === "number" && ocupa > 1)) && "col-span-full",
+        )}
+      >
+        <dt className="flex w-[104px] shrink-0 items-center gap-1 text-xs text-texto-3">
+          {rotulo}
+          {dica && <Dica conteudo={dica} />}
+        </dt>
+        <dd className={cn("m-0 min-w-0 text-[13.5px] font-medium [overflow-wrap:anywhere]", longo && "whitespace-pre-line")}>{children}</dd>
+      </div>
+    );
   return (
     <div
       className={cn(
         "flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha",
-        ocupa && ocupa > 1 && "[grid-column:span_min(var(--ocupa),var(--colunas-agora))/span_min(var(--ocupa),var(--colunas-agora))]",
+        inteiro && "col-span-full",
+        typeof ocupa === "number" &&
+          ocupa > 1 &&
+          "[grid-column:span_min(var(--ocupa),var(--colunas-agora))/span_min(var(--ocupa),var(--colunas-agora))]",
       )}
-      style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
+      style={typeof ocupa === "number" ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
     >
       <dt className="flex items-center gap-1 text-xs text-texto-3">
         {rotulo}

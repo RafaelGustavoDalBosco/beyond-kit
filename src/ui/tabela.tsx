@@ -15,7 +15,7 @@ import { cn } from "../lib/cn";
 import { contagem } from "../lib/formato";
 
 import { Botao } from "./botao";
-import { Carregando } from "./estados";
+import { Carregando, SemValorCompacto } from "./estados";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -53,7 +53,8 @@ export type Pagina = { page: number; page_size: number; total: number };
  * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total). `expandir` dá à linha um botão que
  * abre embaixo dela o detalhe (uma sub-tabela); `podeAbrir` diz quais linhas abrem a ficha; `atributosDaLinha` põe
  * data-*, aria-* ou id no <tr>. `idDaLinha` dá a chave de cada linha: com ela, as linhas abertas do `expandir` seguem
- * abertas quando `dados` muda (o "Carregar mais", um refetch); sem ela, a chave é a posição e elas fecham.
+ * abertas quando `dados` muda (o "Carregar mais", um refetch); sem ela, a chave é a posição e elas fecham. `densa` é a
+ * tabela curta dentro de uma ficha (os tributos do item): linhas de 34px, cabeçalho de 32px e o `SemValor` como um ponto.
  */
 export function Tabela<T>({
   dados,
@@ -69,6 +70,7 @@ export function Tabela<T>({
   podeAbrir,
   atributosDaLinha,
   idDaLinha,
+  densa,
 }: {
   dados: T[] | undefined;
   colunas: ColumnDef<T, any>[];
@@ -83,6 +85,7 @@ export function Tabela<T>({
   podeAbrir?: (linha: T) => boolean;
   atributosDaLinha?: (linha: T) => Record<string, string | number | boolean | undefined>;
   idDaLinha?: (linha: T) => string;
+  densa?: boolean;
 }) {
   const tabela = useReactTable({
     data: dados ?? SEM_DADOS,
@@ -114,131 +117,136 @@ export function Tabela<T>({
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            {tabela.getHeaderGroups().map((g) => (
-              <tr key={g.id}>
-                {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
-                {g.headers.map((h) => (
-                  <th
-                    key={h.id}
-                    className={cn(
-                      "rotulo sticky top-0 h-10 border-b border-linha bg-superficie-2 px-4 text-left whitespace-nowrap",
-                      h.column.columnDef.meta?.numero && "text-right",
-                      h.column.columnDef.meta?.principal && "w-full",
-                      h.column.columnDef.meta?.fixa && "left-0 z-10",
-                      classeDaColuna(h.column.columnDef.meta),
-                    )}
-                  >
-                    {flexRender(h.column.columnDef.header, h.getContext())}
-                  </th>
-                ))}
-                {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {!carregando &&
-              linhas.map((r, i) => {
-                const titulo = grupo?.(r.original);
-                const anterior = linhas[i - 1];
-                const novoGrupo = grupo && (!anterior || titulo !== grupo(anterior.original));
-                const clicavel = !!aoAbrir && (podeAbrir?.(r.original) ?? true);
-                const detalhe = expandir?.(r.original) ?? null;
-                const aberta = detalhe !== null && abertas.has(r.id);
-                return (
-                  <Fragment key={r.id}>
-                    {novoGrupo && (
-                      <tr>
-                        <th colSpan={largura} className="border-b border-linha bg-superficie-2/60 px-4 py-2 text-left">
-                          <span className="titulo-secao">{titulo}</span>
-                        </th>
-                      </tr>
-                    )}
-                    <tr
-                      {...atributosDaLinha?.(r.original)}
-                      onClick={clicavel ? () => aoAbrir?.(r.original) : undefined}
-                      className={cn(
-                        "group border-b border-linha last:border-0",
-                        clicavel && "cursor-pointer transition-colors hover:bg-superficie-2",
-                        classeDaLinha?.(r.original),
-                      )}
-                    >
-                      {expandir && (
-                        <td className="w-8 pl-2">
-                          {detalhe !== null && (
-                            <Botao
-                              tipo="fantasma"
-                              tamanho="icone-sm"
-                              aria-expanded={aberta}
-                              aria-label={aberta ? "Esconder detalhes" : "Mostrar detalhes"}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                alternar(r.id);
-                              }}
-                            >
-                              <ChevronDown className={cn("transition-transform", !aberta && "-rotate-90")} />
-                            </Botao>
-                          )}
-                        </td>
-                      )}
-                      {r.getVisibleCells().map((c) => (
-                        <td
-                          key={c.id}
-                          className={cn(
-                            "h-11 px-4 whitespace-nowrap",
-                            c.column.columnDef.meta?.numero && "numero text-right",
-                            c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
-                            c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
-                            c.column.columnDef.meta?.fixa && "sticky left-0 z-[1] bg-superficie",
-                            classeDaColuna(c.column.columnDef.meta),
-                          )}
-                        >
-                          {flexRender(c.column.columnDef.cell, c.getContext())}
-                        </td>
-                      ))}
-                      {aoAbrir && (
-                        <td className="pr-3 text-texto-3">
-                          {clicavel && (
-                            <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                    {aberta && (
-                      <tr className="border-b border-linha last:border-0">
-                        <td colSpan={largura} className="bg-superficie-2/40 p-0">
-                          {detalhe}
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
-          </tbody>
-          {comRodape && !carregando && (
-            <tfoot>
-              {tabela.getFooterGroups().map((g) => (
-                <tr key={g.id} className="border-t border-linha-forte bg-superficie-2/60">
-                  {expandir && <td />}
+        <SemValorCompacto.Provider value={!!densa}>
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              {tabela.getHeaderGroups().map((g) => (
+                <tr key={g.id}>
+                  {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
                   {g.headers.map((h) => (
-                    <td
+                    <th
                       key={h.id}
                       className={cn(
-                        "h-11 px-4 font-semibold whitespace-nowrap",
-                        h.column.columnDef.meta?.numero && "numero text-right",
+                        "rotulo sticky top-0 border-b border-linha bg-superficie-2 px-4 text-left whitespace-nowrap",
+                        densa ? "h-8" : "h-10",
+                        h.column.columnDef.meta?.numero && "text-right",
+                        h.column.columnDef.meta?.principal && "w-full",
+                        h.column.columnDef.meta?.fixa && "left-0 z-10",
                         classeDaColuna(h.column.columnDef.meta),
                       )}
                     >
-                      {h.isPlaceholder ? null : flexRender(h.column.columnDef.footer, h.getContext())}
-                    </td>
+                      {flexRender(h.column.columnDef.header, h.getContext())}
+                    </th>
                   ))}
-                  {aoAbrir && <td />}
+                  {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
                 </tr>
               ))}
-            </tfoot>
-          )}
-        </table>
+            </thead>
+            <tbody>
+              {!carregando &&
+                linhas.map((r, i) => {
+                  const titulo = grupo?.(r.original);
+                  const anterior = linhas[i - 1];
+                  const novoGrupo = grupo && (!anterior || titulo !== grupo(anterior.original));
+                  const clicavel = !!aoAbrir && (podeAbrir?.(r.original) ?? true);
+                  const detalhe = expandir?.(r.original) ?? null;
+                  const aberta = detalhe !== null && abertas.has(r.id);
+                  return (
+                    <Fragment key={r.id}>
+                      {novoGrupo && (
+                        <tr>
+                          <th colSpan={largura} className="border-b border-linha bg-superficie-2/60 px-4 py-2 text-left">
+                            <span className="titulo-secao">{titulo}</span>
+                          </th>
+                        </tr>
+                      )}
+                      <tr
+                        {...atributosDaLinha?.(r.original)}
+                        onClick={clicavel ? () => aoAbrir?.(r.original) : undefined}
+                        className={cn(
+                          "group border-b border-linha last:border-0",
+                          clicavel && "cursor-pointer transition-colors hover:bg-superficie-2",
+                          classeDaLinha?.(r.original),
+                        )}
+                      >
+                        {expandir && (
+                          <td className="w-8 pl-2">
+                            {detalhe !== null && (
+                              <Botao
+                                tipo="fantasma"
+                                tamanho="icone-sm"
+                                aria-expanded={aberta}
+                                aria-label={aberta ? "Esconder detalhes" : "Mostrar detalhes"}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  alternar(r.id);
+                                }}
+                              >
+                                <ChevronDown className={cn("transition-transform", !aberta && "-rotate-90")} />
+                              </Botao>
+                            )}
+                          </td>
+                        )}
+                        {r.getVisibleCells().map((c) => (
+                          <td
+                            key={c.id}
+                            className={cn(
+                              "px-4 whitespace-nowrap",
+                              densa ? "h-[34px]" : "h-11",
+                              c.column.columnDef.meta?.numero && "numero text-right",
+                              c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
+                              c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
+                              c.column.columnDef.meta?.fixa && "sticky left-0 z-[1] bg-superficie",
+                              classeDaColuna(c.column.columnDef.meta),
+                            )}
+                          >
+                            {flexRender(c.column.columnDef.cell, c.getContext())}
+                          </td>
+                        ))}
+                        {aoAbrir && (
+                          <td className="pr-3 text-texto-3">
+                            {clicavel && (
+                              <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                      {aberta && (
+                        <tr className="border-b border-linha last:border-0">
+                          <td colSpan={largura} className="bg-superficie-2/40 p-0">
+                            {detalhe}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+            </tbody>
+            {comRodape && !carregando && (
+              <tfoot>
+                {tabela.getFooterGroups().map((g) => (
+                  <tr key={g.id} className="border-t border-linha-forte bg-superficie-2/60">
+                    {expandir && <td />}
+                    {g.headers.map((h) => (
+                      <td
+                        key={h.id}
+                        className={cn(
+                          "px-4 font-semibold whitespace-nowrap",
+                          densa ? "h-[34px]" : "h-11",
+                          h.column.columnDef.meta?.numero && "numero text-right",
+                          classeDaColuna(h.column.columnDef.meta),
+                        )}
+                      >
+                        {h.isPlaceholder ? null : flexRender(h.column.columnDef.footer, h.getContext())}
+                      </td>
+                    ))}
+                    {aoAbrir && <td />}
+                  </tr>
+                ))}
+              </tfoot>
+            )}
+          </table>
+        </SemValorCompacto.Provider>
         {carregando && <Carregando forma="tabela" linhas={5} />}
         {!carregando && dados?.length === 0 && vazio && <div className="p-8 text-center text-texto-3">{vazio}</div>}
       </div>

@@ -2,14 +2,25 @@
 
 import { CircleAlert, type LucideIcon } from "lucide-react";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
 import { Botao } from "./botao";
 
-/** null é "sem valor", nunca zero nem travessão; o rótulo vem do consumidor. */
-export function SemValor({ rotulo = "sem valor" }: { rotulo?: string }) {
+/** Liga o `SemValor` compacto (o ponto) em tudo o que estiver dentro; a `Tabela` densa já liga. */
+export const SemValorCompacto = createContext(false);
+
+/** null é "sem valor", nunca zero nem travessão; o rótulo vem do consumidor. `compacto` (ou a `Tabela` densa em volta)
+ * mostra só um ponto apagado, com o rótulo no `title` e para o leitor de tela. */
+export function SemValor({ rotulo = "sem valor", compacto }: { rotulo?: string; compacto?: boolean }) {
+  const noCompacto = useContext(SemValorCompacto);
+  if (compacto ?? noCompacto)
+    return (
+      <span role="img" aria-label={rotulo} title={rotulo} className="text-texto-3">
+        ·
+      </span>
+    );
   return <span className="text-texto-3 italic">{rotulo}</span>;
 }
 

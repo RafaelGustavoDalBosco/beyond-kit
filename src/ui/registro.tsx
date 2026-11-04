@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 import { Bloco } from "./bloco";
+import { DePara } from "./de-para";
 import { Vazio } from "./estados";
 import { Selo, type Tom } from "./selo";
 
@@ -197,7 +198,7 @@ const ACAO: Record<"criacao" | "alteracao" | "exclusao", [ReactNode, Tom]> = {
 
 const semValor = (v: ReactNode) => v == null || v === "";
 
-/** O histórico de um registro: um cartão por evento, com o valor antigo riscado e o novo ao lado. */
+/** O histórico de um registro: um cartão por evento, com o `DePara` de cada campo (o valor antigo riscado, o novo em cobalto). */
 export function Historico({ eventos, vazio = "Nenhuma alteração registrada." }: { eventos: EventoDoHistorico[]; vazio?: ReactNode }) {
   if (eventos.length === 0) return <Vazio titulo={vazio} icone={History} />;
   return (
@@ -222,16 +223,8 @@ export function Historico({ eventos, vazio = "Nenhuma alteração registrada." }
                 {e.mudancas.map((m, n) => (
                   <div key={n} className="flex items-start gap-2 text-xs">
                     <dt className="numero w-32 shrink-0 pt-0.5 text-texto-3">{m.campo}</dt>
-                    <dd className="m-0 flex min-w-0 flex-wrap items-center gap-1.5">
-                      {!semValor(m.de) && (
-                        <span className="rounded bg-risco-suave px-1.5 py-0.5 text-risco line-through [overflow-wrap:anywhere]">{m.de}</span>
-                      )}
-                      <span className="text-texto-3">→</span>
-                      {semValor(m.para) ? (
-                        <span className="text-texto-3">—</span>
-                      ) : (
-                        <span className="rounded bg-ganho-suave px-1.5 py-0.5 text-ganho [overflow-wrap:anywhere]">{m.para}</span>
-                      )}
+                    <dd className="m-0 min-w-0">
+                      <DePara de={semValor(m.de) ? null : m.de} para={semValor(m.para) ? null : m.para} />
                     </dd>
                   </div>
                 ))}
