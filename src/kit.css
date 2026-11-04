@@ -1,0 +1,271 @@
+/* @dalbosco/kit: os tokens, o tema, a base e as utilities. Não importa o Tailwind: o projeto faz
+   `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`. */
+
+@font-face {
+  font-family: "Sora";
+  src: url("./fonts/Sora-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+/* Cobalto, só claro; o menu lateral é cobalto escuro. Cor só com sentido: cobalto é ação e seleção, verde é
+   ganho, laranja é o que pede ação ou ressalva o número, vermelho é risco. */
+:root {
+  --fundo: #f4f5f8;
+  --superficie: #ffffff;
+  --superficie-2: #f0f2f6;
+  --superficie-3: #e8ebf1;
+  --linha: #e4e7ee;
+  --linha-forte: #cdd2dc;
+  --texto: #0d1117;
+  --texto-2: #545c6b;
+  --texto-3: #6b7280;
+  /* o texto secundário nos cartões da lista */
+  --texto-lista: #3f4653;
+
+  --cobalto: #1d4ed8;
+  --cobalto-forte: #1e40af;
+  --cobalto-suave: #ebf0fe;
+  --cobalto-tinta: #1d3fb0;
+  --sobre-cobalto: #ffffff;
+
+  --ganho: #0f7b4a;
+  --ganho-suave: #e7f5ee;
+  --aviso: #b45309;
+  --aviso-suave: #fdf1e3;
+  --risco: #c0362c;
+  --risco-suave: #fcedeb;
+
+  --lateral: #0f1d4a;
+  --lateral-2: rgb(255 255 255 / 0.08);
+  --lateral-linha: rgb(255 255 255 / 0.1);
+  --lateral-texto: #c3cbe0;
+  --lateral-ativo: #ffffff;
+  --lateral-cheio: #2447b8;
+  /* o estado sobre o menu escuro: o aviso e o ganho do claro somem no cobalto escuro */
+  --lateral-aviso: #fbbf24;
+  --lateral-ganho: #34d399;
+
+  /* o "Cobalto claro" do BlocoDestaque: o degradê, o anel e os dois textos sobre ele */
+  --destaque-de: #eef3ff;
+  --destaque-meio: #e3ebff;
+  --destaque-ate: #d4e1ff;
+  --destaque-anel: #c5d5ff;
+  --destaque-texto: #0f1a3d;
+  --destaque-texto-2: #3a4a7a;
+
+  /* o dourado do brasão da Dal Bosco Systems (o fio da assinatura) */
+  --brasao-ouro: #b08a4a;
+
+  /* as séries de um gráfico, na ordem (sem sentido: o verde, o laranja e o vermelho ficam para ganho, aviso e risco) */
+  --serie-1: #1d4ed8;
+  --serie-2: #60a5fa;
+  --serie-3: #a5b4fc;
+  --serie-4: #1e3a8a;
+  --serie-5: #8b92a0;
+
+  --sombra-1: 0 1px 2px rgb(13 17 23 / 0.05);
+  /* a sombra suave dos blocos; botão e campo ficam com a --sombra-1 */
+  --sombra-bloco: 0 4px 16px rgb(20 25 40 / 0.09);
+  --sombra-2: 0 2px 4px rgb(13 17 23 / 0.04), 0 8px 24px rgb(13 17 23 / 0.06);
+  --sombra-3: 0 12px 32px rgb(13 17 23 / 0.14), 0 2px 6px rgb(13 17 23 / 0.06);
+  --veu: rgb(13 17 23 / 0.32);
+  --brilho: rgb(29 78 216 / 0.06);
+  --filete: linear-gradient(90deg, #1e3a8a, #1d4ed8 45%, #60a5fa);
+  --icone-cheio: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+}
+
+@theme inline {
+  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-superficie-3: var(--superficie-3);
+  --color-linha: var(--linha);
+  --color-linha-forte: var(--linha-forte);
+  --color-texto: var(--texto);
+  --color-texto-2: var(--texto-2);
+  --color-texto-3: var(--texto-3);
+  --color-cobalto: var(--cobalto);
+  --color-cobalto-forte: var(--cobalto-forte);
+  --color-cobalto-suave: var(--cobalto-suave);
+  --color-cobalto-tinta: var(--cobalto-tinta);
+  --color-sobre-cobalto: var(--sobre-cobalto);
+  --color-ganho: var(--ganho);
+  --color-ganho-suave: var(--ganho-suave);
+  --color-aviso: var(--aviso);
+  --color-aviso-suave: var(--aviso-suave);
+  --color-risco: var(--risco);
+  --color-risco-suave: var(--risco-suave);
+  --color-lateral: var(--lateral);
+  --color-lateral-2: var(--lateral-2);
+  --color-lateral-linha: var(--lateral-linha);
+  --color-lateral-texto: var(--lateral-texto);
+  --color-lateral-ativo: var(--lateral-ativo);
+  --color-lateral-cheio: var(--lateral-cheio);
+  --color-lateral-aviso: var(--lateral-aviso);
+  --color-lateral-ganho: var(--lateral-ganho);
+  --color-destaque-de: var(--destaque-de);
+  --color-destaque-meio: var(--destaque-meio);
+  --color-destaque-ate: var(--destaque-ate);
+  --color-destaque-anel: var(--destaque-anel);
+  --color-destaque-texto: var(--destaque-texto);
+  --color-destaque-texto-2: var(--destaque-texto-2);
+  --color-brasao-ouro: var(--brasao-ouro);
+  --color-serie-1: var(--serie-1);
+  --color-serie-2: var(--serie-2);
+  --color-serie-3: var(--serie-3);
+  --color-serie-4: var(--serie-4);
+  --color-serie-5: var(--serie-5);
+
+  --shadow-1: var(--sombra-1);
+  --shadow-bloco: var(--sombra-bloco);
+  --shadow-2: var(--sombra-2);
+  --shadow-3: var(--sombra-3);
+
+  --radius-controle: 10px;
+  --radius-bloco: 16px;
+  --radius-ficha: 20px;
+
+  --animate-entrar: entrar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-subir: subir 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-brilhar: brilhar 1.4s ease-in-out infinite;
+  /* espera 200 ms invisível: a resposta rápida não chega a piscar */
+  --animate-surgir: surgir 0.15s ease-out 0.2s both;
+  --animate-correr: correr 1.2s ease-in-out infinite;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes subir {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes brilhar {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes surgir {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes correr {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01";
+  }
+  ::selection {
+    background: var(--cobalto-suave);
+  }
+  :focus-visible {
+    outline: 2px solid var(--cobalto);
+    outline-offset: 2px;
+  }
+}
+
+/* O brasão da Dal Bosco Systems (o `Brasao` do kit): inteiro, com o nome e o lema, ou só o escudo com os animais. */
+.brasao-inteiro {
+  background-image: url("./marca/brasao.webp");
+}
+.brasao-escudo {
+  background-image: url("./marca/escudo.webp");
+}
+
+/* Número de tabela e código (CNPJ, NCM, CFOP, chave): a Sora com algarismos
+   de largura fixa, para as colunas alinharem. Uma fonte só no front. */
+@utility numero {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility rotulo {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* A cor padrão do rótulo fica abaixo das utilities: `rotulo text-cobalto` ganha sempre, em qualquer ordem. */
+@layer components {
+  .rotulo {
+    color: var(--texto-3);
+  }
+}
+
+/* O filete cobalto no alto de uma ficha, de um registro e de um modal. */
+@utility filete {
+  background-image: var(--filete);
+  height: 3px;
+}
+
+/* Título de seção: caixa alta com a barra cobalto à esquerda. */
+@utility titulo-secao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+  &::before {
+    content: "";
+    width: 4px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--cobalto);
+    flex-shrink: 0;
+  }
+}
+
+/* O quadrado do ícone do registro, da ficha e da barra do topo: o cobalto cheio, em degradê. */
+@utility icone-cheio {
+  background-image: var(--icone-cheio);
+  color: var(--sobre-cobalto);
+  box-shadow: inset 0 0 0 1px rgb(15 29 74 / 0.12), var(--sombra-1);
+}
+
+/* O brilho cobalto no alto da área de conteúdo. */
+@utility aurora {
+  background-image: radial-gradient(1200px 320px at 30% -120px, var(--brilho), transparent 70%);
+}
+
+/* O painel de TV (`PainelDeTv`): escuro como o menu lateral, um tom abaixo, para ler de longe. */
+:root {
+  --painel: #0a1538;
+  --painel-2: #0f1d4a;
+  --painel-3: rgb(255 255 255 / 0.06);
+  --painel-linha: rgb(255 255 255 / 0.1);
+  --painel-texto: #ffffff;
+  --painel-texto-2: #c3cbe0;
+  --painel-texto-3: #8792b3;
+  /* a barra e o realce sobre o escuro: o cobalto do claro some no fundo */
+  --painel-destaque: #60a5fa;
+}
+
+@theme inline {
+  --color-painel: var(--painel);
+  --color-painel-2: var(--painel-2);
+  --color-painel-3: var(--painel-3);
+  --color-painel-linha: var(--painel-linha);
+  --color-painel-texto: var(--painel-texto);
+  --color-painel-texto-2: var(--painel-texto-2);
+  --color-painel-texto-3: var(--painel-texto-3);
+  --color-painel-destaque: var(--painel-destaque);
+}
