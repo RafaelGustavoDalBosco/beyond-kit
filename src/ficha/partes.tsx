@@ -6,8 +6,8 @@ import { createContext, useContext, useState, type CSSProperties, type ReactNode
 import { cn } from "../lib/cn";
 import { Dica, type ConteudoDaDica } from "../ui/dica";
 
-/** O alto da ficha: o ícone do tipo, o que ela é, o nome e os códigos, no tom do alto do detalhe e com um fio embaixo
- * (o `mb-5` guarda o respiro até o corpo da ficha). */
+/** O alto da ficha: o ícone do tipo, o que ela é, o nome e os códigos, no tom do alto do detalhe. Com o corpo da ficha
+ * depois dele, leva um fio embaixo e 20px de respiro até o corpo; sozinho (o cabeçalho num `Bloco`), nem um nem outro. */
 export function CabecaDaFicha({
   icone: Icone,
   tipo,
@@ -25,7 +25,7 @@ export function CabecaDaFicha({
   acoes?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex gap-4 border-b border-linha bg-cabeca-detalhe px-6 pt-6 pb-5">
+    <div className="flex gap-4 border-linha bg-cabeca-detalhe px-6 pt-6 pb-5 not-last:mb-5 not-last:border-b">
       <div className="icone-cheio flex size-11 shrink-0 items-center justify-center rounded-xl">
         <Icone className="size-5" />
       </div>
