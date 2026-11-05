@@ -88,10 +88,12 @@ export function ItemDaLista({
     onClick: aoEscolher,
     "aria-current": ativo || undefined,
     className: cn(
-      // o texto do cartão é pequeno: o secundário e o selo neutro escurecem um degrau aqui dentro
-      "flex w-full shrink-0 cursor-pointer rounded-xl border bg-superficie px-4 py-3 text-left shadow-1 transition-[border,box-shadow] [--texto-2:var(--texto-lista)] [--texto-3:var(--texto-2)]",
+      "relative flex w-full shrink-0 cursor-pointer overflow-hidden rounded-xl border px-4 py-3 text-left shadow-1 transition-[border,box-shadow]",
       em === "linha" ? "flex-row items-center gap-3" : "flex-col gap-1.5",
-      ativo ? "border-cobalto ring-1 ring-cobalto" : "border-linha hover:border-linha-forte hover:shadow-2",
+      // o escolhido: o fundo cobalto suave, o contorno e a barra de 4px à esquerda
+      ativo
+        ? "border-cobalto bg-cobalto-suave ring-1 ring-cobalto before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-cobalto before:content-['']"
+        : "border-linha bg-superficie hover:border-linha-forte hover:shadow-2",
     ),
   };
   if (asChild) return <Slot.Root {...comum}>{children}</Slot.Root>;

@@ -93,7 +93,7 @@ export function CabecaDoRegistro({
   return (
     <div className={cn("overflow-hidden rounded-bloco border border-linha bg-superficie shadow-2", className)}>
       <div className="filete" />
-      <div className="flex flex-wrap items-start gap-4 p-5">
+      <div className="flex flex-wrap items-start gap-4 bg-cabeca-detalhe p-5">
         {voltar}
         {Icone && (
           <div className="icone-cheio flex size-12 shrink-0 items-center justify-center rounded-2xl">
@@ -110,7 +110,7 @@ export function CabecaDoRegistro({
           >
             {titulo}
           </h1>
-          {subtitulo && <p className="m-0 mt-1 text-sm leading-snug text-texto-3">{subtitulo}</p>}
+          {subtitulo && <p className="m-0 mt-1 text-sm leading-snug font-medium text-texto-3">{subtitulo}</p>}
           {selos && <div className="mt-3 flex flex-wrap items-center gap-1.5">{selos}</div>}
         </div>
         {acoes && <div className="flex flex-wrap items-center justify-end gap-2 sm:ml-auto">{acoes}</div>}

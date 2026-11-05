@@ -113,7 +113,8 @@ const ICONE: Record<Tom, string> = {
 
 /** O cartão de número: o filete no alto e o ícone do assunto no quadrado. `realce` pinta a borda e o fundo com o tom
  * (o número que pede atenção); `compacto` aperta o cartão para a grade estreita. `carregando` mantém o rótulo e o ícone
- * e põe o esqueleto no lugar do valor e do detalhe. */
+ * e põe o esqueleto no lugar do valor e do detalhe. Nada corta: no cartão estreito (abaixo de 15rem) o ícone sai para
+ * o valor caber, e o valor e o detalhe quebram linha se ainda faltar largura. */
 export function Indicador({
   rotulo,
   valor,
@@ -141,7 +142,7 @@ export function Indicador({
   className?: string;
 }) {
   const caixa = cn(
-    "flex w-full flex-col overflow-hidden rounded-bloco border border-linha bg-superficie text-left shadow-bloco",
+    "@container flex w-full flex-col overflow-hidden rounded-bloco border border-linha bg-superficie text-left shadow-bloco",
     aoAbrir && "cursor-pointer transition-[box-shadow,border,background] hover:border-linha-forte hover:shadow-2",
     realce && REALCE[tom],
     aoAbrir && ativo && "border-cobalto bg-cobalto-suave hover:border-cobalto",
@@ -153,7 +154,7 @@ export function Indicador({
       <div className={cn("flex items-center", compacto ? "gap-3 p-3.5" : "gap-4 p-5")}>
         <div
           className={cn(
-            "flex shrink-0 items-center justify-center",
+            "flex shrink-0 items-center justify-center @max-[15rem]:hidden",
             compacto ? "size-9 rounded-lg" : "size-12 rounded-xl",
             ICONE[tom],
           )}
@@ -171,13 +172,13 @@ export function Indicador({
             <>
               <div
                 className={cn(
-                  "mt-1 leading-tight font-semibold tracking-[-0.02em] tabular-nums",
+                  "mt-1 leading-tight font-semibold tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere]",
                   compacto ? "text-lg" : "text-[22px]",
                 )}
               >
                 {valor}
               </div>
-              {detalhe && <div className="truncate text-xs text-texto-3">{detalhe}</div>}
+              {detalhe && <div className="mt-0.5 text-xs leading-snug font-medium text-texto-3">{detalhe}</div>}
             </>
           )}
         </div>

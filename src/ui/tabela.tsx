@@ -122,12 +122,12 @@ export function Tabela<T>({
             <thead>
               {tabela.getHeaderGroups().map((g) => (
                 <tr key={g.id}>
-                  {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
+                  {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-cabeca-tabela" />}
                   {g.headers.map((h) => (
                     <th
                       key={h.id}
                       className={cn(
-                        "rotulo sticky top-0 border-b border-linha bg-superficie-2 px-4 text-left whitespace-nowrap",
+                        "rotulo sticky top-0 border-b border-linha bg-cabeca-tabela px-4 text-left whitespace-nowrap text-texto-cabeca",
                         densa ? "h-8" : "h-10",
                         h.column.columnDef.meta?.numero && "text-right",
                         h.column.columnDef.meta?.principal && "w-full",
@@ -138,7 +138,7 @@ export function Tabela<T>({
                       {flexRender(h.column.columnDef.header, h.getContext())}
                     </th>
                   ))}
-                  {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-superficie-2" />}
+                  {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-cabeca-tabela" />}
                 </tr>
               ))}
             </thead>
@@ -162,9 +162,11 @@ export function Tabela<T>({
                       )}
                       <tr
                         {...atributosDaLinha?.(r.original)}
+                        // a linha alternada: a segunda, a quarta… de dados (o título de grupo e o detalhe aberto não contam)
+                        data-zebra={i % 2 === 1 || undefined}
                         onClick={clicavel ? () => aoAbrir?.(r.original) : undefined}
                         className={cn(
-                          "group border-b border-linha last:border-0",
+                          "group border-b border-linha last:border-0 data-zebra:bg-zebra",
                           clicavel && "cursor-pointer transition-colors hover:bg-superficie-2",
                           classeDaLinha?.(r.original),
                         )}
@@ -196,7 +198,8 @@ export function Tabela<T>({
                               c.column.columnDef.meta?.numero && "numero text-right",
                               c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
                               c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
-                              c.column.columnDef.meta?.fixa && "sticky left-0 z-[1] bg-superficie",
+                              c.column.columnDef.meta?.fixa &&
+                                cn("sticky left-0 z-[1] bg-superficie group-data-zebra:bg-zebra", clicavel && "group-hover:bg-superficie-2"),
                               classeDaColuna(c.column.columnDef.meta),
                             )}
                           >

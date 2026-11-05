@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-// Selo: o estado de um valor ou de um item. O ponto dá a cor; o fundo é leve.
+// Selo: o estado de um valor ou de um item. O ponto dá a cor; o fundo é leve e o contorno é a própria cor a 35%.
 const estilo = cva(
-  "inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-full px-2 text-xs font-medium whitespace-nowrap [&_svg]:size-3",
+  "inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-full border border-current/35 px-2 text-xs font-semibold whitespace-nowrap [&_svg]:size-3",
   {
     variants: {
       tom: {
-        neutro: "bg-superficie-2 text-texto-2",
+        neutro: "bg-superficie-3 text-texto-2",
         cobalto: "bg-cobalto-suave text-cobalto-tinta",
         ganho: "bg-ganho-suave text-ganho",
         aviso: "bg-aviso-suave text-aviso",

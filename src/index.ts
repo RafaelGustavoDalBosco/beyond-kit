@@ -15,6 +15,7 @@ export * from "./ui/de-para";
 export * from "./ui/dica";
 export * from "./ui/destaque";
 export * from "./ui/estados";
+export * from "./ui/faixa-de-numeros";
 export * from "./ui/interruptor";
 export * from "./ui/menu-lateral";
 export * from "./ui/mestre-detalhe";

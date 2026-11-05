@@ -6,7 +6,8 @@ import { createContext, useContext, useState, type CSSProperties, type ReactNode
 import { cn } from "../lib/cn";
 import { Dica, type ConteudoDaDica } from "../ui/dica";
 
-/** O alto da ficha: o ícone do tipo, o que ela é, o nome e os códigos. */
+/** O alto da ficha: o ícone do tipo, o que ela é, o nome e os códigos, no tom do alto do detalhe e com um fio embaixo
+ * (o `mb-5` guarda o respiro até o corpo da ficha). */
 export function CabecaDaFicha({
   icone: Icone,
   tipo,
@@ -24,7 +25,7 @@ export function CabecaDaFicha({
   acoes?: ReactNode;
 }) {
   return (
-    <div className="flex gap-4 px-6 pt-6 pb-5">
+    <div className="mb-5 flex gap-4 border-b border-linha bg-cabeca-detalhe px-6 pt-6 pb-5">
       <div className="icone-cheio flex size-11 shrink-0 items-center justify-center rounded-xl">
         <Icone className="size-5" />
       </div>
@@ -68,27 +69,52 @@ export function SecaoDaFicha({
   );
 }
 
-/** Um código com o nome dele (NCM, CEST, EAN, CFOP…): a ficha técnica em linha. */
-export function Codigo({ nome, valor, copiavel }: { nome: string; valor: ReactNode; copiavel?: string }) {
+/** Um código com o nome dele (NCM, CEST, EAN, CFOP…): a ficha técnica em linha. `empilhado` põe o nome em cima do
+ * valor, sem a caixa: vários códigos cabem no cabeçalho da ficha estreita (junte-os com `gap-x-4 gap-y-2`). */
+export function Codigo({
+  nome,
+  valor,
+  copiavel,
+  empilhado,
+}: {
+  nome: string;
+  valor: ReactNode;
+  copiavel?: string;
+  empilhado?: boolean;
+}) {
   const [ok, setOk] = useState(false);
+  const copiar = copiavel && (
+    <button
+      type="button"
+      aria-label="Copiar"
+      onClick={() => {
+        navigator.clipboard.writeText(copiavel);
+        setOk(true);
+        setTimeout(() => setOk(false), 1400);
+      }}
+      className={cn(
+        "flex size-5 cursor-pointer items-center justify-center rounded text-texto-3 hover:bg-superficie-3 hover:text-texto",
+        !empilhado && "-ml-1",
+      )}
+    >
+      {ok ? <Check className="size-3" /> : <Copy className="size-3" />}
+    </button>
+  );
+  if (empilhado)
+    return (
+      <span className="inline-flex flex-col">
+        <span className="text-xs text-texto-3">{nome}</span>
+        <span className="numero flex h-6 items-center gap-1 text-[13px] font-medium text-texto">
+          {valor}
+          {copiar}
+        </span>
+      </span>
+    );
   return (
     <span className="inline-flex h-7 items-center gap-2 rounded-lg border border-linha bg-superficie-2 pr-1 pl-2.5 text-xs">
       <span className="text-texto-3">{nome}</span>
       <span className="numero pr-1.5 text-texto">{valor}</span>
-      {copiavel && (
-        <button
-          type="button"
-          aria-label="Copiar"
-          onClick={() => {
-            navigator.clipboard.writeText(copiavel);
-            setOk(true);
-            setTimeout(() => setOk(false), 1400);
-          }}
-          className="-ml-1 flex size-5 cursor-pointer items-center justify-center rounded text-texto-3 hover:bg-superficie-3 hover:text-texto"
-        >
-          {ok ? <Check className="size-3" /> : <Copy className="size-3" />}
-        </button>
-      )}
+      {copiar}
     </span>
   );
 }
@@ -98,22 +124,22 @@ export type ItemDaFaixa = { rotulo: ReactNode; valor: ReactNode; apagado?: boole
 
 /** Uma linha de totais com lugar fixo para cada campo, como o quadro de totais do DANFE: o rótulo em cima, o valor
  * embaixo. `grupos` é o tamanho de cada bloco, em ordem (`[7, 3]`: os tributos | desconto, frete e seguro), e um fio
- * mais forte separa os blocos. Com largura de sobra as colunas dividem a linha; sem ela, a faixa rola de lado dentro
- * do próprio contêiner, nunca a página. */
+ * mais forte separa os blocos. Com largura de sobra os campos dividem a linha; sem ela, quebram em mais linhas, sem
+ * buraco (o último de cada linha estica), nunca rolam de lado. Os fios são o fundo da faixa aparecendo no vão de 1px. */
 export function Faixa({ itens, grupos }: { itens: ItemDaFaixa[]; grupos?: number[] }) {
   const inicios = new Set<number>();
   let n = 0;
   for (const g of grupos ?? []) inicios.add((n += g));
   return (
-    <div className="overflow-x-auto rounded-xl border border-linha">
-      <div className="grid auto-cols-[minmax(max-content,1fr)] grid-flow-col">
+    <div className="overflow-hidden rounded-xl border border-linha">
+      <div className="flex flex-wrap gap-px bg-linha">
         {itens.map((i, k) => (
           <div
             key={k}
             className={cn(
-              "flex min-w-0 flex-col gap-0.5 px-3 py-2",
-              k > 0 && "border-l",
-              inicios.has(k) ? "border-linha-forte" : "border-linha",
+              "flex flex-auto flex-col gap-0.5 bg-superficie px-3 py-2",
+              // o fio forte no vão à esquerda do início do bloco (some quando ele abre a linha)
+              inicios.has(k) && "shadow-[-1px_0_0_var(--linha-forte)]",
             )}
           >
             <span className="rotulo text-[10.5px] whitespace-nowrap">{i.rotulo}</span>

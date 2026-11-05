@@ -155,14 +155,14 @@ function Conteudo(props: Interno) {
   const Link = props.Link ?? LinkPadrao;
   const estaAtivo = (item: ItemDoMenu) => item.ativo ?? (item.href ? (ativo?.(item.href) ?? false) : false);
 
-  // O grupo do item ativo abre sozinho; os outros abrem e fecham no clique.
+  // Um grupo aberto por vez: abrir um fecha o anterior (o menu não rola na tela baixa). O grupo do item ativo abre
+  // sozinho quando a rota muda.
   const grupoAtivo = itens.find((i) => i.filhos?.some(estaAtivo))?.rotulo;
-  const [abertos, setAbertos] = useState<string[]>(grupoAtivo ? [grupoAtivo] : []);
+  const [aberto, setAberto] = useState<string | null>(grupoAtivo ?? null);
   useEffect(() => {
-    if (grupoAtivo) setAbertos((a) => (a.includes(grupoAtivo) ? a : [...a, grupoAtivo]));
+    if (grupoAtivo) setAberto(grupoAtivo);
   }, [grupoAtivo]);
-  const alternar = (rotulo: string) =>
-    setAbertos((a) => (a.includes(rotulo) ? a.filter((r) => r !== rotulo) : [...a, rotulo]));
+  const alternar = (rotulo: string) => setAberto((a) => (a === rotulo ? null : rotulo));
 
   const link = (item: ItemDoMenu, aninhado = false) => {
     const Icone = item.icone;
@@ -204,7 +204,7 @@ function Conteudo(props: Interno) {
         {itens.map((item) => {
           if (!item.filhos?.length) return link(item);
           const Icone = item.icone;
-          const expandido = abertos.includes(item.rotulo);
+          const expandido = aberto === item.rotulo;
           const temAtivo = item.filhos.some(estaAtivo);
           return (
             <div key={item.rotulo}>
