@@ -93,7 +93,7 @@ export function Codigo({
         setTimeout(() => setOk(false), 1400);
       }}
       className={cn(
-        "flex size-5 cursor-pointer items-center justify-center rounded text-texto-3 hover:bg-superficie-3 hover:text-texto",
+        "flex size-5 shrink-0 cursor-pointer items-center justify-center rounded text-texto-3 hover:bg-superficie-3 hover:text-texto",
         !empilhado && "-ml-1",
       )}
     >
@@ -102,18 +102,19 @@ export function Codigo({
   );
   if (empilhado)
     return (
-      <span className="inline-flex flex-col">
+      <span className="inline-flex max-w-full min-w-0 flex-col">
         <span className="text-xs text-texto-3">{nome}</span>
-        <span className="numero flex h-6 items-center gap-1 text-[13px] font-medium text-texto">
-          {valor}
+        <span className="numero flex h-6 min-w-0 items-center gap-1 text-[13px] font-medium text-texto">
+          <span className="min-w-0 truncate" title={copiavel}>{valor}</span>
           {copiar}
         </span>
       </span>
     );
+  // O valor comprido (a chave da NF-e) corta com reticências; o nome e o copiar ficam sempre à vista.
   return (
-    <span className="inline-flex h-7 items-center gap-2 rounded-lg border border-linha bg-superficie-2 pr-1 pl-2.5 text-xs">
-      <span className="text-texto-3">{nome}</span>
-      <span className="numero pr-1.5 text-texto">{valor}</span>
+    <span className="inline-flex h-7 max-w-full min-w-0 items-center gap-2 rounded-lg border border-linha bg-superficie-2 pr-1 pl-2.5 text-xs">
+      <span className="shrink-0 text-texto-3">{nome}</span>
+      <span className="numero min-w-0 truncate pr-1.5 text-texto" title={copiavel}>{valor}</span>
       {copiar}
     </span>
   );
