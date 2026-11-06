@@ -16,8 +16,9 @@ import { Campo, Rotulado } from "../ui/campo";
 import { CampoDeSenha } from "../ui/campo-de-senha";
 
 /**
- * A tela sem menu: o painel à esquerda e o cartão do formulário à direita,
- * com o selo "Um produto Dal Bosco Systems" embaixo. O painel `produto`
+ * A tela sem menu: um bloco só no meio da tela, com o painel à esquerda e o
+ * cartão do formulário à direita na mesma altura, e o selo "Um produto Dal
+ * Bosco Systems" embaixo do bloco. O painel `produto`
  * (padrão) é cobalto e fala do produto (a marca, o rótulo, o título e a
  * frase); o painel `brasao` é o cobalto escuro do menu com o brasão grande (o
  * da própria Dal Bosco Systems, no hub), e aí o selo sai. Abaixo de `lg` o
@@ -46,33 +47,36 @@ export function MolduraPublica({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen">
-      {painel === "produto" ? (
-        <div className="hidden w-1/2 flex-col justify-between bg-cobalto p-12 text-sobre-cobalto lg:flex">
-          <div className="flex items-center gap-3 text-xl font-semibold">{marcaDoPainel}</div>
-          <div>
-            {rotulo && <div className="rotulo mb-3 text-sobre-cobalto/80">{rotulo}</div>}
-            {titulo && <h1 className="m-0 text-5xl leading-tight font-semibold tracking-[-0.02em] text-sobre-cobalto">{titulo}</h1>}
-            {frase && <p className="mt-4 max-w-md text-sobre-cobalto/70">{frase}</p>}
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-fundo p-6">
+      <div className="flex items-center gap-3 text-lg font-semibold lg:hidden">{marca}</div>
+      <div className="flex w-full max-w-sm items-stretch lg:max-w-3xl lg:overflow-hidden lg:rounded-bloco lg:shadow-bloco">
+        {painel === "produto" ? (
+          <div className="hidden w-1/2 flex-col justify-between gap-10 bg-cobalto p-10 text-sobre-cobalto lg:flex">
+            <div className="flex items-center gap-3 text-xl font-semibold">{marcaDoPainel}</div>
+            <div>
+              {rotulo && <div className="rotulo mb-3 text-sobre-cobalto/80">{rotulo}</div>}
+              {titulo && <h1 className="m-0 text-3xl leading-tight font-semibold tracking-[-0.02em] text-sobre-cobalto">{titulo}</h1>}
+              {frase && <p className="mt-4 text-sobre-cobalto/70">{frase}</p>}
+            </div>
+            <div className="text-xs text-sobre-cobalto/70">{rodape}</div>
           </div>
-          <div className="text-xs text-sobre-cobalto/70">{rodape}</div>
-        </div>
-      ) : (
-        <div className="hidden w-1/2 flex-col items-center justify-between bg-lateral p-12 text-lateral-ativo lg:flex">
-          {rotulo ? <div className="rotulo self-start text-lateral-texto">{rotulo}</div> : <span />}
-          <div className="flex w-full flex-col items-center gap-6 text-center">
-            <Brasao className="w-[min(360px,80%)] drop-shadow-[0_8px_24px_rgb(0_0_0/0.35)]" />
-            {titulo && <h1 className="m-0 max-w-md text-3xl leading-tight font-semibold tracking-[-0.02em]">{titulo}</h1>}
-            {frase && <p className="m-0 max-w-md text-lateral-texto">{frase}</p>}
+        ) : (
+          <div className="hidden w-1/2 flex-col items-center justify-between gap-6 bg-lateral p-10 text-lateral-ativo lg:flex">
+            {rotulo ? <div className="rotulo self-start text-lateral-texto">{rotulo}</div> : <span />}
+            <div className="flex w-full flex-col items-center gap-4 text-center">
+              <Brasao className="w-[min(180px,70%)] drop-shadow-[0_8px_24px_rgb(0_0_0/0.35)]" />
+              {titulo && <h1 className="m-0 text-xl leading-tight font-semibold tracking-[-0.02em]">{titulo}</h1>}
+              {frase && <p className="m-0 text-lateral-texto">{frase}</p>}
+            </div>
+            <div className="self-start text-xs text-lateral-texto">{rodape}</div>
           </div>
-          <div className="self-start text-xs text-lateral-texto">{rodape}</div>
+        )}
+        {/* O cartão encosta no painel: no bloco, sem o canto, a borda e a sombra do lado do painel. */}
+        <div className="flex w-full lg:w-1/2 lg:[&>*]:max-w-none lg:[&>*]:rounded-l-none lg:[&>*]:border-l-0 lg:[&>*]:shadow-none">
+          {children}
         </div>
-      )}
-      <div className="flex w-full flex-col items-center justify-center gap-6 bg-fundo p-6 lg:w-1/2">
-        <div className="flex items-center gap-3 text-lg font-semibold lg:hidden">{marca}</div>
-        {children}
-        {selo && <SeloDalBosco />}
       </div>
+      {selo && <SeloDalBosco />}
     </div>
   );
 }
