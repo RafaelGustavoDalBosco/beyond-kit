@@ -5,6 +5,7 @@
 export * from "./ui/abas";
 export * from "./ui/bloco";
 export * from "./ui/botao";
+export * from "./ui/cabecalho";
 export * from "./ui/campo";
 export * from "./ui/campo-de-senha";
 export * from "./ui/campo-moeda";

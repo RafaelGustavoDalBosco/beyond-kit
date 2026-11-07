@@ -20,14 +20,15 @@ export function ComColuna({
   largura = 340,
   ponto = "4xl",
   lado = "direita",
-  topo = 16,
+  topo = 72,
   children,
   className,
 }: {
   coluna: ReactNode;
   /** A largura da coluna, em px. */
   largura?: number;
-  /** Onde a coluna presa para, em px do alto da janela: 16, ou 80 sob a `BarraDoTopo` presa (64px + 16). */
+  /** Onde a coluna presa para, em px do alto da janela: 72 sob o `CabecalhoDoApp` (56px + 16), ou 136 sob ele e a
+   * `BarraDoTopo` presa (56 + 64 + 16). */
   topo?: number;
   ponto?: keyof typeof PONTO;
   lado?: "direita" | "esquerda";

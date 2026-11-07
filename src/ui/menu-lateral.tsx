@@ -1,11 +1,11 @@
 "use client";
 
-// O menu lateral cobalto escuro da casca, na medida do ArchFlow: a marca no alto (a sigla pesada e o nome em caixa
-// alta espaçada), os itens com ícone, os grupos que abrem e fecham, a área fixa de baixo (Suporte, Novidades) e o pé
-// com o usuário, o "Instalar o app", o "Sair" e a versão. No celular (abaixo de `lg`) vira a barra do alto com o botão
-// que abre a gaveta. O kit não conhece o roteador: o consumidor passa o `Link` dele e diz qual item está ativo.
+// O menu lateral cobalto escuro da casca, na medida do ArchFlow, só com a navegação: os itens com ícone e os grupos
+// que abrem e fecham. A marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele.
+// No celular (abaixo de `lg`) vira a gaveta que o botão do cabeçalho abre. O kit não conhece o roteador: o consumidor
+// passa o `Link` dele e diz qual item está ativo.
 
-import { ChevronDown, LogOut, Menu, MonitorSmartphone, X, type LucideIcon } from "lucide-react";
+import { ChevronDown, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -45,67 +45,31 @@ const LinkPadrao: LinkDoMenu = ({ href, children, ...resto }) => (
 
 /** As props do `MenuLateral`. */
 export type PropsDoMenuLateral = {
-  /** As iniciais da empresa, em negrito pesado (PJTS). */
-  sigla?: string;
-  /** O nome ao lado da sigla, em caixa alta espaçada (PROJETSE); sem sigla, menor e em até 2 linhas (a razão social). */
-  nome: string;
-  /** Para onde a marca leva (o início); ou `aoClicarNaMarca`. */
-  hrefDaMarca?: string;
-  aoClicarNaMarca?: () => void;
-  /** Embaixo da marca, o seletor de empresa do app. */
-  seletor?: ReactNode;
   itens: ItemDoMenu[];
-  /** A área fixa de baixo, acima do usuário (Suporte, Novidades). */
-  rodape?: ItemDoMenu[];
   /** Diz se o `href` é a rota atual, para o item sem `ativo`. */
   ativo?: (href: string) => boolean;
-  usuario: { nome: string; perfil?: ReactNode };
-  /** O nome e a inicial levam ao perfil. */
-  hrefDoPerfil?: string;
-  /** Mostra o "Instalar o app" (quando o navegador oferece, ou para explicar no iPhone). */
-  aoInstalar?: () => void;
-  aoSair: () => void;
-  versao?: string;
-  /** A versão leva às novidades. */
-  hrefDaVersao?: string;
+  /** A gaveta do celular, aberta pelo botão do `CabecalhoDoApp` (`menuAberto` e `aoAlternarMenu`). */
+  aberto?: boolean;
+  aoFechar?: () => void;
   Link?: LinkDoMenu;
 };
 
-/** O menu lateral da casca: aside fixo no desktop, barra do alto com gaveta no celular. */
+/** O menu lateral da casca, só com a navegação: aside fixo sob o cabeçalho no desktop, gaveta no celular. */
 export function MenuLateral(props: PropsDoMenuLateral) {
-  const [aberto, setAberto] = useState(false);
-  const fechar = () => setAberto(false);
+  const { aberto, aoFechar } = props;
+  const fechar = () => aoFechar?.();
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 lg:block">
+      <aside className="fixed top-14 bottom-0 left-0 z-30 hidden w-72 lg:block">
         <Conteudo {...props} fechar={fechar} />
       </aside>
 
-      {/* celular */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between bg-lateral px-4 text-lateral-ativo lg:hidden">
-        <Marca {...props} fechar={fechar} compacta />
-        <button
-          type="button"
-          onClick={() => setAberto(true)}
-          aria-label="Menu"
-          className="flex size-9 cursor-pointer items-center justify-center rounded-lg text-lateral-texto transition-colors hover:bg-lateral-2 hover:text-lateral-ativo"
-        >
-          <Menu className="size-5" />
-        </button>
-      </div>
+      {/* celular: a gaveta abre embaixo do cabeçalho, que continua à mostra */}
       {aberto && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-x-0 top-14 bottom-0 z-30 lg:hidden">
           <div className="absolute inset-0 bg-(--veu)" onClick={fechar} />
           <aside className="absolute inset-y-0 left-0 w-72 shadow-3">
-            <button
-              type="button"
-              onClick={fechar}
-              aria-label="Fechar"
-              className="absolute top-5 right-3 z-10 cursor-pointer text-lateral-texto hover:text-lateral-ativo"
-            >
-              <X className="size-5" />
-            </button>
             <Conteudo {...props} fechar={fechar} />
           </aside>
         </div>
@@ -116,42 +80,8 @@ export function MenuLateral(props: PropsDoMenuLateral) {
 
 type Interno = PropsDoMenuLateral & { fechar: () => void };
 
-/** A sigla pesada e o nome em caixa alta espaçada; o nome quebra em linhas se não couber. Sem sigla, só o nome, menor. */
-function Marca({ sigla, nome, hrefDaMarca, aoClicarNaMarca, Link = LinkPadrao, fechar, compacta }: Interno & { compacta?: boolean }) {
-  const desenho = sigla ? (
-    <span className={cn("flex items-center gap-2.5 leading-none", compacta ? "text-base" : "text-xl")}>
-      <span className="text-[1.55em] font-extrabold tracking-tight">{sigla}</span>
-      <span className="text-[0.92em] leading-[1.1] font-semibold tracking-[0.12em] uppercase">{nome}</span>
-    </span>
-  ) : (
-    <span title={nome} className="line-clamp-2 text-sm leading-snug font-semibold">
-      {nome}
-    </span>
-  );
-  if (hrefDaMarca)
-    return (
-      <Link href={hrefDaMarca} onClick={fechar} className="min-w-0 text-lateral-ativo">
-        {desenho}
-      </Link>
-    );
-  if (aoClicarNaMarca)
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          fechar();
-          aoClicarNaMarca();
-        }}
-        className="min-w-0 cursor-pointer text-left text-lateral-ativo"
-      >
-        {desenho}
-      </button>
-    );
-  return <div className="min-w-0 text-lateral-ativo">{desenho}</div>;
-}
-
 function Conteudo(props: Interno) {
-  const { seletor, itens, rodape, ativo, usuario, hrefDoPerfil, aoInstalar, aoSair, versao, hrefDaVersao, fechar } = props;
+  const { itens, ativo, fechar } = props;
   const Link = props.Link ?? LinkPadrao;
   const estaAtivo = (item: ItemDoMenu) => item.ativo ?? (item.href ? (ativo?.(item.href) ?? false) : false);
 
@@ -190,16 +120,8 @@ function Conteudo(props: Interno) {
     );
   };
 
-  const botaoDoPe = "flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-lateral-texto transition-colors hover:bg-lateral-2 hover:text-lateral-ativo";
-  const inicial = usuario.nome.trim().charAt(0).toUpperCase();
-
   return (
     <div className="flex h-full flex-col bg-lateral text-lateral-ativo">
-      <div className="flex flex-col gap-3 border-b border-lateral-linha px-5 py-5 pr-10 lg:pr-5">
-        <Marca {...props} />
-        {seletor}
-      </div>
-
       <nav className="flex-1 space-y-0.5 overflow-y-auto py-4">
         {itens.map((item) => {
           if (!item.filhos?.length) return link(item);
@@ -228,70 +150,6 @@ function Conteudo(props: Interno) {
           );
         })}
       </nav>
-
-      {rodape && rodape.length > 0 && (
-        <div className="space-y-0.5 border-t border-lateral-linha py-2">{rodape.map((item) => link(item))}</div>
-      )}
-
-      <div className="border-t border-lateral-linha p-4">
-        <div className="mb-3 flex items-center gap-3">
-          {hrefDoPerfil ? (
-            <Link href={hrefDoPerfil} onClick={fechar} title="Meu perfil" className="transition-opacity hover:opacity-80">
-              <Avatar inicial={inicial} />
-            </Link>
-          ) : (
-            <Avatar inicial={inicial} />
-          )}
-          <div className="min-w-0 flex-1">
-            {hrefDoPerfil ? (
-              <Link href={hrefDoPerfil} onClick={fechar} className="block truncate text-sm font-medium transition-colors hover:text-lateral-texto">
-                {usuario.nome}
-              </Link>
-            ) : (
-              <div className="truncate text-sm font-medium">{usuario.nome}</div>
-            )}
-            {usuario.perfil && <div className="truncate text-xs text-lateral-texto">{usuario.perfil}</div>}
-          </div>
-        </div>
-        {aoInstalar && (
-          <button
-            type="button"
-            onClick={() => {
-              fechar();
-              aoInstalar();
-            }}
-            className={botaoDoPe}
-          >
-            <MonitorSmartphone size={16} />
-            Instalar o app
-          </button>
-        )}
-        <button type="button" onClick={aoSair} className={botaoDoPe}>
-          <LogOut size={16} />
-          Sair
-        </button>
-        {versao &&
-          (hrefDaVersao ? (
-            <Link
-              href={hrefDaVersao}
-              onClick={fechar}
-              className="numero mt-2 block text-center text-xs text-lateral-texto/40 transition-colors hover:text-lateral-texto"
-            >
-              {versao}
-            </Link>
-          ) : (
-            <div className="numero mt-2 text-center text-xs text-lateral-texto/40">{versao}</div>
-          ))}
-      </div>
     </div>
-  );
-}
-
-/** A inicial do usuário no círculo cobalto. */
-function Avatar({ inicial }: { inicial: string }) {
-  return (
-    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-lateral-cheio text-sm font-semibold text-lateral-ativo">
-      {inicial}
-    </span>
   );
 }

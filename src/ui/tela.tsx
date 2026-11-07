@@ -3,8 +3,8 @@ import { Fragment, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-/** A barra presa no alto da área de conteúdo: o ícone da seção, a trilha (Comercial › Clientes), o título em caixa
- * alta e as ações à direita (o sino, o usuário). Os itens da trilha podem ser o `Link` do roteador. `carregando` liga a
+/** A barra da tela, presa embaixo do `CabecalhoDoApp`: o ícone da seção, a trilha (Comercial › Clientes), o título
+ * em caixa alta e as ações da tela à direita (o mês, os botões); a busca, o sino e o usuário ficam no cabeçalho. Os itens da trilha podem ser o `Link` do roteador. `carregando` liga a
  * linha fina no pé da barra, o sinal de que a tela está trabalhando; o app diz quando (no TanStack, o `useIsFetching`). */
 export function BarraDoTopo({
   icone: Icone,
@@ -26,7 +26,7 @@ export function BarraDoTopo({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 h-16 border-b border-linha bg-superficie/85 px-4 shadow-[0_6px_20px_-18px_rgb(13_17_23/0.55)] backdrop-blur-md sm:px-6",
+        "sticky top-14 z-20 h-16 border-b border-linha bg-superficie/85 px-4 shadow-[0_6px_20px_-18px_rgb(13_17_23/0.55)] backdrop-blur-md sm:px-6",
         className,
       )}
     >
