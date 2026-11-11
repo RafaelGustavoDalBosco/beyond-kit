@@ -4,73 +4,136 @@ import { Check, Copy, type LucideIcon } from "lucide-react";
 import { Children, createContext, Fragment, isValidElement, useContext, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { Bloco } from "../ui/bloco";
 import { Dica, type ConteudoDaDica } from "../ui/dica";
+import { Emblema, type TomDoEmblema } from "../ui/emblema";
 
-/** O alto da ficha: o ícone do tipo, o que ela é, o nome e os códigos, no tom do alto do detalhe. Com o corpo da ficha
- * depois dele, leva um fio embaixo e 20px de respiro até o corpo; sozinho (o cabeçalho num `Bloco`), nem um nem outro. */
+/** O alto da ficha, em branco: o ícone do tipo num quadrado colorido, a linha de cima, o título em frase, os selos e
+ * os códigos; à direita, o número principal e as ações. Com o corpo da ficha depois dele, leva um fio embaixo e 18px
+ * de respiro até o corpo; sozinho (o cabeçalho num `Bloco`), nem um nem outro. */
 export function CabecaDaFicha({
-  icone: Icone,
+  icone,
+  tom = "cobalto",
   tipo,
+  sobretitulo,
   titulo,
   selos,
   codigos,
+  numero,
+  rotuloDoNumero,
   acoes,
 }: {
   icone: LucideIcon;
-  tipo: ReactNode;
+  /** A cor do ícone, pelo significado (a entrada em verde-água, a saída em azul). */
+  tom?: TomDoEmblema;
+  /** O que a ficha é ("Produto"): a linha de cima do título quando não há `sobretitulo`. */
+  tipo?: ReactNode;
+  /** A linha de cima do título ("NF-e 1284 · série 1 · 10/11"); no lugar do `tipo`. */
+  sobretitulo?: ReactNode;
   titulo: ReactNode;
   selos?: ReactNode;
   codigos?: ReactNode;
-  /** Os botões da ficha, à direita do título. */
+  /** O número principal da ficha, à direita, com o `rotuloDoNumero` embaixo. */
+  numero?: ReactNode;
+  rotuloDoNumero?: ReactNode;
+  /** Os botões da ficha, à direita do título (depois do número). */
   acoes?: ReactNode;
 }) {
+  const linhaDeCima = sobretitulo ?? tipo;
   return (
-    <div className="flex gap-4 border-linha bg-cabeca-detalhe px-6 pt-6 pb-5 not-last:mb-5 not-last:border-b">
-      <div className="icone-cheio flex size-11 shrink-0 items-center justify-center rounded-xl">
-        <Icone className="size-5" />
-      </div>
+    <div className="flex items-center gap-4 border-linha bg-superficie px-[22px] py-[18px] not-last:mb-[18px] not-last:border-b celular:flex-wrap celular:gap-3 celular:px-3.5 celular:py-4">
+      <Emblema icone={icone} tom={tom} forma="quadrado" tamanho="lg" className="celular:size-11" />
       <div className="min-w-0 flex-1">
-        <div className="rotulo flex items-center gap-2">{tipo}</div>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <h2 className="m-0 min-w-0 text-xl leading-tight font-bold tracking-tight uppercase [overflow-wrap:anywhere]">{titulo}</h2>
-          {selos}
-        </div>
-        {codigos && <div className="mt-3 flex flex-wrap items-center gap-1.5">{codigos}</div>}
+        {linhaDeCima && <div className="flex items-center gap-2 text-[13px] font-bold text-texto-2">{linhaDeCima}</div>}
+        <h2 className="m-0 text-[21px] leading-tight font-extrabold tracking-[-0.01em] [overflow-wrap:anywhere] celular:text-lg">{titulo}</h2>
+        {selos && <div className="mt-1.5 flex flex-wrap items-center gap-1.5">{selos}</div>}
+        {codigos && <div className="mt-2 flex flex-wrap items-center gap-1.5">{codigos}</div>}
       </div>
-      {acoes && <div className="flex shrink-0 flex-wrap items-start gap-2">{acoes}</div>}
+      {(numero != null || acoes) && (
+        <div className="flex shrink-0 items-center gap-4 text-right celular:w-full celular:justify-between celular:text-left">
+          {numero != null && (
+            <div className="min-w-0">
+              <div className="numero text-[26px] leading-tight font-extrabold tracking-[-0.02em] celular:text-[22px]">{numero}</div>
+              {rotuloDoNumero && <div className="text-[12.5px] font-bold text-texto-2">{rotuloDoNumero}</div>}
+            </div>
+          )}
+          {acoes && <div className="flex flex-wrap items-center justify-end gap-2">{acoes}</div>}
+        </div>
+      )}
     </div>
   );
 }
 
-/** Uma seção dentro da ficha ou do detalhe: o título de seção, os selos ao lado dele e a ação à direita (o botão,
- * o detalhe em texto). */
+/** Um dado rápido da ficha: o rótulo em cima, o valor embaixo. */
+export type DadoRapido = { rotulo: ReactNode; valor: ReactNode };
+
+/** A linha de dados rápidos da ficha, logo abaixo do cabeçalho: até quatro mini cartões brancos lado a lado (dois por
+ * linha no celular); o valor comprido corta com reticências. */
+export function DadosRapidos({ itens, className }: { itens: DadoRapido[]; className?: string }) {
+  return (
+    <dl
+      className={cn("m-0 grid grid-cols-2 gap-2 mesa:grid-cols-[repeat(var(--dados),minmax(0,1fr))] mesa:gap-2.5", className)}
+      style={{ "--dados": Math.min(itens.length, 4) } as CSSProperties}
+    >
+      {itens.map((i, k) => (
+        <div key={k} className="min-w-0 rounded-icone bg-superficie px-3.5 py-3 shadow-1">
+          <dt className="text-[12.5px] font-bold text-texto-2">{i.rotulo}</dt>
+          <dd className="numero m-0 mt-0.5 truncate text-base font-extrabold">{i.valor}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** Uma seção da ficha ou do detalhe: a caixa branca com o título em frase, os selos ao lado dele e a ação à direita
+ * (o botão, o link em texto, o detalhe parado). `solto` tira a caixa, para a seção dentro de um `Bloco` que já existe. */
 export function SecaoDaFicha({
   titulo,
   selos,
   acao,
+  solto,
   className,
   children,
 }: {
   titulo: ReactNode;
   selos?: ReactNode;
   acao?: ReactNode;
+  /** Sem a caixa em volta (dentro de um `Bloco` que já existe). */
+  solto?: boolean;
   className?: string;
   children: ReactNode;
 }) {
+  const cabeca = (
+    <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1.5">
+      <h3 className="m-0 text-base font-extrabold">{titulo}</h3>
+      {selos}
+      {/* o texto parado ("3 itens") fica neutro; o azul é só do link e do botão sem desenho próprio (o `Botao` e o
+          link com classe ficam como vieram) */}
+      {acao && (
+        <div className="ml-auto flex items-center gap-2 text-[13px] font-semibold text-texto-2 [&_a:not([class])]:font-bold [&_a:not([class])]:text-cobalto [&_button:not([class])]:cursor-pointer [&_button:not([class])]:font-bold [&_button:not([class])]:text-cobalto">
+          {acao}
+        </div>
+      )}
+    </div>
+  );
+  if (solto)
+    return (
+      <section className={cn("flex flex-col gap-3", className)}>
+        {cabeca}
+        {children}
+      </section>
+    );
   return (
-    <section className={cn("flex flex-col gap-3", className)}>
-      <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1.5">
-        <h3 className="titulo-secao m-0">{titulo}</h3>
-        {selos}
-        {acao && <div className="ml-auto flex items-center gap-2 text-xs text-texto-3">{acao}</div>}
-      </div>
+    <Bloco className={cn("flex flex-col gap-3 px-[18px] pt-3.5 pb-4", className)}>
+      {cabeca}
       {children}
-    </section>
+    </Bloco>
   );
 }
 
-/** Um código com o nome dele (NCM, CEST, EAN, CFOP…): a ficha técnica em linha. `empilhado` põe o nome em cima do
- * valor, sem a caixa: vários códigos cabem no cabeçalho da ficha estreita (junte-os com `gap-x-4 gap-y-2`). */
+/** Um código com o nome dele (NCM, CEST, EAN, CFOP…): a ficha técnica em linha, numa pílula cinza. `empilhado` põe o
+ * nome em cima do valor, sem a pílula: vários códigos cabem no cabeçalho da ficha estreita (junte-os com
+ * `gap-x-4 gap-y-2`). */
 export function Codigo({
   nome,
   valor,
@@ -93,7 +156,7 @@ export function Codigo({
         setTimeout(() => setOk(false), 1400);
       }}
       className={cn(
-        "flex size-5 shrink-0 cursor-pointer items-center justify-center rounded text-texto-3 hover:bg-superficie-3 hover:text-texto",
+        "flex size-[22px] shrink-0 cursor-pointer items-center justify-center rounded-full text-cobalto hover:bg-cobalto-suave",
         !empilhado && "-ml-1",
       )}
     >
@@ -103,8 +166,8 @@ export function Codigo({
   if (empilhado)
     return (
       <span className="inline-flex max-w-full min-w-0 flex-col">
-        <span className="text-xs text-texto-3">{nome}</span>
-        <span className="numero flex h-6 min-w-0 items-center gap-1 text-[13px] font-medium text-texto">
+        <span className="text-xs font-bold text-texto-2">{nome}</span>
+        <span className="numero flex h-6 min-w-0 items-center gap-1 text-[13px] font-bold text-texto">
           <span className="min-w-0 truncate" title={copiavel}>{valor}</span>
           {copiar}
         </span>
@@ -112,15 +175,15 @@ export function Codigo({
     );
   // O valor comprido (a chave da NF-e) corta com reticências; o nome e o copiar ficam sempre à vista.
   return (
-    <span className="inline-flex h-7 max-w-full min-w-0 items-center gap-2 rounded-lg border border-linha bg-superficie-2 pr-1 pl-2.5 text-xs">
-      <span className="shrink-0 text-texto-3">{nome}</span>
-      <span className="numero min-w-0 truncate pr-1.5 text-texto" title={copiavel}>{valor}</span>
+    <span className="inline-flex h-7 max-w-full min-w-0 items-center gap-2 rounded-pilula bg-superficie-2 pr-1 pl-3 text-xs">
+      <span className="shrink-0 font-semibold text-texto-2">{nome}</span>
+      <span className="numero min-w-0 truncate pr-1.5 font-bold text-texto" title={copiavel}>{valor}</span>
       {copiar}
     </span>
   );
 }
 
-/** Um valor da `Faixa`; `apagado` é o zero (em texto-3, peso normal), para o número com valor saltar aos olhos. */
+/** Um valor da `Faixa`; `apagado` é o zero (em texto-3, mais leve), para o número com valor saltar aos olhos. */
 export type ItemDaFaixa = { rotulo: ReactNode; valor: ReactNode; apagado?: boolean };
 
 /** Uma linha de totais com lugar fixo para cada campo, como o quadro de totais do DANFE: o rótulo em cima, o valor
@@ -132,8 +195,8 @@ export function Faixa({ itens, grupos }: { itens: ItemDaFaixa[]; grupos?: number
   let n = 0;
   for (const g of grupos ?? []) inicios.add((n += g));
   return (
-    <div className="overflow-hidden rounded-xl border border-linha">
-      <div className="flex flex-wrap gap-px bg-linha">
+    <div className="overflow-hidden rounded-icone border border-linha">
+      <div className="flex flex-wrap gap-px bg-fio">
         {itens.map((i, k) => (
           <div
             key={k}
@@ -143,8 +206,8 @@ export function Faixa({ itens, grupos }: { itens: ItemDaFaixa[]; grupos?: number
               inicios.has(k) && "shadow-[-1px_0_0_var(--linha-forte)]",
             )}
           >
-            <span className="rotulo text-[10.5px] whitespace-nowrap">{i.rotulo}</span>
-            <span className={cn("numero text-[13.5px] whitespace-nowrap", i.apagado ? "text-texto-3" : "font-semibold text-texto")}>
+            <span className="text-xs font-bold whitespace-nowrap text-texto-2">{i.rotulo}</span>
+            <span className={cn("numero text-[13.5px] whitespace-nowrap", i.apagado ? "font-semibold text-texto-3" : "font-extrabold text-texto")}>
               {i.valor}
             </span>
           </div>
@@ -177,7 +240,7 @@ function pedido(filho: ReactNode) {
 }
 
 // Quanto cada filho ocupa numa grade de `n` colunas: o pedido (até `n`), mais o resto da linha quando o seguinte não
-// cabe nela ou quando é o último, para a caixa nunca mostrar célula vazia.
+// cabe nela ou quando é o último, para a grade nunca mostrar lugar vazio.
 function vaos(pedidos: number[], n: number) {
   const vao = pedidos.map((p) => Math.min(p, n));
   let usadas = 0;
@@ -192,14 +255,16 @@ function vaos(pedidos: number[], n: number) {
   return vao;
 }
 
-/** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco: o último par dela estica até o fim. As colunas
- * seguem a largura do contêiner (não a da tela), para a ficha estreita não espremer: uma coluna abaixo de 24rem, duas
- * até 42rem, `colunas` daí para cima. Cada filho conta como um par (o que não é `Par` ocupa uma coluna). `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista. `denso` é a lista de definição em
- * duas colunas (uma abaixo de 32rem): o rótulo de 104px à esquerda, o valor à direita, linhas de 34px com um fio
- * embaixo e sem caixa por par, para a ficha curta e cheia (o item da nota). */
+/** Pares rótulo → valor, em blocos claros numa grade de até quatro colunas; a linha incompleta não deixa buraco: o
+ * último par dela estica até o fim. As colunas seguem a largura do contêiner (não a da tela), para a ficha estreita
+ * não espremer: uma coluna abaixo de 20rem, duas até 42rem, `colunas` daí para cima. Cada filho conta como um par (o
+ * que não é `Par` ocupa uma coluna). `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista.
+ * `denso` é a lista de definição em duas colunas (uma abaixo de 32rem, como na gaveta): o rótulo de 120px à esquerda,
+ * o valor à direita, linhas de 34px com um fio embaixo e sem bloco por par. Os blocos são claros: vão sobre o branco
+ * (a `SecaoDaFicha`, o `Bloco`). */
 export function Pares({
   children,
-  colunas = 3,
+  colunas = 4,
   compacto,
   denso,
 }: {
@@ -212,7 +277,7 @@ export function Pares({
     return (
       <div className="@container">
         <Denso.Provider value={true}>
-          <dl className="m-0 grid grid-cols-1 gap-x-7 border-t border-linha @lg:grid-cols-2">{children}</dl>
+          <dl className="m-0 grid grid-cols-1 gap-x-7 @lg:grid-cols-2">{children}</dl>
         </Denso.Provider>
       </div>
     );
@@ -224,7 +289,7 @@ export function Pares({
     <div className="@container">
       <dl
         className={cn(
-          "m-0 grid grid-cols-[repeat(var(--colunas-agora),minmax(0,1fr))] gap-px overflow-hidden rounded-xl border border-linha bg-superficie [--colunas-agora:1] *:[--vao:1] @sm:[--colunas-agora:2] @sm:*:[--vao:var(--vao-2,1)]",
+          "m-0 grid grid-cols-[repeat(var(--colunas-agora),minmax(0,1fr))] gap-2.5 [--colunas-agora:1] *:[--vao:1] @xs:[--colunas-agora:2] @xs:*:[--vao:var(--vao-2,1)]",
           compacto
             ? "@lg:[--colunas-agora:var(--colunas)] @lg:*:[--vao:var(--vao-n,1)]"
             : "@2xl:[--colunas-agora:var(--colunas)] @2xl:*:[--vao:var(--vao-n,1)]",
@@ -243,7 +308,7 @@ export function Pares({
 
 /** Um par; `longo` não corta o valor (o endereço, a descrição) e `ocupa` estende por mais colunas, até as que o `Pares`
  * tem abertas (`"inteiro"` é a linha toda: o CFOP com a descrição); o último da linha estica até o fim dela, quando
- * o seguinte não cabe ou quando acabam os pares. `dica` põe o (i) que explica o termo. */
+ * o seguinte não cabe ou quando acabam os pares. `dica` põe o (?) que explica o termo. */
 export function Par({
   rotulo,
   longo,
@@ -264,27 +329,27 @@ export function Par({
     return (
       <div
         className={cn(
-          "flex min-h-[34px] min-w-0 items-baseline gap-3 border-b border-linha px-0.5 py-[7px]",
+          "flex min-h-[34px] min-w-0 items-baseline gap-3 border-b border-fio py-2",
           (inteiro || (typeof ocupa === "number" && ocupa > 1)) && "col-span-full",
         )}
       >
-        <dt className="flex w-[104px] shrink-0 items-center gap-1 text-xs text-texto-3">
+        <dt className="flex w-[120px] shrink-0 items-center gap-1 text-[13px] font-semibold text-texto-2">
           {rotulo}
           {dica && <Dica conteudo={dica} />}
         </dt>
-        <dd className={cn("m-0 min-w-0 text-[13.5px] font-medium [overflow-wrap:anywhere]", longo && "whitespace-pre-line")}>{children}</dd>
+        <dd className={cn("m-0 min-w-0 text-sm font-bold [overflow-wrap:anywhere]", longo && "whitespace-pre-line")}>{children}</dd>
       </div>
     );
   return (
     <div
-      className="flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha [grid-column:span_var(--vao,1)]"
+      className="flex min-w-0 flex-col gap-0.5 rounded-controle bg-superficie-2 px-3 py-2.5 [grid-column:span_var(--vao,1)]"
       style={vao ? ({ "--vao-2": vao.dois, "--vao-n": vao.n } as CSSProperties) : undefined}
     >
-      <dt className="flex items-center gap-1 text-xs text-texto-3">
+      <dt className="flex items-center gap-1 text-xs font-bold text-texto-2">
         {rotulo}
         {dica && <Dica conteudo={dica} />}
       </dt>
-      <dd className={cn("m-0 text-sm font-medium", longo ? "whitespace-pre-line [overflow-wrap:anywhere]" : "truncate")}>{children}</dd>
+      <dd className={cn("m-0 text-sm font-extrabold", longo ? "whitespace-pre-line [overflow-wrap:anywhere]" : "truncate")}>{children}</dd>
     </div>
   );
 }
@@ -299,7 +364,7 @@ export function Entidade({ children, aoAbrir, className }: { children: ReactNode
         aoAbrir();
       }}
       className={cn(
-        "numero cursor-pointer rounded px-1 -mx-1 text-cobalto underline decoration-cobalto/30 underline-offset-[3px] hover:bg-cobalto-suave hover:decoration-cobalto",
+        "numero -mx-1 cursor-pointer rounded-md px-1 font-bold text-cobalto underline-offset-[3px] hover:bg-cobalto-suave hover:underline",
         className,
       )}
     >

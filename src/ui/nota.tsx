@@ -3,16 +3,17 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-// Nota: o aviso que fica na tela, em linha (o resultado de uma ação vai ao toast, o `avisar`).
+import { PAR_DO_TOM } from "./emblema";
 
-export type TomDaNota = "neutro" | "cobalto" | "ganho" | "aviso" | "risco";
+// Nota: o aviso que fica na tela (o resultado de uma ação vai ao toast, o `avisar`). É também a faixa que vale para
+// a tela inteira: colorida no par do tom, sem borda, com a ação à direita.
 
+export type TomDaNota = "neutro" | "cobalto" | "ganho" | "aviso" | "risco" | "agua";
+
+// O par do tom; no azul o texto vai no azul escuro, que lê melhor numa frase inteira.
 const COR: Record<TomDaNota, string> = {
-  neutro: "border-linha bg-superficie-2 text-texto-2",
-  cobalto: "border-cobalto/20 bg-cobalto-suave text-cobalto-tinta",
-  ganho: "border-ganho/20 bg-ganho-suave text-ganho",
-  aviso: "border-aviso/20 bg-aviso-suave text-aviso",
-  risco: "border-risco/20 bg-risco-suave text-risco",
+  ...PAR_DO_TOM,
+  cobalto: "bg-cobalto-suave text-cobalto-tinta",
 };
 
 const ICONE: Record<TomDaNota, LucideIcon> = {
@@ -21,9 +22,11 @@ const ICONE: Record<TomDaNota, LucideIcon> = {
   ganho: CircleCheck,
   aviso: TriangleAlert,
   risco: CircleAlert,
+  agua: Info,
 };
 
-/** O aviso em linha: ícone do tom, título opcional, o texto e a ação à direita. O risco é `role="alert"`. */
+/** A faixa de aviso: ícone do tom, título opcional, a frase e a ação à direita (no celular, a ação desce para
+ * baixo da frase). O risco é `role="alert"`. */
 export function Nota({
   tom = "neutro",
   icone,
@@ -36,6 +39,7 @@ export function Nota({
   icone?: LucideIcon;
   titulo?: ReactNode;
   children?: ReactNode;
+  /** O botão (ou os botões) à direita da faixa. */
   acao?: ReactNode;
   className?: string;
 }) {
@@ -43,14 +47,21 @@ export function Nota({
   return (
     <div
       role={tom === "risco" ? "alert" : "status"}
-      className={cn("flex items-start gap-3 rounded-xl border px-4 py-3 text-sm leading-relaxed", COR[tom], className)}
+      className={cn(
+        "flex gap-3 rounded-icone px-4 py-3 text-sm leading-[1.45] font-bold celular:flex-wrap",
+        // só a frase: ícone, frase e ação no mesmo eixo; com título, o ícone acompanha a primeira linha
+        titulo ? "items-start" : "items-center",
+        COR[tom],
+        className,
+      )}
     >
-      <Icone className="mt-[3px] size-4 shrink-0" aria-hidden />
+      <Icone className={cn("size-[18px] shrink-0", titulo && "mt-px")} aria-hidden />
       <div className="min-w-0 flex-1">
-        {titulo && <div className="font-semibold">{titulo}</div>}
-        {children && <div className={cn(titulo && "mt-0.5")}>{children}</div>}
+        {titulo && <div className="font-extrabold">{titulo}</div>}
+        {children && <div className={cn(titulo && "mt-0.5 font-semibold")}>{children}</div>}
       </div>
-      {acao && <div className="flex shrink-0 items-center gap-2 self-center">{acao}</div>}
+      {/* no celular a ação ocupa a linha de baixo, alinhada com a frase (18px do ícone + 12px do respiro) */}
+      {acao && <div className="flex shrink-0 items-center gap-2 self-center celular:w-full celular:pl-[30px]">{acao}</div>}
     </div>
   );
 }

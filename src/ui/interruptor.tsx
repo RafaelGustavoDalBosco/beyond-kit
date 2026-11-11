@@ -5,18 +5,19 @@ import { useId, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-// O interruptor (liga/desliga) e a linha de opção do cadastro do usuário, como no ArchFlow.
+// O interruptor (liga/desliga) e a linha de opção do cadastro do usuário.
 
-const TRILHO = { ganho: "data-[state=checked]:bg-ganho", cobalto: "data-[state=checked]:bg-cobalto" };
-const ROTULO = { ganho: "text-ganho", cobalto: "text-cobalto" };
+const TRILHO = { cobalto: "data-[state=checked]:bg-cobalto", ganho: "data-[state=checked]:bg-ganho" };
+const ROTULO = { cobalto: "text-cobalto", ganho: "text-ganho" };
 
-/** O interruptor: verde (`ganho`) ligado, cinza desligado, a bolinha branca corre de um lado ao outro. */
+/** O interruptor: azul ligado (ou verde, com `tom="ganho"`), cinza desligado; a bolinha branca corre de um lado ao
+ * outro. */
 export function Interruptor({
   checked,
   onCheckedChange,
   disabled,
   id,
-  tom = "ganho",
+  tom = "cobalto",
   "aria-label": rotulo,
   className,
 }: {
@@ -37,12 +38,12 @@ export function Interruptor({
       disabled={disabled}
       aria-label={rotulo}
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-linha-forte outline-none transition-colors focus-visible:ring-3 focus-visible:ring-cobalto-suave disabled:cursor-default disabled:opacity-50",
+        "relative inline-flex h-[23px] w-10 shrink-0 cursor-pointer items-center rounded-full bg-linha-forte outline-none transition-colors focus-visible:ring-3 focus-visible:ring-cobalto-anel disabled:cursor-not-allowed disabled:opacity-45",
         TRILHO[tom],
         className,
       )}
     >
-      <Switch.Thumb className="block size-5 translate-x-0.5 rounded-full bg-white shadow-1 transition-transform data-[state=checked]:translate-x-[22px]" />
+      <Switch.Thumb className="block size-[17px] translate-x-[3px] rounded-full bg-white shadow-1 transition-transform data-[state=checked]:translate-x-5" />
     </Switch.Root>
   );
 }
@@ -56,7 +57,7 @@ export function OpcaoDoCadastro({
   onCheckedChange,
   rotuloLigado = "Ativo",
   rotuloDesligado = "Desativado",
-  tomLigado = "ganho",
+  tomLigado = "cobalto",
   disabled,
   className,
 }: {
@@ -72,15 +73,15 @@ export function OpcaoDoCadastro({
 }) {
   const id = useId();
   return (
-    <div className={cn("flex items-center justify-between gap-4 rounded-bloco border border-linha bg-superficie p-4", className)}>
+    <div className={cn("flex items-center justify-between gap-4 rounded-cartao border border-linha bg-superficie p-4", className)}>
       <div className="min-w-0">
-        <label htmlFor={id} className="text-sm font-medium text-texto">
+        <label htmlFor={id} className="text-sm font-bold text-texto">
           {titulo}
         </label>
-        {descricao && <p className="m-0 mt-0.5 text-xs text-texto-2">{descricao}</p>}
+        {descricao && <p className="m-0 mt-0.5 text-[12.5px] font-semibold text-texto-2">{descricao}</p>}
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        <span aria-hidden className={cn("text-sm font-medium", checked ? ROTULO[tomLigado] : "text-texto-3")}>
+      <div className="flex shrink-0 items-center gap-2.5">
+        <span aria-hidden className={cn("text-[13px] font-bold", checked ? ROTULO[tomLigado] : "text-texto-3")}>
           {checked ? rotuloLigado : rotuloDesligado}
         </span>
         <Interruptor id={id} checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} tom={tomLigado} />

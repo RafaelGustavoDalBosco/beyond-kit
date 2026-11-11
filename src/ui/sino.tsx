@@ -1,34 +1,39 @@
 "use client";
 
-// O sino e a busca do CabecalhoDoApp (no fundo escuro dele) ou da BarraDoTopo. O kit só desenha: as notificações, o
+// O sino e a busca do CabecalhoDoApp (sobre o azul dele) ou da BarraDoTopo. O kit só desenha: as notificações, o
 // que é lido e o que abre ao clicar são do app.
 
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, type LucideIcon } from "lucide-react";
 import { Popover } from "radix-ui";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { useNoCabecalho } from "./cabecalho";
+import { Emblema, type TomDoEmblema } from "./emblema";
 
-/** Uma notificação da lista do sino; `quando` já vem formatada pelo app. */
+/** Uma notificação da lista do sino; `quando` já vem formatada pelo app. O `icone` e o `tom` dizem o que ela é (a
+ * correção aplicada em verde, o atraso em laranja); sem eles, o sino em azul. */
 export type Notificacao = {
   id: string | number;
   titulo: ReactNode;
   texto?: ReactNode;
   quando: ReactNode;
   lida?: boolean;
+  icone?: LucideIcon;
+  tom?: TomDoEmblema;
 };
 
 const BOTAO =
-  "relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-texto-3 transition-colors hover:bg-superficie-2 hover:text-texto data-[state=open]:bg-cobalto-suave data-[state=open]:text-cobalto [&_svg]:size-[19px]";
+  "relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-texto-2 transition-colors hover:bg-superficie-2 hover:text-texto data-[state=open]:bg-cobalto-suave data-[state=open]:text-cobalto [&_svg]:size-5";
 
-// No cobalto escuro do cabeçalho.
-const BOTAO_ESCURO =
-  "relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-lateral-texto transition-colors hover:bg-lateral-2 hover:text-lateral-ativo data-[state=open]:bg-lateral-2 data-[state=open]:text-lateral-ativo [&_svg]:size-[19px]";
+// Sobre o azul do cabeçalho; o contorno do foco vai em branco, que o azul do kit some no fundo.
+const BOTAO_NO_CABECALHO =
+  "relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-cabecalho-texto transition-colors hover:bg-cabecalho-2 focus-visible:outline-cabecalho-texto data-[state=open]:bg-cabecalho-2 [&_svg]:size-5";
 
-/** O campo de busca do cabeçalho, ao lado do sino: abre a busca do app (a Paleta do Ctrl K). No celular, só a lupa. */
+/** O campo de busca do cabeçalho: abre a busca do app (a Paleta do Ctrl K). No cabeçalho é o campo branco em pílula,
+ * que ocupa o lugar que o cabeçalho dá; fora dele leva a borda. No celular, só a lupa. */
 export function BotaoDeBusca({ aoBuscar, exemplo = "Buscar..." }: { aoBuscar: () => void; exemplo?: string }) {
-  const escuro = useNoCabecalho();
+  const noCabecalho = useNoCabecalho();
   // Começa em Ctrl K: o servidor não sabe o sistema, e o desenho da hidratação tem de ser igual ao dele.
   const [atalho, setAtalho] = useState("Ctrl K");
   useEffect(() => {
@@ -40,31 +45,24 @@ export function BotaoDeBusca({ aoBuscar, exemplo = "Buscar..." }: { aoBuscar: ()
       type="button"
       onClick={aoBuscar}
       className={cn(
-        escuro ? BOTAO_ESCURO : BOTAO,
-        "md:w-64 md:justify-start md:gap-2 md:border md:px-3 xl:w-80",
-        escuro
-          ? "md:border-lateral-linha md:bg-lateral-2 md:hover:border-lateral-texto/40"
-          : "md:border-linha md:bg-superficie-2 md:hover:border-linha-forte",
+        "flex h-[38px] w-full min-w-0 cursor-pointer items-center gap-2 rounded-pilula bg-superficie px-4 text-sm font-semibold text-texto-2 transition-colors [&_svg]:size-4 [&_svg]:shrink-0",
+        "celular:size-[34px] celular:shrink-0 celular:justify-center celular:rounded-full celular:px-0",
+        // a largura de fora do cabeçalho vai sem `mesa:`: a variante do kit sai depois das do Tailwind e ganharia do `xl:`
+        noCabecalho ? "focus-visible:outline-cabecalho-texto" : "w-64 border border-linha hover:border-linha-forte xl:w-80",
       )}
       aria-label="Buscar"
       title={`Buscar (${atalho})`}
     >
-      <Search className="shrink-0" />
-      <span className="hidden min-w-0 flex-1 truncate text-left text-[13px] md:block">{exemplo}</span>
-      <kbd
-        className={cn(
-          "hidden shrink-0 rounded-md border px-1.5 py-0.5 font-sans text-[11px] leading-none font-medium md:block",
-          escuro ? "border-lateral-linha bg-transparent" : "border-linha bg-superficie",
-        )}
-      >
-        {atalho}
-      </kbd>
+      <Search />
+      <span className="min-w-0 flex-1 truncate text-left celular:hidden">{exemplo}</span>
+      <kbd className="shrink-0 font-sans text-xs font-semibold text-texto-3 celular:hidden">{atalho}</kbd>
     </button>
   );
 }
 
-/** O sino com a contagem das não lidas (9+ acima de 9) e o painel das notificações. Clicar num item fecha o painel
- * e chama `aoAbrir`; marcar como lida é do app. */
+/** O sino com a contagem das não lidas (9+ acima de 9) e o painel das notificações: o cabeçalho com "Marcar todas
+ * como lidas" e cada notificação com o ícone em círculo, a nova em azul claro. Clicar num item fecha o painel e
+ * chama `aoAbrir`; marcar como lida é do app. */
 export function Sino({
   notificacoes,
   naoLidas,
@@ -79,19 +77,22 @@ export function Sino({
   aoMarcarTodas?: () => void;
   vazio?: ReactNode;
 }) {
-  const escuro = useNoCabecalho();
+  const noCabecalho = useNoCabecalho();
   const [aberto, setAberto] = useState(false);
   const total = naoLidas ?? notificacoes.filter((n) => !n.lida).length;
 
   return (
     <Popover.Root open={aberto} onOpenChange={setAberto}>
-      <Popover.Trigger className={escuro ? BOTAO_ESCURO : BOTAO} aria-label={total > 0 ? `Notificações (${total} não lidas)` : "Notificações"}>
+      <Popover.Trigger
+        className={noCabecalho ? BOTAO_NO_CABECALHO : BOTAO}
+        aria-label={total > 0 ? `Notificações (${total} não lidas)` : "Notificações"}
+      >
         <Bell />
         {total > 0 && (
           <span
             className={cn(
-              "numero absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-risco px-1 text-[10px] font-bold text-white ring-2",
-              escuro ? "ring-lateral" : "ring-superficie",
+              "numero absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-risco px-1 text-[10px] font-extrabold text-white ring-2",
+              noCabecalho ? "ring-cabecalho" : "ring-superficie",
             )}
           >
             {total > 9 ? "9+" : total}
@@ -101,24 +102,24 @@ export function Sino({
       <Popover.Portal>
         <Popover.Content
           align="end"
-          sideOffset={8}
-          className="z-50 w-80 animate-entrar overflow-hidden rounded-bloco border border-linha bg-superficie shadow-3 outline-none"
+          sideOffset={10}
+          className="z-50 w-[360px] max-w-[calc(100vw-24px)] animate-entrar overflow-hidden rounded-bloco border border-fio bg-superficie text-texto shadow-2 outline-none"
         >
-          <div className="flex items-center justify-between gap-3 border-b border-linha px-4 py-3">
-            <span className="rotulo">Notificações</span>
+          <div className="flex items-center justify-between gap-3 border-b border-fio px-4 py-3.5">
+            <span className="font-extrabold">Notificações</span>
             {total > 0 && aoMarcarTodas && (
               <button
                 type="button"
                 onClick={aoMarcarTodas}
-                className="cursor-pointer text-xs font-medium text-cobalto hover:underline"
+                className="cursor-pointer text-[13px] font-bold text-cobalto hover:text-cobalto-forte"
               >
                 Marcar todas como lidas
               </button>
             )}
           </div>
-          <div className="max-h-[420px] divide-y divide-linha overflow-y-auto">
+          <div className="max-h-[420px] overflow-y-auto">
             {notificacoes.length === 0 ? (
-              <p className="m-0 py-8 text-center text-sm text-texto-3">{vazio}</p>
+              <p className="m-0 py-8 text-center text-sm font-semibold text-texto-2">{vazio}</p>
             ) : (
               notificacoes.map((n) => (
                 <button
@@ -129,15 +130,16 @@ export function Sino({
                     aoAbrir?.(n);
                   }}
                   className={cn(
-                    "flex w-full cursor-pointer items-start gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-superficie-2",
-                    !n.lida && "bg-cobalto-suave/60",
+                    "flex w-full cursor-pointer items-start gap-3 border-b border-fio px-4 py-3 text-left text-sm transition-colors last:border-b-0",
+                    // a nova vai no azul claro, mais leve que o da seleção
+                    n.lida ? "hover:bg-superficie-2" : "bg-cobalto-suave/40 hover:bg-cobalto-suave/70",
                   )}
                 >
-                  <span className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", n.lida ? "bg-transparent" : "bg-cobalto")} />
+                  <Emblema icone={n.icone ?? Bell} tom={n.tom} tamanho="sm" />
                   <span className="min-w-0 flex-1">
-                    <span className="block font-semibold text-texto">{n.titulo}</span>
-                    {n.texto && <span className="mt-0.5 block text-texto-2">{n.texto}</span>}
-                    <span className="numero mt-1 block text-xs text-texto-3">{n.quando}</span>
+                    <span className="block font-bold text-texto">{n.titulo}</span>
+                    {n.texto && <span className="block text-[13px] font-semibold text-texto-2">{n.texto}</span>}
+                    <span className="numero mt-0.5 block text-xs font-bold text-texto-3">{n.quando}</span>
                   </span>
                 </button>
               ))

@@ -92,26 +92,26 @@ function Relogio({ atualizadoEm, aoAtualizar }: { atualizadoEm: number; aoAtuali
 
   return (
     <div className="shrink-0 text-right">
-      <p className="numero m-0 text-2xl leading-tight font-bold tracking-tight">{agora ? relogio(agora) : " "}</p>
+      <p className="numero m-0 text-2xl leading-tight font-extrabold tracking-tight">{agora ? relogio(agora) : " "}</p>
       {aoAtualizar ? (
         <button
           type="button"
           onClick={aoAtualizar}
           title="Atualizar agora"
-          className="ml-auto flex cursor-pointer items-center gap-1 text-xs text-painel-texto-3 transition-colors hover:text-painel-texto-2"
+          className="ml-auto flex cursor-pointer items-center gap-1 text-xs font-semibold text-painel-texto-3 transition-colors hover:text-painel-texto-2"
         >
           {atualizado}
         </button>
       ) : (
-        <span className="flex items-center justify-end gap-1 text-xs text-painel-texto-3">{atualizado}</span>
+        <span className="flex items-center justify-end gap-1 text-xs font-semibold text-painel-texto-3">{atualizado}</span>
       )}
     </div>
   );
 }
 
 /**
- * A moldura do painel de TV: escura, na altura toda. No alto, `voltar` (o `Link` do app), `marca`, o `rotulo` em
- * caixa alta sobre o `titulo`, os `filtros` e, à direita, o relógio, o "atualizado há" (`atualizadoEm` em ms, o
+ * A moldura do painel de TV: escura, na altura toda. No alto, `voltar` (o `Link` do app), `marca`, o `rotulo` (a
+ * linha pequena) sobre o `titulo`, os `filtros` e, à direita, o relógio, o "atualizado há" (`atualizadoEm` em ms, o
  * `dataUpdatedAt` do React Query) e o botão de tela cheia.
  */
 export function PainelDeTv({
@@ -146,8 +146,8 @@ export function PainelDeTv({
         {marca && <div className="shrink-0">{marca}</div>}
         {marca && <div className="mx-1 h-8 w-px bg-painel-linha" />}
         <div className="min-w-0">
-          {rotulo && <div className="rotulo text-painel-texto-3">{rotulo}</div>}
-          <p className="m-0 truncate text-lg leading-tight font-semibold">{titulo}</p>
+          {rotulo && <div className="text-xs font-bold text-painel-texto-3">{rotulo}</div>}
+          <p className="m-0 truncate text-lg leading-tight font-extrabold">{titulo}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-6">
           {filtros && <div className="flex flex-wrap items-center gap-2">{filtros}</div>}
@@ -182,7 +182,7 @@ export function SegmentosDoPainel<T extends string | number>({
           aria-pressed={v === valor}
           onClick={() => aoMudar(v)}
           className={cn(
-            "flex cursor-pointer items-center gap-1 rounded-md px-3 py-1 text-xs font-medium transition-colors",
+            "flex cursor-pointer items-center gap-1 rounded-md px-3 py-1 text-xs font-bold transition-colors",
             v === valor ? "bg-painel-texto text-painel-2" : "text-painel-texto-2 hover:text-painel-texto",
           )}
         >
@@ -199,7 +199,7 @@ export function SelecaoDoPainel({ className, ...props }: ComponentProps<"select"
   return (
     <select
       className={cn(
-        "cursor-pointer rounded-lg border border-painel-linha bg-painel-2 px-3 py-1.5 text-sm text-painel-texto focus:ring-1 focus:ring-painel-texto-3 focus:outline-none",
+        "cursor-pointer rounded-lg border border-painel-linha bg-painel-2 px-3 py-1.5 text-sm font-semibold text-painel-texto focus:ring-1 focus:ring-painel-texto-3 focus:outline-none",
         className,
       )}
       {...props}
@@ -336,8 +336,8 @@ export function ControlesDaApresentacao({
           <button type="button" onClick={proximo} className={botao} title={`Próximo ${nomeDoItem} (→)`}>
             <SkipForward className="size-5" />
           </button>
-          <span className="ml-2 text-sm">{pausado ? "pausado" : `passando a cada ${segundos}s`}</span>
-          <span className="numero ml-2 text-sm">
+          <span className="ml-2 text-sm font-semibold">{pausado ? "pausado" : `passando a cada ${segundos}s`}</span>
+          <span className="numero ml-2 text-sm font-semibold">
             {nomeDoItem} {indice + 1} de {total}
           </span>
         </div>
@@ -422,7 +422,7 @@ export function ConteudoDoPainel<T>({
 
   if (carregando || itens.length === 0) {
     return (
-      <div className={cn("p-12 text-center text-painel-texto-3", apresentando ? "text-2xl" : "text-sm")}>
+      <div className={cn("p-12 text-center font-semibold text-painel-texto-3", apresentando ? "text-2xl" : "text-sm")}>
         {carregando ? "Carregando…" : vazio}
       </div>
     );
@@ -467,7 +467,7 @@ export function BarraDoPainel({
 export function SeloDoPainel({ cor, rotulo, className }: { cor: string; rotulo: ReactNode; className?: string }) {
   return (
     <span
-      className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium", className)}
+      className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold", className)}
       style={{ color: cor, background: `color-mix(in srgb, ${cor} 16%, transparent)` }}
     >
       <span className="size-1.5 shrink-0 rounded-full" style={{ background: cor }} />

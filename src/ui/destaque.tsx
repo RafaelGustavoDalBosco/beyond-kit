@@ -1,15 +1,17 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { Slot } from "radix-ui";
+import { createContext, useContext, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
+import { Emblema, type TomDoEmblema } from "./emblema";
 import { Esqueleto } from "./estados";
 import type { Tom } from "./selo";
 
-/** O bloco de destaque, "Cobalto claro": o número que abre a tela. Com `aoAbrir`, o rótulo e o valor viram botão e o
- * clique vale no bloco todo (o "link esticado": o ::after do botão cobre o bloco); os links e botões dos `children`
+/** O bloco de destaque, em azul claro chapado: o número que pede o olho. Com `aoAbrir`, o rótulo e o valor viram botão
+ * e o clique vale no bloco todo (o "link esticado": o ::after do botão cobre o bloco); os links e botões dos `children`
  * ficam por cima e seguem clicáveis, sem interativo dentro de interativo. */
 export function BlocoDestaque({
   rotulo,
@@ -26,26 +28,23 @@ export function BlocoDestaque({
   aoAbrir?: () => void;
   className?: string;
 }) {
-  const caixa = cn(
-    "relative isolate overflow-hidden rounded-bloco bg-gradient-to-br from-destaque-de via-destaque-meio to-destaque-ate p-6 text-destaque-texto shadow-2 ring-1 ring-destaque-anel",
-    aoAbrir && "transition-[box-shadow] hover:shadow-3 hover:ring-cobalto/40",
-    className,
-  );
   const alto = (
     <>
-      <div className="text-[11px] font-semibold tracking-[0.1em] text-cobalto uppercase">{rotulo}</div>
-      <div className="mt-2 flex flex-wrap items-center gap-3">
-        <span className="text-[34px] leading-none font-semibold tracking-[-0.03em] tabular-nums">{valor}</span>
+      <div className="text-[13px] font-bold text-destaque-texto-2">{rotulo}</div>
+      <div className="mt-1 flex flex-wrap items-center gap-3">
+        <span className="numero text-[26px] leading-[1.1] font-extrabold tracking-[-0.02em]">{valor}</span>
         {selo}
       </div>
     </>
   );
   return (
-    <div className={caixa}>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(420px_180px_at_90%_-30px,rgb(29_78_216/0.18),transparent_70%)]"
-      />
+    <div
+      className={cn(
+        "relative isolate rounded-bloco bg-destaque-de p-5 text-destaque-texto",
+        aoAbrir && "transition-shadow hover:ring-2 hover:ring-cobalto/40",
+        className,
+      )}
+    >
       {aoAbrir ? (
         <button
           type="button"
@@ -58,7 +57,7 @@ export function BlocoDestaque({
         alto
       )}
       {children && (
-        <div className={cn("mt-6", aoAbrir && "[&_:is(a,button,input,select,textarea,label)]:relative [&_:is(a,button,input,select,textarea,label)]:z-[1]")}>
+        <div className={cn("mt-5", aoAbrir && "[&_:is(a,button,input,select,textarea,label)]:relative [&_:is(a,button,input,select,textarea,label)]:z-[1]")}>
           {children}
         </div>
       )}
@@ -69,7 +68,7 @@ export function BlocoDestaque({
 /** O selo dentro do bloco de destaque (a estimativa, por exemplo). */
 export function SeloDoDestaque({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full border border-dashed border-cobalto/40 px-2 py-0.5 text-[11px] text-cobalto">
+    <span className="rounded-pilula border border-dashed border-cobalto/50 px-2.5 py-0.5 text-xs font-bold whitespace-nowrap text-cobalto">
       {children}
     </span>
   );
@@ -78,13 +77,13 @@ export function SeloDoDestaque({ children }: { children: ReactNode }) {
 /** Uma linha de composição dentro do destaque: rótulo, valor e a barra da fatia. */
 export function LinhaDoDestaque({ rotulo, valor, fatia }: { rotulo: ReactNode; valor: ReactNode; fatia?: number | null }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between gap-3 text-[13px]">
-        <span className="text-destaque-texto-2">{rotulo}</span>
-        <span className="numero font-medium">{valor}</span>
+        <span className="font-semibold text-destaque-texto-2">{rotulo}</span>
+        <span className="numero font-extrabold">{valor}</span>
       </div>
       {fatia != null && (
-        <div className="h-1 overflow-hidden rounded-full bg-cobalto/12">
+        <div className="h-1.5 overflow-hidden rounded-full bg-superficie">
           <div className="h-full rounded-full bg-cobalto" style={{ width: `${fatia}%` }} />
         </div>
       )}
@@ -92,36 +91,65 @@ export function LinhaDoDestaque({ rotulo, valor, fatia }: { rotulo: ReactNode; v
   );
 }
 
-// O `realce` do indicador: o tom pinta também a borda e o fundo.
-const REALCE: Record<Tom, string> = {
-  cobalto: "border-cobalto/40 bg-cobalto-suave",
-  ganho: "border-ganho/40 bg-ganho-suave",
-  aviso: "border-aviso/40 bg-aviso-suave",
-  risco: "border-risco/40 bg-risco-suave",
-  neutro: "",
-  contorno: "",
+/** Liga o `compacto` dos cartões de número em tudo o que estiver dentro; o `ComGaveta` com a gaveta aberta já liga. */
+export const IndicadorCompacto = createContext(false);
+
+/** A grade dos cartões de número que abre a tela (os `Indicador`): quatro por linha e, no celular, dois, com o ícone
+ * em cima. `compacto` aperta a grade e vale para os cartões de dentro; sem ele, vale o do `ComGaveta` em volta (a
+ * gaveta aberta ao lado). */
+export function CartoesDeNumero({
+  compacto,
+  className,
+  children,
+  "aria-label": rotulo,
+}: {
+  compacto?: boolean;
+  className?: string;
+  children: ReactNode;
+  "aria-label"?: string;
+}) {
+  const deFora = useContext(IndicadorCompacto);
+  const apertado = compacto ?? deFora;
+  return (
+    <IndicadorCompacto.Provider value={apertado}>
+      <div
+        role="group"
+        aria-label={rotulo}
+        className={cn("grid grid-cols-4 celular:grid-cols-2 celular:gap-2.5", apertado ? "gap-2.5" : "gap-3.5", className)}
+      >
+        {children}
+      </div>
+    </IndicadorCompacto.Provider>
+  );
+}
+
+// O `realce` do indicador: o fundo claro do tom (o ícone passa para o branco, para não sumir nele).
+const REALCE: Record<TomDoEmblema, string> = {
+  cobalto: "bg-cobalto-suave",
+  ganho: "bg-ganho-suave",
+  aviso: "bg-aviso-suave",
+  risco: "bg-risco-suave",
+  neutro: "bg-neutro-suave",
+  agua: "bg-agua-suave",
 };
 
-const ICONE: Record<Tom, string> = {
-  cobalto: "bg-cobalto-suave text-cobalto",
-  ganho: "bg-ganho-suave text-ganho",
-  aviso: "bg-aviso-suave text-aviso",
-  risco: "bg-risco-suave text-risco",
-  neutro: "bg-superficie-2 text-texto-2",
-  contorno: "bg-superficie-2 text-texto-2",
-};
-
-/** O cartão de número: o filete no alto e o ícone do assunto no quadrado. `realce` pinta a borda e o fundo com o tom
- * (o número que pede atenção); `compacto` aperta o cartão para a grade estreita. `carregando` mantém o rótulo e o ícone
- * e põe o esqueleto no lugar do valor e do detalhe. Nada corta: no cartão estreito (abaixo de 15rem) o ícone sai para
- * o valor caber, e o valor e o detalhe quebram linha se ainda faltar largura. */
+/** O cartão de número: o ícone do assunto no círculo do tom, o rótulo, o valor e a linha pequena embaixo (`detalhe`).
+ * Com `aoAbrir` é botão, com `href` é `<a>` e com `asChild` o filho único (o `Link` do roteador, vazio) leva o desenho
+ * e o conteúdo: o cartão que leva a outra tela. `ativo` marca o escolhido com a borda azul (o cartão que é seletor).
+ * `realce` pinta o fundo com o tom (o número que pede atenção). `compacto` (ou o do `CartoesDeNumero` em volta, ou o do
+ * `ComGaveta` com a gaveta aberta) tira o ícone e aperta o respiro, para o valor caber ao lado dela. `carregando` mantém o rótulo e o ícone e põe o
+ * esqueleto no lugar do valor e do detalhe. Nada corta: no cartão estreito (abaixo de 13rem de largura) o ícone sai, e
+ * o valor e o detalhe quebram linha se ainda faltar largura. No celular o ícone vai em cima. */
 export function Indicador({
   rotulo,
   valor,
   detalhe,
-  icone: Icone,
+  icone,
   tom = "cobalto",
   aoAbrir,
+  href,
+  asChild,
+  children,
   ativo,
   realce,
   compacto,
@@ -131,65 +159,88 @@ export function Indicador({
   rotulo: ReactNode;
   valor: ReactNode;
   detalhe?: ReactNode;
-  icone: LucideIcon;
-  tom?: Tom;
+  icone?: LucideIcon;
+  tom?: Tom | TomDoEmblema;
   aoAbrir?: () => void;
-  /** Com `aoAbrir`, o indicador vira filtro: `ativo` liga o aria-pressed e o contorno cobalto. */
+  href?: string;
+  asChild?: boolean;
+  /** Só com `asChild`: o `Link` do roteador. */
+  children?: ReactNode;
+  /** O cartão escolhido: a borda azul (e o aria-pressed no botão, o aria-current no link). */
   ativo?: boolean;
   realce?: boolean;
   compacto?: boolean;
   carregando?: boolean;
   className?: string;
 }) {
+  const deFora = useContext(IndicadorCompacto);
+  const apertado = compacto ?? deFora;
+  const tomDoIcone: TomDoEmblema = tom === "contorno" ? "neutro" : tom;
   const caixa = cn(
-    "@container flex w-full flex-col overflow-hidden rounded-bloco border border-linha bg-superficie text-left shadow-bloco",
-    aoAbrir && "cursor-pointer transition-[box-shadow,border,background] hover:border-linha-forte hover:shadow-2",
-    realce && REALCE[tom],
-    aoAbrir && ativo && "border-cobalto bg-cobalto-suave hover:border-cobalto",
+    "@container flex w-full items-center rounded-cartao bg-superficie text-left shadow-1 celular:flex-col celular:items-start celular:gap-2.5 celular:p-3",
+    apertado ? "gap-2.5 p-3" : "gap-3 p-4",
+    realce && REALCE[tomDoIcone],
+    (aoAbrir || href || asChild) && "cursor-pointer transition-shadow hover:ring-2 hover:ring-cobalto-anel",
+    ativo && "ring-2 ring-cobalto ring-inset hover:ring-cobalto",
     className,
   );
   const conteudo = (
     <>
-      <div className="filete w-full" />
-      <div className={cn("flex items-center", compacto ? "gap-3 p-3.5" : "gap-4 p-5")}>
-        <div
+      {icone && (
+        <Emblema
+          icone={icone}
+          tom={tomDoIcone}
           className={cn(
-            "flex shrink-0 items-center justify-center @max-[15rem]:hidden",
-            compacto ? "size-9 rounded-lg" : "size-12 rounded-xl",
-            ICONE[tom],
+            "celular:size-8 celular:[&_svg]:size-4",
+            // 11rem de miolo: o contêiner mede sem o respiro (16 de cada lado), então é o cartão de 13rem
+            apertado ? "mesa:hidden" : "mesa:@max-[11rem]:hidden",
+            realce && "bg-superficie",
           )}
-        >
-          <Icone className={compacto ? "size-4" : "size-5"} />
-        </div>
-        <div className={cn("min-w-0", carregando && "flex-1")}>
-          <div className="rotulo">{rotulo}</div>
-          {carregando ? (
-            <div className="animate-surgir">
-              <Esqueleto className={cn("mt-1.5 w-3/4", compacto ? "h-[18px]" : "h-[22px]")} />
-              <Esqueleto className="mt-1.5 h-3 w-1/2" />
+        />
+      )}
+      <div className={cn("min-w-0", carregando && "flex-1 celular:w-full")}>
+        <div className="text-[13px] leading-snug font-bold text-texto-2">{rotulo}</div>
+        {carregando ? (
+          <div className="animate-surgir">
+            <Esqueleto className={cn("mt-1 w-3/4", apertado ? "h-5" : "h-[22px]")} />
+            <Esqueleto className="mt-1.5 h-3 w-1/2" />
+          </div>
+        ) : (
+          <>
+            <div
+              className={cn(
+                "numero font-extrabold [overflow-wrap:anywhere] celular:text-[16px]",
+                apertado ? "text-[17px]" : "text-[19px]",
+                // depois do tamanho: o tailwind-merge tira a altura de linha que vem antes dele
+                "leading-tight",
+              )}
+            >
+              {valor}
             </div>
-          ) : (
-            <>
-              <div
-                className={cn(
-                  "mt-1 leading-tight font-semibold tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere]",
-                  compacto ? "text-lg" : "text-[22px]",
-                )}
-              >
-                {valor}
-              </div>
-              {detalhe && <div className="mt-0.5 text-xs leading-snug font-medium text-texto-3">{detalhe}</div>}
-            </>
-          )}
-        </div>
+            {detalhe && <div className="text-[12.5px] leading-snug font-semibold text-texto-2">{detalhe}</div>}
+          </>
+        )}
       </div>
     </>
   );
-  return aoAbrir ? (
-    <button type="button" onClick={aoAbrir} aria-pressed={ativo} className={caixa}>
-      {conteudo}
-    </button>
-  ) : (
-    <div className={caixa}>{conteudo}</div>
-  );
+  if (asChild)
+    return (
+      <Slot.Root className={caixa} aria-current={ativo ? "true" : undefined}>
+        {conteudo}
+        <Slot.Slottable>{children}</Slot.Slottable>
+      </Slot.Root>
+    );
+  if (href)
+    return (
+      <a href={href} aria-current={ativo ? "true" : undefined} className={caixa}>
+        {conteudo}
+      </a>
+    );
+  if (aoAbrir)
+    return (
+      <button type="button" onClick={aoAbrir} aria-pressed={ativo} className={caixa}>
+        {conteudo}
+      </button>
+    );
+  return <div className={caixa}>{conteudo}</div>;
 }

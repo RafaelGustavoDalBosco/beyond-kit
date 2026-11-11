@@ -1,22 +1,25 @@
 "use client";
 
-// O menu lateral cobalto escuro da casca, na medida do ArchFlow, só com a navegação: os itens com ícone e os grupos
-// que abrem e fecham. A marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele.
-// No celular (abaixo de `lg`) vira a gaveta que o botão do cabeçalho abre. O kit não conhece o roteador: o consumidor
-// passa o `Link` dele e diz qual item está ativo.
+// O menu lateral branco da casca, com a borda à direita e só a navegação: os itens com ícone e os grupos que abrem e
+// fecham. A marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele. No celular
+// (até 760px) ele some: o caminho é a `BarraDeNavegacao`; a gaveta continua para quem passa `aberto` (o botão do
+// cabeçalho ou um item "Menu" da barra). O kit não conhece o roteador: o consumidor passa o `Link` dele e diz qual
+// item está ativo.
 
 import { ChevronDown, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-/** A largura do menu no desktop, em px (a `w-72`). */
-export const LARGURA_DO_MENU = 288;
+/** A largura do menu no desktop, em px. */
+export const LARGURA_DO_MENU = 230;
 
 /** O recuo do conteúdo ao lado do menu fixo: vai no `main` da casca. */
-export const RECUO_DO_MENU = "lg:pl-72";
+export const RECUO_DO_MENU = "mesa:pl-[230px]";
 
-/** Um item do menu. Com `filhos`, vira grupo que abre e fecha (o `href` do grupo não é usado). */
+/** Um item do menu. Com `filhos`, vira grupo que abre e fecha (o `href` do grupo não é usado); o grupo de um filho
+ * só vira item direto, com o nome e o ícone do grupo e o destino do filho. Sem `href` e sem filhos, é o item sem
+ * tela: apagado e sem clique. */
 export type ItemDoMenu = {
   rotulo: string;
   icone: LucideIcon;
@@ -48,28 +51,29 @@ export type PropsDoMenuLateral = {
   itens: ItemDoMenu[];
   /** Diz se o `href` é a rota atual, para o item sem `ativo`. */
   ativo?: (href: string) => boolean;
-  /** A gaveta do celular, aberta pelo botão do `CabecalhoDoApp` (`menuAberto` e `aoAlternarMenu`). */
+  /** A gaveta do celular, aberta pelo botão do `CabecalhoDoApp` (`menuAberto` e `aoAlternarMenu`) ou por um item da
+   * `BarraDeNavegacao`; sem `aberto`, o menu não aparece no celular. */
   aberto?: boolean;
   aoFechar?: () => void;
   Link?: LinkDoMenu;
 };
 
-/** O menu lateral da casca, só com a navegação: aside fixo sob o cabeçalho no desktop, gaveta no celular. */
+/** O menu lateral da casca, só com a navegação: aside fixo sob o cabeçalho acima de 760px, gaveta no celular. */
 export function MenuLateral(props: PropsDoMenuLateral) {
   const { aberto, aoFechar } = props;
   const fechar = () => aoFechar?.();
 
   return (
     <>
-      <aside className="fixed top-14 bottom-0 left-0 z-30 hidden w-72 lg:block">
+      <aside className="fixed top-15 bottom-0 left-0 z-30 w-[230px] celular:hidden">
         <Conteudo {...props} fechar={fechar} />
       </aside>
 
-      {/* celular: a gaveta abre embaixo do cabeçalho, que continua à mostra */}
+      {/* celular: a gaveta abre embaixo do cabeçalho (56px lá), que continua à mostra, e por cima da barra de navegação */}
       {aberto && (
-        <div className="fixed inset-x-0 top-14 bottom-0 z-30 lg:hidden">
-          <div className="absolute inset-0 bg-(--veu)" onClick={fechar} />
-          <aside className="absolute inset-y-0 left-0 w-72 shadow-3">
+        <div className="fixed inset-x-0 top-14 bottom-0 z-35 mesa:hidden">
+          <div className="absolute inset-0 bg-veu" onClick={fechar} />
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] shadow-3">
             <Conteudo {...props} fechar={fechar} />
           </aside>
         </div>
@@ -79,6 +83,12 @@ export function MenuLateral(props: PropsDoMenuLateral) {
 }
 
 type Interno = PropsDoMenuLateral & { fechar: () => void };
+
+const ITEM = "flex w-full items-center gap-3 rounded-icone px-3 py-2.5 text-left text-sm font-bold transition-colors";
+const SOLTO = "text-lateral-texto hover:bg-lateral-2";
+const ATIVO = "bg-lateral-cheio text-lateral-ativo";
+// O filho do grupo entra alinhado ao rótulo do pai (o respiro, o ícone de 18 e o vão).
+const ANINHADO = "pl-[42px]";
 
 function Conteudo(props: Interno) {
   const { itens, ativo, fechar } = props;
@@ -96,56 +106,57 @@ function Conteudo(props: Interno) {
 
   const link = (item: ItemDoMenu, aninhado = false) => {
     const Icone = item.icone;
-    return (
-      <Link
-        key={item.href ?? item.rotulo}
-        href={item.href ?? "#"}
-        onClick={fechar}
-        className={cn(
-          "flex items-center gap-3 border-l-[3px] py-2.5 pr-6 text-sm font-medium transition-colors",
-          aninhado ? "pl-[49px]" : "pl-[21px]",
-          estaAtivo(item)
-            ? "border-lateral-ativo bg-lateral-cheio text-lateral-ativo"
-            : "border-transparent text-lateral-texto hover:bg-lateral-2 hover:text-lateral-ativo",
-        )}
-      >
+    const miolo = (
+      <>
         <Icone size={aninhado ? 16 : 18} className="shrink-0" />
         <span className="min-w-0 flex-1 leading-snug">{item.rotulo}</span>
         {!!item.contagem && (
-          <span className="numero flex size-5 shrink-0 items-center justify-center rounded-full bg-lateral-ativo text-xs font-bold text-lateral">
+          <span className="numero flex size-5 shrink-0 items-center justify-center rounded-full bg-cobalto text-xs font-extrabold text-sobre-cobalto">
             {item.contagem > 9 ? "9+" : item.contagem}
           </span>
         )}
+      </>
+    );
+    // O item sem tela fica à mostra, apagado e sem clique.
+    if (!item.href)
+      return (
+        <div key={item.rotulo} className={cn(ITEM, "cursor-default text-lateral-apagado", aninhado && ANINHADO)}>
+          {miolo}
+        </div>
+      );
+    return (
+      <Link key={item.href} href={item.href} onClick={fechar} className={cn(ITEM, aninhado && ANINHADO, estaAtivo(item) ? ATIVO : SOLTO)}>
+        {miolo}
       </Link>
     );
   };
 
   return (
-    <div className="flex h-full flex-col bg-lateral text-lateral-ativo">
-      <nav className="flex-1 space-y-0.5 overflow-y-auto py-4">
+    <div className="flex h-full flex-col border-r border-lateral-linha bg-lateral">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
         {itens.map((item) => {
-          if (!item.filhos?.length) return link(item);
+          const filhos = item.filhos ?? [];
+          const [primeiro] = filhos;
+          if (!primeiro) return link(item);
+          // O grupo de um item só não vira grupo: vai direto ao filho, com o nome e o ícone do grupo (o nome do
+          // filho sozinho perde o assunto).
+          if (filhos.length === 1) return link({ ...primeiro, rotulo: item.rotulo, icone: item.icone });
           const Icone = item.icone;
           const expandido = aberto === item.rotulo;
-          const temAtivo = item.filhos.some(estaAtivo);
+          const temAtivo = filhos.some(estaAtivo);
           return (
             <div key={item.rotulo}>
               <button
                 type="button"
                 onClick={() => alternar(item.rotulo)}
                 aria-expanded={expandido}
-                className={cn(
-                  "flex w-full cursor-pointer items-center gap-3 border-l-[3px] border-transparent py-2.5 pr-6 pl-[21px] text-sm font-medium transition-colors",
-                  !expandido && temAtivo
-                    ? "bg-lateral-2 text-lateral-ativo"
-                    : "text-lateral-texto hover:bg-lateral-2 hover:text-lateral-ativo",
-                )}
+                className={cn(ITEM, "cursor-pointer", !expandido && temAtivo ? "bg-lateral-2 text-lateral-ativo" : SOLTO)}
               >
                 <Icone size={18} className="shrink-0" />
-                <span className="min-w-0 flex-1 text-left leading-snug">{item.rotulo}</span>
+                <span className="min-w-0 flex-1 leading-snug">{item.rotulo}</span>
                 <ChevronDown size={16} className={cn("shrink-0 transition-transform", expandido && "rotate-180")} />
               </button>
-              {expandido && <div className="mt-0.5 space-y-0.5">{item.filhos.map((f) => link(f, true))}</div>}
+              {expandido && <div className="mt-0.5 flex flex-col gap-0.5">{filhos.map((f) => link(f, true))}</div>}
             </div>
           );
         })}

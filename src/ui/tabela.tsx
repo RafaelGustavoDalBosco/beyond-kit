@@ -8,14 +8,14 @@ import {
   type ColumnMeta,
   type RowData,
 } from "@tanstack/react-table";
-import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Fragment, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { contagem } from "../lib/formato";
 
 import { Botao } from "./botao";
 import { Carregando, SemValorCompacto } from "./estados";
+import { Paginacao } from "./mestre-detalhe";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -48,13 +48,15 @@ const SEM_DADOS: never[] = [];
 export type Pagina = { page: number; page_size: number; total: number };
 
 /**
- * A lista: cabeçalho fixo, linha inteira clicável quando abre a ficha. `classeDaLinha` marca a linha (a inativa
- * apagada, a atrasada em aviso); `grupo` abre uma faixa de título quando o valor muda de uma linha para a outra
- * (os dados chegam ordenados); o `footer` das colunas vira o rodapé (o total). `expandir` dá à linha um botão que
- * abre embaixo dela o detalhe (uma sub-tabela); `podeAbrir` diz quais linhas abrem a ficha; `atributosDaLinha` põe
- * data-*, aria-* ou id no <tr>. `idDaLinha` dá a chave de cada linha: com ela, as linhas abertas do `expandir` seguem
- * abertas quando `dados` muda (o "Carregar mais", um refetch); sem ela, a chave é a posição e elas fecham. `densa` é a
- * tabela curta dentro de uma ficha (os tributos do item): linhas de 34px, cabeçalho de 32px e o `SemValor` como um ponto.
+ * A lista: cabeçalho fixo, linhas separadas pelo fio, linha inteira clicável quando abre a ficha. `classeDaLinha`
+ * marca a linha (a inativa apagada, a atrasada em aviso); `escolhida` diz qual está aberta ao lado (azul claro, com a
+ * barra azul); `grupo` abre uma faixa de título quando o valor muda de uma linha para a outra (os dados chegam
+ * ordenados); o `footer` das colunas vira o rodapé (o total). `expandir` dá à linha um botão que abre embaixo dela o
+ * detalhe (uma sub-tabela); `podeAbrir` diz quais linhas abrem a ficha; `atributosDaLinha` põe data-*, aria-* ou id no
+ * <tr>. `idDaLinha` dá a chave de cada linha: com ela, as linhas abertas do `expandir` seguem abertas quando `dados`
+ * muda (o "Carregar mais", um refetch); sem ela, a chave é a posição e elas fecham. `densa` é a tabela curta dentro de
+ * uma ficha (os tributos do item): linhas de 40px, cabeçalho de 36px e o `SemValor` como um ponto. Com `pagina`, a
+ * `Paginacao` vai no pé; `tamanhosDaPagina` e `aoMudarTamanhoDaPagina` ligam o "Por página".
  */
 export function Tabela<T>({
   dados,
@@ -63,8 +65,11 @@ export function Tabela<T>({
   carregando,
   pagina,
   aoMudarPagina,
+  tamanhosDaPagina,
+  aoMudarTamanhoDaPagina,
   vazio,
   classeDaLinha,
+  escolhida,
   grupo,
   expandir,
   podeAbrir,
@@ -78,8 +83,11 @@ export function Tabela<T>({
   carregando?: boolean;
   pagina?: Pagina;
   aoMudarPagina?: (page: number) => void;
+  tamanhosDaPagina?: number[];
+  aoMudarTamanhoDaPagina?: (page_size: number) => void;
   vazio?: ReactNode;
   classeDaLinha?: (linha: T) => string | false | undefined;
+  escolhida?: (linha: T) => boolean;
   grupo?: (linha: T) => ReactNode;
   expandir?: (linha: T) => ReactNode | null;
   podeAbrir?: (linha: T) => boolean;
@@ -100,7 +108,6 @@ export function Tabela<T>({
     setDadosDasAbertas(dados);
     setAbertas(new Set());
   }
-  const paginas = pagina ? Math.max(1, Math.ceil(pagina.total / pagina.page_size)) : 1;
   const largura = tabela.getVisibleLeafColumns().length + (aoAbrir ? 1 : 0) + (expandir ? 1 : 0);
   const comRodape = tabela.getAllLeafColumns().some((c) => c.columnDef.footer);
   const linhas = tabela.getRowModel().rows;
@@ -122,13 +129,13 @@ export function Tabela<T>({
             <thead>
               {tabela.getHeaderGroups().map((g) => (
                 <tr key={g.id}>
-                  {expandir && <th className="sticky top-0 w-8 border-b border-linha bg-cabeca-tabela" />}
+                  {expandir && <th className="sticky top-0 w-8 border-b border-fio bg-cabeca-tabela" />}
                   {g.headers.map((h) => (
                     <th
                       key={h.id}
                       className={cn(
-                        "rotulo sticky top-0 border-b border-linha bg-cabeca-tabela px-4 text-left whitespace-nowrap text-texto-cabeca",
-                        densa ? "h-8" : "h-10",
+                        "sticky top-0 border-b border-fio bg-cabeca-tabela text-left text-[12.5px] font-bold whitespace-nowrap text-texto-cabeca",
+                        densa ? "h-9 px-3" : "h-10 px-[18px]",
                         h.column.columnDef.meta?.numero && "text-right",
                         h.column.columnDef.meta?.principal && "w-full",
                         h.column.columnDef.meta?.fixa && "left-0 z-10",
@@ -138,7 +145,7 @@ export function Tabela<T>({
                       {flexRender(h.column.columnDef.header, h.getContext())}
                     </th>
                   ))}
-                  {aoAbrir && <th className="sticky top-0 w-8 border-b border-linha bg-cabeca-tabela" />}
+                  {aoAbrir && <th className="sticky top-0 w-8 border-b border-fio bg-cabeca-tabela" />}
                 </tr>
               ))}
             </thead>
@@ -151,28 +158,37 @@ export function Tabela<T>({
                   const clicavel = !!aoAbrir && (podeAbrir?.(r.original) ?? true);
                   const detalhe = expandir?.(r.original) ?? null;
                   const aberta = detalhe !== null && abertas.has(r.id);
+                  const daVez = !!escolhida?.(r.original);
                   return (
                     <Fragment key={r.id}>
                       {novoGrupo && (
                         <tr>
-                          <th colSpan={largura} className="border-b border-linha bg-superficie-2/60 px-4 py-2 text-left">
-                            <span className="titulo-secao">{titulo}</span>
+                          <th
+                            colSpan={largura}
+                            className={cn(
+                              "border-b border-fio bg-cabeca-tabela py-2 text-left text-[13px] font-extrabold text-texto-cabeca",
+                              densa ? "px-3" : "px-[18px]",
+                            )}
+                          >
+                            {titulo}
                           </th>
                         </tr>
                       )}
                       <tr
+                        // antes do spread: o `aria-current` que o app manda por `atributosDaLinha` ganha
+                        aria-current={daVez || undefined}
                         {...atributosDaLinha?.(r.original)}
-                        // a linha alternada: a segunda, a quarta… de dados (o título de grupo e o detalhe aberto não contam)
-                        data-zebra={i % 2 === 1 || undefined}
                         onClick={clicavel ? () => aoAbrir?.(r.original) : undefined}
                         className={cn(
-                          "group border-b border-linha last:border-0 data-zebra:bg-zebra",
-                          clicavel && "cursor-pointer transition-colors hover:bg-superficie-2",
+                          "group border-b border-fio transition-colors last:border-0",
+                          clicavel && "cursor-pointer",
+                          // a escolhida não muda sob o mouse
+                          daVez ? "bg-cobalto-suave" : clicavel && "hover:bg-superficie-2",
                           classeDaLinha?.(r.original),
                         )}
                       >
                         {expandir && (
-                          <td className="w-8 pl-2">
+                          <td className={cn("w-8 pl-2", daVez && "barra-escolhida")}>
                             {detalhe !== null && (
                               <Botao
                                 tipo="fantasma"
@@ -193,13 +209,18 @@ export function Tabela<T>({
                           <td
                             key={c.id}
                             className={cn(
-                              "px-4 whitespace-nowrap",
-                              densa ? "h-[34px]" : "h-11",
+                              "whitespace-nowrap",
+                              densa ? "h-10 px-3" : "h-12 px-[18px]",
                               c.column.columnDef.meta?.numero && "numero text-right",
                               c.column.columnDef.meta?.principal && "max-w-0 truncate whitespace-normal",
                               c.column.columnDef.meta?.quebra && "h-auto py-3 align-top whitespace-normal",
                               c.column.columnDef.meta?.fixa &&
-                                cn("sticky left-0 z-[1] bg-superficie group-data-zebra:bg-zebra", clicavel && "group-hover:bg-superficie-2"),
+                                cn(
+                                  "sticky left-0 z-[1] transition-colors",
+                                  daVez ? "bg-cobalto-suave" : cn("bg-superficie", clicavel && "group-hover:bg-superficie-2"),
+                                ),
+                              // a barra azul vai na primeira célula da linha escolhida
+                              daVez && !expandir && "first:barra-escolhida",
                               classeDaColuna(c.column.columnDef.meta),
                             )}
                           >
@@ -209,14 +230,14 @@ export function Tabela<T>({
                         {aoAbrir && (
                           <td className="pr-3 text-texto-3">
                             {clicavel && (
-                              <ArrowUpRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                              <ChevronRight className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
                             )}
                           </td>
                         )}
                       </tr>
                       {aberta && (
-                        <tr className="border-b border-linha last:border-0">
-                          <td colSpan={largura} className="bg-superficie-2/40 p-0">
+                        <tr className="border-b border-fio last:border-0">
+                          <td colSpan={largura} className="bg-cabeca-tabela p-0">
                             {detalhe}
                           </td>
                         </tr>
@@ -228,14 +249,14 @@ export function Tabela<T>({
             {comRodape && !carregando && (
               <tfoot>
                 {tabela.getFooterGroups().map((g) => (
-                  <tr key={g.id} className="border-t border-linha-forte bg-superficie-2/60">
+                  <tr key={g.id} className="border-t-2 border-fio">
                     {expandir && <td />}
                     {g.headers.map((h) => (
                       <td
                         key={h.id}
                         className={cn(
-                          "px-4 font-semibold whitespace-nowrap",
-                          densa ? "h-[34px]" : "h-11",
+                          "font-extrabold whitespace-nowrap",
+                          densa ? "h-10 px-3" : "h-12 px-[18px]",
                           h.column.columnDef.meta?.numero && "numero text-right",
                           classeDaColuna(h.column.columnDef.meta),
                         )}
@@ -251,31 +272,17 @@ export function Tabela<T>({
           </table>
         </SemValorCompacto.Provider>
         {carregando && <Carregando forma="tabela" linhas={5} />}
-        {!carregando && dados?.length === 0 && vazio && <div className="p-8 text-center text-texto-3">{vazio}</div>}
+        {!carregando && dados?.length === 0 && vazio && <div className="px-[18px] py-7 text-center font-semibold text-texto-2">{vazio}</div>}
       </div>
-      {pagina && aoMudarPagina && pagina.total > pagina.page_size && (
-        <div className="flex items-center justify-between border-t border-linha px-4 py-2.5 text-xs text-texto-2">
-          <span className="numero">
-            {contagem((pagina.page - 1) * pagina.page_size + 1)}–{contagem(Math.min(pagina.page * pagina.page_size, pagina.total))} de{" "}
-            {contagem(pagina.total)}
-          </span>
-          <div className="flex items-center gap-1">
-            <Botao tipo="fantasma" tamanho="icone-sm" disabled={pagina.page <= 1} onClick={() => aoMudarPagina(pagina.page - 1)}>
-              <ChevronLeft />
-            </Botao>
-            <span className="numero px-1">
-              {pagina.page}/{paginas}
-            </span>
-            <Botao
-              tipo="fantasma"
-              tamanho="icone-sm"
-              disabled={pagina.page >= paginas}
-              onClick={() => aoMudarPagina(pagina.page + 1)}
-            >
-              <ChevronRight />
-            </Botao>
-          </div>
-        </div>
+      {pagina && aoMudarPagina && (
+        <Paginacao
+          page={pagina.page}
+          page_size={pagina.page_size}
+          total={pagina.total}
+          aoMudar={aoMudarPagina}
+          tamanhos={tamanhosDaPagina}
+          aoMudarTamanho={aoMudarTamanhoDaPagina}
+        />
       )}
     </div>
   );

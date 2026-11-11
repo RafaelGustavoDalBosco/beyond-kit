@@ -2,85 +2,110 @@
    `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`. */
 
 @font-face {
-  font-family: "Sora";
-  src: url("./fonts/Sora-latin.woff2") format("woff2");
-  font-weight: 100 800;
+  font-family: "Nunito Sans";
+  src: url("./fonts/NunitoSans-latin.woff2") format("woff2");
+  font-weight: 200 1000;
   font-display: swap;
 }
 
-/* Cobalto, só claro; o menu lateral é cobalto escuro. Cor só com sentido: cobalto é ação e seleção, verde é
-   ganho, laranja é o que pede ação ou ressalva o número, vermelho é risco. */
+/* Azul cheio, só claro: o cabeçalho é azul e o menu lateral é branco. Cor só com sentido, cada uma em par
+   claro/forte: azul é ação e seleção, verde é ganho, laranja é o que pede ação, vermelho é risco, cinza é neutro
+   e verde-água é ICMS-ST e entrada. Nada de degradê nem de brilho. */
 :root {
-  --fundo: #e2e7f2;
+  --fundo: #eef2f7;
   --superficie: #ffffff;
-  --superficie-2: #e9edf4;
-  --superficie-3: #e4e7ee;
-  --linha: #c5cbd8;
-  --linha-forte: #8a93a6;
-  --texto: #0d1117;
-  --texto-2: #39414f;
-  --texto-3: #434b5c;
-  /* a estrutura: o cabeçalho da tabela, o texto escuro dele e do título de seção, a linha alternada e o alto do
-     detalhe (do registro, da ficha) */
-  --cabeca-tabela: #d9e2f5;
-  --texto-cabeca: #1c2a4d;
-  --zebra: #f5f7fb;
-  --cabeca-detalhe: #f3f6fd;
+  --superficie-2: #f1f4f8;
+  --superficie-3: #e9edf3;
+  /* a borda de cartão, caixa e campo; o fio é a divisória entre as linhas de uma lista */
+  --linha: #dfe5ee;
+  --linha-forte: #b6c1cf;
+  --fio: #edf1f6;
+  /* o secundário nunca vai apagado: peso 600 a 700 */
+  --texto: #22303e;
+  --texto-2: #5f6f82;
+  --texto-3: #8a98a8;
+  /* a estrutura: o cabeçalho da tabela, o texto dele, a linha alternada e o fundo do modal de ficha */
+  --cabeca-tabela: #f4f7fb;
+  --texto-cabeca: #4a5a6c;
+  --zebra: #f8fafc;
+  --cabeca-detalhe: #f4f7fb;
 
-  --cobalto: #1d4ed8;
-  --cobalto-forte: #1e40af;
-  --cobalto-suave: #ebf0fe;
-  --cobalto-tinta: #1d3fb0;
+  --cobalto: #1463ff;
+  --cobalto-forte: #0f52d9;
+  --cobalto-suave: #e3edff;
+  --cobalto-tinta: #0b3fb3;
   --sobre-cobalto: #ffffff;
+  /* o anel do foco de um campo e o contorno do cartão sob o mouse */
+  --cobalto-anel: #d6e4ff;
 
-  --ganho: #0f7b4a;
-  --ganho-suave: #e7f5ee;
-  --aviso: #b45309;
-  --aviso-suave: #fdf1e3;
-  --risco: #c0362c;
-  --risco-suave: #fcedeb;
+  --ganho: #118a45;
+  --ganho-suave: #dcf7e6;
+  --aviso: #c25a00;
+  --aviso-suave: #fff0e0;
+  --risco: #d12d2d;
+  --risco-suave: #ffe4e4;
+  --risco-anel: #ffd9d9;
+  --neutro: #4a5a6c;
+  --neutro-suave: #eef1f5;
+  --agua: #0b8a68;
+  --agua-suave: #dcf7ef;
 
-  --lateral: #0f1d4a;
-  --lateral-2: rgb(255 255 255 / 0.08);
-  --lateral-linha: rgb(255 255 255 / 0.1);
-  --lateral-texto: #c3cbe0;
-  --lateral-ativo: #ffffff;
-  --lateral-cheio: #2447b8;
-  /* o estado sobre o menu escuro: o aviso e o ganho do claro somem no cobalto escuro */
-  --lateral-aviso: #fbbf24;
-  --lateral-ganho: #34d399;
+  /* o cabeçalho do app, em azul cheio: a pílula translúcida da empresa e o texto sobre ele */
+  --cabecalho: #1463ff;
+  --cabecalho-2: rgb(255 255 255 / 0.16);
+  --cabecalho-3: rgb(255 255 255 / 0.26);
+  --cabecalho-texto: #ffffff;
 
-  /* o "Cobalto claro" do BlocoDestaque: o degradê, o anel e os dois textos sobre ele */
-  --destaque-de: #eef3ff;
-  --destaque-meio: #e3ebff;
-  --destaque-ate: #d4e1ff;
-  --destaque-anel: #c5d5ff;
-  --destaque-texto: #0f1a3d;
-  --destaque-texto-2: #3a4a7a;
+  /* o menu lateral, branco: o item sob o mouse, a borda, o texto, o ativo (texto azul no azul claro) e o sem tela */
+  --lateral: #ffffff;
+  --lateral-2: #f5f7fa;
+  --lateral-linha: #dfe5ee;
+  --lateral-texto: #4a5a6c;
+  --lateral-ativo: #1463ff;
+  --lateral-cheio: #e8f0ff;
+  --lateral-apagado: #9aa6b4;
+  --lateral-aviso: #c25a00;
+  --lateral-ganho: #118a45;
+
+  /* o BlocoDestaque: azul claro chapado (os três tons ficam iguais, sem degradê) */
+  --destaque-de: #e3edff;
+  --destaque-meio: #e3edff;
+  --destaque-ate: #e3edff;
+  --destaque-anel: #cfdcff;
+  --destaque-texto: #22303e;
+  --destaque-texto-2: #5f6f82;
+
+  /* a barra de lote, que flutua embaixo da lista */
+  --lote: #14213d;
 
   /* o dourado do brasão da Dal Bosco Systems (o fio da assinatura) */
   --brasao-ouro: #b08a4a;
 
   /* as séries de um gráfico, na ordem (sem sentido: o verde, o laranja e o vermelho ficam para ganho, aviso e risco) */
-  --serie-1: #1d4ed8;
-  --serie-2: #60a5fa;
-  --serie-3: #a5b4fc;
-  --serie-4: #1e3a8a;
-  --serie-5: #8b92a0;
+  --serie-1: #1463ff;
+  --serie-2: #8fb4ff;
+  --serie-3: #cfdcff;
+  --serie-4: #0b3fb3;
+  --serie-5: #8a98a8;
 
-  --sombra-1: 0 1px 3px rgb(13 17 23 / 0.1);
-  /* a sombra suave dos blocos; botão e campo ficam com a --sombra-1 */
-  --sombra-bloco: 0 4px 16px rgb(20 25 40 / 0.13);
-  --sombra-2: 0 2px 4px rgb(13 17 23 / 0.04), 0 8px 24px rgb(13 17 23 / 0.06);
-  --sombra-3: 0 12px 32px rgb(13 17 23 / 0.14), 0 2px 6px rgb(13 17 23 / 0.06);
-  --veu: rgb(13 17 23 / 0.32);
-  --brilho: rgb(29 78 216 / 0.06);
-  --filete: linear-gradient(90deg, #1e3a8a, #1d4ed8 45%, #60a5fa);
-  --icone-cheio: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+  /* sombra quase nenhuma em cartão, caixa, botão e campo; a forte só em menu (2), em modal e aviso (3), na gaveta
+     e na folha do celular */
+  --sombra-1: 0 1px 2px rgb(16 24 40 / 0.06);
+  --sombra-bloco: 0 1px 2px rgb(16 24 40 / 0.06);
+  --sombra-2: 0 12px 32px rgb(15 23 42 / 0.18);
+  --sombra-3: 0 24px 64px rgb(15 23 42 / 0.3);
+  --sombra-gaveta: -16px 0 40px rgb(26 31 54 / 0.07);
+  --sombra-folha: 0 -12px 40px rgb(15 23 42 / 0.2);
+  --veu: rgb(15 23 42 / 0.45);
 }
 
+/* O celular do kit: até 760px o menu lateral some, entra a barra de navegação embaixo, a gaveta vira folha e o
+   modal de ficha ocupa a tela. `celular:` vale só nele e `mesa:` só acima dele. */
+@custom-variant celular (@media (max-width: 760px));
+@custom-variant mesa (@media (min-width: 761px));
+
 @theme inline {
-  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
 
   --color-fundo: var(--fundo);
   --color-superficie: var(--superficie);
@@ -88,6 +113,7 @@
   --color-superficie-3: var(--superficie-3);
   --color-linha: var(--linha);
   --color-linha-forte: var(--linha-forte);
+  --color-fio: var(--fio);
   --color-texto: var(--texto);
   --color-texto-2: var(--texto-2);
   --color-texto-3: var(--texto-3);
@@ -100,18 +126,29 @@
   --color-cobalto-suave: var(--cobalto-suave);
   --color-cobalto-tinta: var(--cobalto-tinta);
   --color-sobre-cobalto: var(--sobre-cobalto);
+  --color-cobalto-anel: var(--cobalto-anel);
   --color-ganho: var(--ganho);
   --color-ganho-suave: var(--ganho-suave);
   --color-aviso: var(--aviso);
   --color-aviso-suave: var(--aviso-suave);
   --color-risco: var(--risco);
   --color-risco-suave: var(--risco-suave);
+  --color-risco-anel: var(--risco-anel);
+  --color-neutro: var(--neutro);
+  --color-neutro-suave: var(--neutro-suave);
+  --color-agua: var(--agua);
+  --color-agua-suave: var(--agua-suave);
+  --color-cabecalho: var(--cabecalho);
+  --color-cabecalho-2: var(--cabecalho-2);
+  --color-cabecalho-3: var(--cabecalho-3);
+  --color-cabecalho-texto: var(--cabecalho-texto);
   --color-lateral: var(--lateral);
   --color-lateral-2: var(--lateral-2);
   --color-lateral-linha: var(--lateral-linha);
   --color-lateral-texto: var(--lateral-texto);
   --color-lateral-ativo: var(--lateral-ativo);
   --color-lateral-cheio: var(--lateral-cheio);
+  --color-lateral-apagado: var(--lateral-apagado);
   --color-lateral-aviso: var(--lateral-aviso);
   --color-lateral-ganho: var(--lateral-ganho);
   --color-destaque-de: var(--destaque-de);
@@ -121,6 +158,8 @@
   --color-destaque-texto: var(--destaque-texto);
   --color-destaque-texto-2: var(--destaque-texto-2);
   --color-brasao-ouro: var(--brasao-ouro);
+  --color-lote: var(--lote);
+  --color-veu: var(--veu);
   --color-serie-1: var(--serie-1);
   --color-serie-2: var(--serie-2);
   --color-serie-3: var(--serie-3);
@@ -131,14 +170,23 @@
   --shadow-bloco: var(--sombra-bloco);
   --shadow-2: var(--sombra-2);
   --shadow-3: var(--sombra-3);
+  --shadow-gaveta: var(--sombra-gaveta);
+  --shadow-folha: var(--sombra-folha);
 
+  /* campo 10, ícone e item de menu 12, cartão 14, caixa 16, modal de ficha 20; pílula e botão 20 */
   --radius-controle: 10px;
+  --radius-icone: 12px;
+  --radius-cartao: 14px;
   --radius-bloco: 16px;
   --radius-ficha: 20px;
+  --radius-pilula: 20px;
 
   --animate-entrar: entrar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-subir: subir 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-brilhar: brilhar 1.4s ease-in-out infinite;
+  /* a gaveta entra pela direita; no celular, a folha sobe de baixo */
+  --animate-deslizar: deslizar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-folha: folha 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
   /* espera 200 ms invisível: a resposta rápida não chega a piscar */
   --animate-surgir: surgir 0.15s ease-out 0.2s both;
   --animate-correr: correr 1.2s ease-in-out infinite;
@@ -155,6 +203,18 @@
 @keyframes brilhar {
   0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
+}
+@keyframes deslizar {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes folha {
+  from { opacity: 0.6; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes reluzir {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 @keyframes surgir {
   from { opacity: 0; }
@@ -177,7 +237,6 @@
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: "ss01";
   }
   ::selection {
     background: var(--cobalto-suave);
@@ -196,15 +255,16 @@
   background-image: url("./marca/escudo.webp");
 }
 
-/* Número de tabela e código (CNPJ, NCM, CFOP, chave): a Sora com algarismos
-   de largura fixa, para as colunas alinharem. Uma fonte só no front. */
+/* Número de tabela e código (CNPJ, NCM, CFOP, chave): algarismos de largura fixa, para as colunas alinharem.
+   Uma fonte só no front. */
 @utility numero {
   font-variant-numeric: tabular-nums;
 }
 
+/* O rótulo pequeno em caixa alta: só no grupo da paleta, nunca em título. */
 @utility rotulo {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -216,45 +276,30 @@
   }
 }
 
-/* O filete cobalto no alto de uma ficha, de um registro e de um modal. */
-@utility filete {
-  background-image: var(--filete);
-  height: 3px;
-}
-
-/* Título de seção: caixa alta com a barra cobalto à esquerda. */
-@utility titulo-secao {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--texto-cabeca);
-  &::before {
-    content: "";
-    width: 4px;
-    height: 14px;
-    border-radius: 999px;
-    background: var(--cobalto);
-    flex-shrink: 0;
+/* O esqueleto da primeira carga: a faixa clara que passa sobre o cinza. */
+@utility reluzir {
+  background-image: linear-gradient(90deg, #e9eef4 25%, #f6f8fb 50%, #e9eef4 75%);
+  background-size: 200% 100%;
+  animation: reluzir 1.4s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 }
 
-/* O quadrado do ícone do registro, da ficha e da barra do topo: o cobalto cheio, em degradê. */
-@utility icone-cheio {
-  background-image: var(--icone-cheio);
-  color: var(--sobre-cobalto);
-  box-shadow: inset 0 0 0 1px rgb(15 29 74 / 0.12), var(--sombra-1);
+/* A linha escolhida de uma lista: a barra azul de 3px à esquerda. */
+@utility barra-escolhida {
+  box-shadow: inset 3px 0 0 var(--cobalto);
 }
 
-/* O brilho cobalto no alto da área de conteúdo. */
-@utility aurora {
-  background-image: radial-gradient(1200px 320px at 30% -120px, var(--brilho), transparent 70%);
+/* A rolagem de lado sem a barra (as abas em pílula no celular). */
+@utility sem-barra {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-/* O painel de TV (`PainelDeTv`): escuro como o menu lateral, um tom abaixo, para ler de longe. */
+/* O painel de TV (`PainelDeTv`): a única tela escura do kit, para ler de longe. */
 :root {
   --painel: #0a1538;
   --painel-2: #0f1d4a;

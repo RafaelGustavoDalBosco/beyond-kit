@@ -1,42 +1,70 @@
+// Sem "use client" de propósito: a página de servidor passa `icone` (um componente) para a `CabecaDoBloco`; o
+// `aoAbrir` só chega de um componente de cliente.
+
 import type { LucideIcon } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-/** O bloco: a unidade da tela (a grade bento é feita deles). */
+import { Emblema } from "./emblema";
+
+/** A caixa: o bloco branco que agrupa uma lista ou um conteúdo (a unidade da tela). Corta o que passa do canto (a
+ * linha escolhida e o hover da lista que encosta na borda); o que precisa sair dela (um menu absoluto, um `sticky`
+ * preso à página) fica fora ou passa `overflow-visible` no `className`. */
 export function Bloco({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-bloco border border-linha bg-superficie shadow-bloco", className)} {...props} />;
+  return <div className={cn("overflow-hidden rounded-bloco bg-superficie shadow-1", className)} {...props} />;
 }
 
-/** O alto do bloco: o ícone do assunto (opcional), o título, o detalhe e a ação à direita. */
+// A ação de texto do alto da caixa ("Ver todas", "Abrir").
+const ACAO_DE_TEXTO = "shrink-0 text-[13px] font-bold text-cobalto transition-colors hover:text-cobalto-forte";
+
+/** O alto da caixa: o ícone do assunto (opcional), o título, o detalhe e, à direita, a ação. `acaoDeTexto` é a ação
+ * de texto em azul ("Ver todas", "Abrir"): com `aoAbrir` é botão, com `href` é `<a>` e, sem os dois, o próprio nó (o
+ * `Link` do roteador) leva o desenho. `acao` segue para o que não é texto (um botão, um selo, a legenda). */
 export function CabecaDoBloco({
   titulo,
   detalhe,
   acao,
-  icone: Icone,
+  acaoDeTexto,
+  aoAbrir,
+  href,
+  icone,
 }: {
   titulo: ReactNode;
   detalhe?: ReactNode;
   acao?: ReactNode;
+  acaoDeTexto?: ReactNode;
+  /** O clique da `acaoDeTexto`. */
+  aoAbrir?: () => void;
+  /** O destino da `acaoDeTexto`. */
+  href?: string;
   icone?: LucideIcon;
 }) {
   return (
-    <div className="flex min-h-12 items-center gap-3 border-b border-linha px-5 py-3">
-      {Icone && (
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-cobalto-suave text-cobalto">
-          <Icone className="size-4" />
-        </div>
-      )}
+    <div className="flex items-center gap-3 px-[18px] pt-4 pb-1.5">
+      {icone && <Emblema icone={icone} forma="quadrado" tamanho="sm" />}
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold">{titulo}</div>
-        {detalhe && <div className="text-xs text-texto-3">{detalhe}</div>}
+        <div className="text-base leading-snug font-extrabold">{titulo}</div>
+        {detalhe && <div className="text-[12.5px] font-semibold text-texto-2">{detalhe}</div>}
       </div>
+      {acaoDeTexto != null &&
+        (aoAbrir ? (
+          <button type="button" onClick={aoAbrir} className={cn(ACAO_DE_TEXTO, "cursor-pointer")}>
+            {acaoDeTexto}
+          </button>
+        ) : href ? (
+          <a href={href} className={ACAO_DE_TEXTO}>
+            {acaoDeTexto}
+          </a>
+        ) : (
+          <span className={ACAO_DE_TEXTO}>{acaoDeTexto}</span>
+        ))}
       {acao}
     </div>
   );
 }
 
-/** O número de destaque de um bloco: rótulo, valor e o que o qualifica. */
+/** O número de destaque de uma caixa: rótulo, valor e o que o qualifica. */
 export function Destaque({
   rotulo,
   valor,
@@ -52,18 +80,18 @@ export function Destaque({
   detalhe?: ReactNode;
   tom?: "texto" | "cobalto" | "ganho" | "aviso" | "risco";
   grande?: boolean;
-  /** Com borda, fundo e respiro, como um mini bloco. */
+  /** Com contorno, fundo e respiro, como um mini cartão. */
   emCaixa?: boolean;
 }) {
   const cor = { texto: "text-texto", cobalto: "text-cobalto", ganho: "text-ganho", aviso: "text-aviso", risco: "text-risco" }[tom];
   return (
-    <div className={cn("flex min-w-0 flex-col gap-1.5", emCaixa && "rounded-xl border border-linha bg-superficie px-4 py-3")}>
-      <span className="rotulo">{rotulo}</span>
+    <div className={cn("flex min-w-0 flex-col gap-0.5", emCaixa && "rounded-icone border border-linha bg-superficie px-3.5 py-3")}>
+      <span className="text-[12.5px] font-bold text-texto-2">{rotulo}</span>
       <div className="flex flex-wrap items-center gap-2">
         <span
           className={cn(
-            "font-semibold tracking-[-0.02em] tabular-nums",
-            grande ? "text-[34px] leading-[1.1]" : "text-[22px] leading-tight",
+            "numero font-extrabold",
+            grande ? "text-[26px] leading-[1.1] tracking-[-0.02em]" : "text-[19px] leading-tight",
             cor,
           )}
         >
@@ -71,7 +99,7 @@ export function Destaque({
         </span>
         {selo}
       </div>
-      {detalhe && <span className="text-xs text-texto-2">{detalhe}</span>}
+      {detalhe && <span className="text-[12.5px] font-semibold text-texto-2">{detalhe}</span>}
     </div>
   );
 }

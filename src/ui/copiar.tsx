@@ -11,7 +11,7 @@ import { Botao, type BotaoProps } from "./botao";
  * O botão de copiar com rótulo: copia `valor` e mostra o Check e o `copiado` por 1,4 s.
  * `tamanho` "icone"/"icone-sm": só o ícone, com o rótulo (ou o `copiado`) como nome acessível.
  * `onClick` corre antes de copiar (ex.: stopPropagation dentro de uma linha clicável);
- * `avisoAoCopiar` também mostra o toast de sucesso.
+ * `avisoAoCopiar` também mostra o toast de sucesso. Sem `tipo`, é o botão neutro (contorno cinza).
  */
 export function BotaoDeCopiar({
   valor,
@@ -19,6 +19,7 @@ export function BotaoDeCopiar({
   copiado = "Copiado",
   avisoAoCopiar,
   onClick,
+  tipo = "neutro",
   ...props
 }: Omit<BotaoProps, "onClick" | "asChild" | "children"> & {
   valor: string;
@@ -33,6 +34,7 @@ export function BotaoDeCopiar({
   return (
     <Botao
       {...props}
+      tipo={tipo}
       onClick={async (e) => {
         onClick?.(e);
         try {
