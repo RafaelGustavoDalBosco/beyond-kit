@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Copy, type LucideIcon } from "lucide-react";
-import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
+import { Children, createContext, Fragment, isValidElement, useContext, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Dica, type ConteudoDaDica } from "../ui/dica";
@@ -157,9 +157,44 @@ export function Faixa({ itens, grupos }: { itens: ItemDaFaixa[]; grupos?: number
 // O `Par` sabe se está num `Pares` denso.
 const Denso = createContext(false);
 
-/** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco. As colunas seguem a largura do contêiner (não
- * a da tela), para a ficha estreita não espremer: uma coluna abaixo de 24rem, duas até 42rem, `colunas` daí para cima.
- * `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista. `denso` é a lista de definição em
+// Quantas colunas o `Par` ocupa com duas e com `colunas` abertas (com uma, ocupa sempre uma).
+const Vao = createContext<{ dois: number; n: number } | null>(null);
+
+// Os filhos do `Pares` com uma chave cada, abrindo os fragmentos (`{x && <><Par /><Par /></>}`).
+function filhosDosPares(children: ReactNode, prefixo = ""): [string, ReactNode][] {
+  return Children.toArray(children).flatMap((filho, i): [string, ReactNode][] => {
+    const chave = prefixo + (isValidElement(filho) ? String(filho.key) : i);
+    return isValidElement<{ children?: ReactNode }>(filho) && filho.type === Fragment
+      ? filhosDosPares(filho.props.children, `${chave}/`)
+      : [[chave, filho]];
+  });
+}
+
+// As colunas que cada filho pede: `ocupa` do `Par` (o "inteiro" pede todas); o que não é `Par` pede uma.
+function pedido(filho: ReactNode) {
+  if (!isValidElement<{ ocupa?: number | "inteiro" }>(filho) || filho.type !== Par) return 1;
+  return filho.props.ocupa === "inteiro" ? Infinity : (filho.props.ocupa ?? 1);
+}
+
+// Quanto cada filho ocupa numa grade de `n` colunas: o pedido (até `n`), mais o resto da linha quando o seguinte não
+// cabe nela ou quando é o último, para a caixa nunca mostrar célula vazia.
+function vaos(pedidos: number[], n: number) {
+  const vao = pedidos.map((p) => Math.min(p, n));
+  let usadas = 0;
+  vao.forEach((v, i) => {
+    if (usadas + v > n) {
+      vao[i - 1]! += n - usadas;
+      usadas = 0;
+    }
+    usadas = (usadas + v) % n;
+  });
+  if (usadas) vao[vao.length - 1]! += n - usadas;
+  return vao;
+}
+
+/** Pares rótulo → valor, em grade; a linha incompleta não deixa buraco: o último par dela estica até o fim. As colunas
+ * seguem a largura do contêiner (não a da tela), para a ficha estreita não espremer: uma coluna abaixo de 24rem, duas
+ * até 42rem, `colunas` daí para cima. Cada filho conta como um par (o que não é `Par` ocupa uma coluna). `compacto` abre as `colunas` já em 32rem, para o detalhe ao lado de uma lista. `denso` é a lista de definição em
  * duas colunas (uma abaixo de 32rem): o rótulo de 104px à esquerda, o valor à direita, linhas de 34px com um fio
  * embaixo e sem caixa por par, para a ficha curta e cheia (o item da nota). */
 export function Pares({
@@ -181,23 +216,34 @@ export function Pares({
         </Denso.Provider>
       </div>
     );
+  const filhos = filhosDosPares(children);
+  const pedidos = filhos.map(([, filho]) => pedido(filho));
+  const dois = vaos(pedidos, 2);
+  const n = vaos(pedidos, colunas);
   return (
     <div className="@container">
       <dl
         className={cn(
-          "m-0 grid grid-cols-[repeat(var(--colunas-agora),minmax(0,1fr))] gap-px overflow-hidden rounded-xl border border-linha bg-superficie [--colunas-agora:1] @sm:[--colunas-agora:2]",
-          compacto ? "@lg:[--colunas-agora:var(--colunas)]" : "@2xl:[--colunas-agora:var(--colunas)]",
+          "m-0 grid grid-cols-[repeat(var(--colunas-agora),minmax(0,1fr))] gap-px overflow-hidden rounded-xl border border-linha bg-superficie [--colunas-agora:1] *:[--vao:1] @sm:[--colunas-agora:2] @sm:*:[--vao:var(--vao-2,1)]",
+          compacto
+            ? "@lg:[--colunas-agora:var(--colunas)] @lg:*:[--vao:var(--vao-n,1)]"
+            : "@2xl:[--colunas-agora:var(--colunas)] @2xl:*:[--vao:var(--vao-n,1)]",
         )}
         style={{ "--colunas": colunas } as CSSProperties}
       >
-        {children}
+        {filhos.map(([chave, filho], i) => (
+          <Vao.Provider key={chave} value={{ dois: dois[i]!, n: n[i]! }}>
+            {filho}
+          </Vao.Provider>
+        ))}
       </dl>
     </div>
   );
 }
 
 /** Um par; `longo` não corta o valor (o endereço, a descrição) e `ocupa` estende por mais colunas, até as que o `Pares`
- * tem abertas (`"inteiro"` é a linha toda: o CFOP com a descrição); `dica` põe o (i) que explica o termo. */
+ * tem abertas (`"inteiro"` é a linha toda: o CFOP com a descrição); o último da linha estica até o fim dela, quando
+ * o seguinte não cabe ou quando acabam os pares. `dica` põe o (i) que explica o termo. */
 export function Par({
   rotulo,
   longo,
@@ -212,6 +258,7 @@ export function Par({
   children: ReactNode;
 }) {
   const denso = useContext(Denso);
+  const vao = useContext(Vao);
   const inteiro = ocupa === "inteiro";
   if (denso)
     return (
@@ -230,14 +277,8 @@ export function Par({
     );
   return (
     <div
-      className={cn(
-        "flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha",
-        inteiro && "col-span-full",
-        typeof ocupa === "number" &&
-          ocupa > 1 &&
-          "[grid-column:span_min(var(--ocupa),var(--colunas-agora))/span_min(var(--ocupa),var(--colunas-agora))]",
-      )}
-      style={typeof ocupa === "number" ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
+      className="flex min-w-0 flex-col gap-1 bg-superficie px-4 py-3 outline outline-1 outline-linha [grid-column:span_var(--vao,1)]"
+      style={vao ? ({ "--vao-2": vao.dois, "--vao-n": vao.n } as CSSProperties) : undefined}
     >
       <dt className="flex items-center gap-1 text-xs text-texto-3">
         {rotulo}
