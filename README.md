@@ -2,7 +2,7 @@
 
 O kit de UI da Dal Bosco Systems: azul cheio sobre a base do Conta Azul, só claro, só Nunito Sans. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 e Tailwind 4 (Next.js 15/16 ou Vite); projeto em React 18 ou Tailwind 3 sobe antes de adotar.
 
-Adotam: beyond-data, dalbosco-systems (hub), beyond-metric, beyond-payments, beyond-rewards e ethos-integra. Fora: Dor3D e beyond-archflow.
+Adotam: dalbosco-systems (hub), beyond-metric, beyond-payments, beyond-rewards e ethos-integra. Fora: Dor3D, beyond-archflow e beyond-data.
 
 ## Adoção
 
