@@ -7,7 +7,7 @@ import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 /** O que a dica explica. Texto puro é o balão curto; o objeto é o balão completo, com título e exemplo. Os dois são
- * escuros, com a letra branca. */
+ * o `.hint` do Lastro: a janelinha escura, de leitura, que surge em 120ms. */
 export type ConteudoDaDica = string | { titulo?: ReactNode; texto: ReactNode; exemplo?: ReactNode };
 
 /** O tempo para o mouse ir do gatilho até o balão sem ele fechar. */
@@ -72,10 +72,9 @@ function Balao({
       </Popover.Anchor>
       <Popover.Portal>
         <Popover.Content
-          side="top"
+          side="bottom"
           align="center"
-          sideOffset={3}
-          arrowPadding={10}
+          sideOffset={6}
           collisionPadding={8}
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
@@ -85,40 +84,40 @@ function Balao({
           onPointerEnter={entrar}
           onPointerLeave={sair}
           onClick={(e) => e.stopPropagation()}
+          // o `.hint` parado (`is-estatico`): quem posiciona é o Radix, e o balão recebe o mouse para ficar aberto
           className={cn(
-            "z-50 animate-entrar rounded-controle bg-texto text-[12.5px] leading-[1.45] font-semibold text-white shadow-2 outline-none",
-            typeof conteudo === "string" ? "max-w-[250px] px-3 py-2" : "w-72 p-3",
+            "hint is-estatico outline-none animate-[kit-entrar_120ms_ease-out] motion-reduce:animate-none",
+            typeof conteudo !== "string" && "w-[280px]",
           )}
         >
           {typeof conteudo === "string" ? (
-            conteudo
+            <span>{conteudo}</span>
           ) : (
             <>
-              {conteudo.titulo && <div className="mb-1 text-sm font-extrabold">{conteudo.titulo}</div>}
-              {conteudo.texto}
-              {conteudo.exemplo && <div className="mt-2 rounded-lg bg-white/15 px-2.5 py-1.5">{conteudo.exemplo}</div>}
+              {conteudo.titulo && <b>{conteudo.titulo}</b>}
+              <span>{conteudo.texto}</span>
+              {conteudo.exemplo && <div className="mt-1 rounded-p bg-hint-titulo/10 px-2 py-1.5">{conteudo.exemplo}</div>}
             </>
           )}
-          <Popover.Arrow width={10} height={5} className="fill-texto" />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
   );
 }
 
-/** O (?) que explica um termo, com o balão escuro em cima. No `Rotulado` e no `Par`, use a prop `dica`. */
+/** O (?) que explica um termo, com o balão escuro embaixo (sobe se não couber). No `Rotulado` e no `Par`, use a prop `dica`. */
 export function Dica({ conteudo, className }: { conteudo: ConteudoDaDica; className?: string }) {
-  // A margem negativa deixa 14px no fluxo: o círculo de 22px não aumenta a linha do rótulo ao lado.
+  // A margem negativa deixa 12px no fluxo: o círculo de 20px não aumenta a linha do rótulo ao lado.
   return (
     <Balao
       conteudo={conteudo}
       rotulo="O que é isto?"
       className={cn(
-        "-my-1 inline-grid size-[22px] shrink-0 cursor-help place-items-center self-center rounded-full text-texto-2 outline-none transition-colors hover:bg-neutro-suave focus-visible:ring-2 focus-visible:ring-cobalto aria-expanded:bg-neutro-suave aria-expanded:text-texto",
+        "-my-1 inline-grid size-5 shrink-0 cursor-help place-items-center self-center rounded-full text-texto-apoio hover:bg-hover hover:text-texto aria-expanded:bg-hover aria-expanded:text-texto",
         className,
       )}
     >
-      <CircleHelp className="size-4" />
+      <CircleHelp className="size-3.5" />
     </Balao>
   );
 }
@@ -129,7 +128,7 @@ export function TermoComDica({ conteudo, className, children }: { conteudo: Cont
     <Balao
       conteudo={conteudo}
       className={cn(
-        "cursor-help rounded-sm border-b border-dotted border-texto-3 text-left outline-none transition-colors hover:border-cobalto hover:text-cobalto focus-visible:ring-2 focus-visible:ring-cobalto aria-expanded:border-cobalto aria-expanded:text-cobalto",
+        "cursor-help border-b border-dotted border-texto-apoio text-left hover:border-texto aria-expanded:border-texto",
         className,
       )}
     >

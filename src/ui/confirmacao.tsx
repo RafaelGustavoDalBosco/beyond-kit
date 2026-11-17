@@ -13,30 +13,23 @@ const semMascara = (texto: string) => texto.replace(/[^0-9A-Za-z]/g, "").toUpper
 
 type TipoDaConfirmacao = "perigo" | "primario";
 
-// O que não se desfaz vai em vermelho, com o botão cheio e o pé do modal de formulário (o fio e os botões à
-// direita); o passo que não é risco vai em azul, com os botões no meio.
+// O que não se desfaz confirma no `.btn-perigo` do Lastro (o contorno vermelho), com o ícone de alerta no traço
+// vermelho; o passo que não é risco confirma no primário, com o ícone neutro.
 const DESENHO = {
-  perigo: { tom: "risco", icone: TriangleAlert, botao: "perigo-cheio", rodapeNoMeio: false },
-  primario: { tom: "cobalto", icone: CircleHelp, botao: "primario", rodapeNoMeio: true },
+  perigo: { tom: "erro", icone: TriangleAlert, botao: "perigo" },
+  primario: { tom: "neutro", icone: CircleHelp, botao: "primario" },
 } as const;
 
-const LARGURA = 440;
+const LARGURA = 460;
 
-const FRASE = "text-sm leading-relaxed font-semibold text-texto-2";
+const FRASE = "text-base leading-texto text-texto-secundario";
 
-/** O ícone em círculo que abre a confirmação, no tom do tipo: 56px, um passo acima do `lg` do `Emblema`. */
+/** O emblema discreto ao lado do título da confirmação, no tom do tipo. */
 function emblemaDa(tipo: TipoDaConfirmacao, icone: LucideIcon | undefined) {
-  return (
-    <Emblema
-      icone={icone ?? DESENHO[tipo].icone}
-      tom={DESENHO[tipo].tom}
-      tamanho="lg"
-      className="size-14 [&_svg]:size-[26px]"
-    />
-  );
+  return <Emblema icone={icone ?? DESENHO[tipo].icone} tom={DESENHO[tipo].tom} tamanho="md" />;
 }
 
-/** O botão do que não se desfaz: abre a confirmação (modal pequeno e centrado, com o ícone em círculo, o título em pergunta e a frase). `tipoDoConfirmar="primario"` quando o passo não é risco (virar contrato, publicar). `digitar` só libera o confirmar com esse texto digitado (o CNPJ ao apagar a empresa). */
+/** O botão do que não se desfaz: abre a confirmação (o `.dialog` pequeno, com o emblema ao lado do título em pergunta, a frase e o confirmar à direita). `tipoDoConfirmar="primario"` quando o passo não é risco (virar contrato, publicar). `digitar` só libera o confirmar com esse texto digitado (o CNPJ ao apagar a empresa). */
 export function BotaoDeConfirmar({
   children,
   titulo,
@@ -55,7 +48,7 @@ export function BotaoDeConfirmar({
   confirmar: ReactNode;
   aoConfirmar: () => void;
   tipoDoConfirmar?: TipoDaConfirmacao;
-  /** O ícone do círculo da confirmação (padrão: o alerta no perigo e a interrogação no primário). */
+  /** O ícone do emblema da confirmação (padrão: o alerta no perigo e a interrogação no primário). */
   iconeDaConfirmacao?: LucideIcon;
   rotuloDoCancelar?: ReactNode;
   digitar?: string;
@@ -81,7 +74,6 @@ export function BotaoDeConfirmar({
         titulo={titulo}
         largura={LARGURA}
         emblema={emblemaDa(tipoDoConfirmar, iconeDaConfirmacao)}
-        rodapeNoMeio={DESENHO[tipoDoConfirmar].rodapeNoMeio}
         rodape={
           <>
             <Cancelar rotulo={rotuloDoCancelar} />
@@ -101,11 +93,11 @@ export function BotaoDeConfirmar({
         {frase && <div className={FRASE}>{frase}</div>}
         {digitar !== undefined && (
           <Rotulado
-            className="mt-4 text-left"
+            className="mt-3.5"
             rotulo={
               rotuloDoDigitar ?? (
                 <>
-                  Digite <b className="font-extrabold">{digitar}</b> para confirmar
+                  Digite <b className="font-forte">{digitar}</b> para confirmar
                 </>
               )
             }
@@ -124,7 +116,7 @@ export type OpcoesDaConfirmacao = {
   /** O texto do botão de confirmar (padrão "Confirmar"). */
   confirmar?: ReactNode;
   tipo?: TipoDaConfirmacao;
-  /** O ícone do círculo (padrão: o alerta no perigo e a interrogação no primário). */
+  /** O ícone do emblema (padrão: o alerta no perigo e a interrogação no primário). */
   icone?: LucideIcon;
   rotuloDoCancelar?: ReactNode;
 };
@@ -163,7 +155,6 @@ export function useConfirmar() {
       titulo={opcoes.titulo}
       largura={LARGURA}
       emblema={emblemaDa(tipo, opcoes.icone)}
-      rodapeNoMeio={DESENHO[tipo].rodapeNoMeio}
       rodape={
         <>
           <Cancelar rotulo={opcoes.rotuloDoCancelar} />

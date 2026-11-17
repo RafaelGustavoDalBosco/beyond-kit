@@ -5,8 +5,10 @@ import { useCallback, useEffect, useState, type ComponentProps, type ReactNode }
 
 import { cn } from "../lib/cn";
 
-// O painel de TV: escuro, letra grande, um item por vez passando sozinho (ou a lista inteira). O assunto
-// (obra, disciplina, pedido) fica no app; aqui moram a moldura, os controles e a passagem.
+// O painel de TV: sempre escuro (os tokens `painel*` do kit.css, com os valores do tema escuro do Lastro, nos dois
+// temas), letra grande em Onest, números em peso 500, um item por vez passando sozinho (ou a lista inteira). O assunto
+// (obra, disciplina, pedido) fica no app; aqui moram a moldura, os controles e a passagem. A cor dos dados do app vem
+// das séries do Lastro (`bg-serie-1`…`5`) e dos tons de sentido; o azul (`painel-destaque`) é só do que se toca.
 
 /** Tempos oferecidos para cada item na tela, em segundos. */
 export const TEMPOS_DA_APRESENTACAO = [10, 20, 30, 60] as const;
@@ -64,6 +66,7 @@ function BotaoTelaCheia() {
       type="button"
       onClick={alternar}
       title={cheia ? "Sair da tela cheia" : "Tela cheia"}
+      aria-label={cheia ? "Sair da tela cheia" : "Tela cheia"}
       className="cursor-pointer text-painel-texto-3 transition-colors hover:text-painel-texto"
     >
       <Icone className="size-5" />
@@ -92,18 +95,18 @@ function Relogio({ atualizadoEm, aoAtualizar }: { atualizadoEm: number; aoAtuali
 
   return (
     <div className="shrink-0 text-right">
-      <p className="numero m-0 text-2xl leading-tight font-extrabold tracking-tight">{agora ? relogio(agora) : " "}</p>
+      <p className="numero m-0 text-numero-p leading-numero font-medio tracking-titulo">{agora ? relogio(agora) : " "}</p>
       {aoAtualizar ? (
         <button
           type="button"
           onClick={aoAtualizar}
           title="Atualizar agora"
-          className="ml-auto flex cursor-pointer items-center gap-1 text-xs font-semibold text-painel-texto-3 transition-colors hover:text-painel-texto-2"
+          className="ml-auto flex cursor-pointer items-center gap-1 text-apoio text-painel-texto-3 transition-colors hover:text-painel-texto-2"
         >
           {atualizado}
         </button>
       ) : (
-        <span className="flex items-center justify-end gap-1 text-xs font-semibold text-painel-texto-3">{atualizado}</span>
+        <span className="flex items-center justify-end gap-1 text-apoio text-painel-texto-3">{atualizado}</span>
       )}
     </div>
   );
@@ -136,7 +139,7 @@ export function PainelDeTv({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("flex min-h-screen flex-col bg-painel text-painel-texto", className)}>
+    <div className={cn("flex min-h-screen flex-col bg-painel font-sans text-painel-texto [color-scheme:dark]", className)}>
       <header className="flex shrink-0 flex-wrap items-center gap-4 border-b border-painel-linha bg-painel-2 px-6 py-4">
         {voltar && (
           <div className="shrink-0 text-painel-texto-3 transition-colors [&_a:hover]:text-painel-texto [&_button:hover]:text-painel-texto">
@@ -146,8 +149,8 @@ export function PainelDeTv({
         {marca && <div className="shrink-0">{marca}</div>}
         {marca && <div className="mx-1 h-8 w-px bg-painel-linha" />}
         <div className="min-w-0">
-          {rotulo && <div className="text-xs font-bold text-painel-texto-3">{rotulo}</div>}
-          <p className="m-0 truncate text-lg leading-tight font-extrabold">{titulo}</p>
+          {rotulo && <div className="text-apoio font-medio text-painel-texto-3">{rotulo}</div>}
+          <p className="m-0 truncate text-subtitulo leading-titulo font-forte tracking-titulo">{titulo}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-6">
           {filtros && <div className="flex flex-wrap items-center gap-2">{filtros}</div>}
@@ -160,7 +163,8 @@ export function PainelDeTv({
   );
 }
 
-/** O controle segmentado do painel (o filtro de situação, o modo): a opção ativa acende em branco. */
+/** O controle segmentado do painel (o filtro de situação, o modo), o `.seg` do Lastro no escuro: a opção ativa ganha
+ * o contorno e o texto no azul de ação. */
 export function SegmentosDoPainel<T extends string | number>({
   opcoes,
   valor,
@@ -173,7 +177,7 @@ export function SegmentosDoPainel<T extends string | number>({
   className?: string;
 }) {
   return (
-    <div className={cn("flex gap-1 rounded-lg border border-painel-linha bg-painel-3 p-1", className)}>
+    <div className={cn("flex overflow-hidden rounded-m border border-painel-linha bg-painel-2", className)}>
       {opcoes.map(({ valor: v, rotulo, icone: Icone, dica }) => (
         <button
           key={String(v)}
@@ -182,8 +186,10 @@ export function SegmentosDoPainel<T extends string | number>({
           aria-pressed={v === valor}
           onClick={() => aoMudar(v)}
           className={cn(
-            "flex cursor-pointer items-center gap-1 rounded-md px-3 py-1 text-xs font-bold transition-colors",
-            v === valor ? "bg-painel-texto text-painel-2" : "text-painel-texto-2 hover:text-painel-texto",
+            "flex cursor-pointer items-center gap-1.5 border-l border-painel-linha px-3 py-1.5 text-base first:border-l-0",
+            v === valor
+              ? "font-medio text-painel-destaque shadow-[inset_0_0_0_1px_var(--painel-destaque)]"
+              : "text-painel-texto-2 hover:bg-painel-3 hover:text-painel-texto",
           )}
         >
           {Icone && <Icone className="size-3.5" />}
@@ -199,7 +205,7 @@ export function SelecaoDoPainel({ className, ...props }: ComponentProps<"select"
   return (
     <select
       className={cn(
-        "cursor-pointer rounded-lg border border-painel-linha bg-painel-2 px-3 py-1.5 text-sm font-semibold text-painel-texto focus:ring-1 focus:ring-painel-texto-3 focus:outline-none",
+        "cursor-pointer rounded-m border border-painel-linha bg-painel-2 px-2.5 py-1.5 text-base text-painel-texto hover:border-painel-texto-3 focus-visible:border-painel-destaque focus-visible:outline-none",
         className,
       )}
       {...props}
@@ -336,8 +342,8 @@ export function ControlesDaApresentacao({
           <button type="button" onClick={proximo} className={botao} title={`Próximo ${nomeDoItem} (→)`}>
             <SkipForward className="size-5" />
           </button>
-          <span className="ml-2 text-sm font-semibold">{pausado ? "pausado" : `passando a cada ${segundos}s`}</span>
-          <span className="numero ml-2 text-sm font-semibold">
+          <span className="ml-2 text-base">{pausado ? "pausado" : `passando a cada ${segundos}s`}</span>
+          <span className="numero ml-2 text-base font-medio">
             {nomeDoItem} {indice + 1} de {total}
           </span>
         </div>
@@ -422,7 +428,7 @@ export function ConteudoDoPainel<T>({
 
   if (carregando || itens.length === 0) {
     return (
-      <div className={cn("p-12 text-center font-semibold text-painel-texto-3", apresentando ? "text-2xl" : "text-sm")}>
+      <div className={cn("p-12 text-center font-medio text-painel-texto-3", apresentando ? "text-numero-p" : "text-base")}>
         {carregando ? "Carregando…" : vazio}
       </div>
     );
@@ -445,7 +451,8 @@ export function ConteudoDoPainel<T>({
   );
 }
 
-/** A barra de andamento no escuro: `valor` de 0 a 100; `cor` é a classe do preenchimento (padrão o destaque). */
+/** A barra de andamento no escuro (a `.barra` do Lastro): `valor` de 0 a 100; `cor` é a classe do preenchimento
+ * (padrão o azul do painel; para dado, uma série do Lastro, `bg-serie-3`, ou um tom de sentido, `bg-positivo`). */
 export function BarraDoPainel({
   valor,
   cor = "bg-painel-destaque",
@@ -457,17 +464,18 @@ export function BarraDoPainel({
 }) {
   const largura = Math.min(100, Math.max(0, valor));
   return (
-    <div className={cn("h-2 overflow-hidden rounded-full bg-painel-3", className)}>
-      <div className={cn("h-full rounded-full transition-[width]", cor)} style={{ width: `${largura}%` }} />
+    <div className={cn("h-2 overflow-hidden rounded-p bg-painel-3", className)}>
+      <div className={cn("h-full rounded-p transition-[width]", cor)} style={{ width: `${largura}%` }} />
     </div>
   );
 }
 
-/** A situação em pílula; `cor` é dado do app (a cor do status no banco), por isso vai no style. */
+/** A situação no selo do Lastro (raio pequeno, o ponto como sinal ao lado do texto); `cor` é dado do app (a cor do
+ * status no banco), por isso vai no style. */
 export function SeloDoPainel({ cor, rotulo, className }: { cor: string; rotulo: ReactNode; className?: string }) {
   return (
     <span
-      className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold", className)}
+      className={cn("inline-flex items-center gap-1.5 rounded-p px-[7px] py-px text-apoio font-medio whitespace-nowrap", className)}
       style={{ color: cor, background: `color-mix(in srgb, ${cor} 16%, transparent)` }}
     >
       <span className="size-1.5 shrink-0 rounded-full" style={{ background: cor }} />

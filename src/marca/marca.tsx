@@ -32,12 +32,12 @@ export function AssinaturaDalBosco({
 }) {
   const Caixa = como;
   return (
-    <Caixa className={cn("mt-10 flex flex-col items-center gap-1.5 pb-2 text-center", className)}>
-      <Brasao className="h-[72px]" />
-      <span aria-hidden className="my-1 h-px w-16 bg-brasao-ouro" />
-      <small className="text-xs font-semibold text-texto-2">
-        Um produto da <b className="font-bold text-texto">Dal Bosco Systems</b> · © <span className="numero">{ano}</span> ·{" "}
-        <a href="https://dalboscosystems.com.br" target="_blank" rel="noreferrer" className="font-bold text-cobalto hover:underline">
+    <Caixa className={cn("mt-10 flex flex-col items-center gap-2 pb-2 text-center", className)}>
+      <Brasao className="h-[76px]" />
+      <span aria-hidden className="h-px w-16 bg-brasao-ouro" />
+      <small className="text-base font-medio text-texto-secundario">
+        Um produto da <b className="font-forte text-texto">Dal Bosco Systems</b> · © <span className="numero">{ano}</span> ·{" "}
+        <a href="https://dalboscosystems.com.br" target="_blank" rel="noreferrer" className="text-acao-texto hover:underline">
           dalboscosystems.com.br
         </a>
       </small>
@@ -46,30 +46,34 @@ export function AssinaturaDalBosco({
 }
 
 /**
- * O selo do login: o escudo e "Um produto da Dal Bosco Systems". `sobreCobalto` é o do pé do painel azul (a frase
- * em branco) e `tamanho="sm"`, o que desce para baixo do botão no celular.
+ * O selo do login: o escudo e "Um produto da Dal Bosco Systems". `sobreEscuro` é o do pé do painel escuro da moldura
+ * (a frase no claro do hint) e `tamanho="sm"`, o que desce para baixo do formulário no celular.
  */
 export function SeloDalBosco({
+  sobreEscuro,
   sobreCobalto,
   tamanho = "md",
   className,
 }: {
+  sobreEscuro?: boolean;
+  /** @deprecated O painel do login deixou de ser azul: vale o mesmo que `sobreEscuro`. */
   sobreCobalto?: boolean;
   tamanho?: "md" | "sm";
   className?: string;
 }) {
+  const escuro = sobreEscuro ?? sobreCobalto;
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-2.5 font-bold",
-        tamanho === "md" ? "text-[13px]" : "text-[12.5px]",
-        sobreCobalto ? "text-sobre-cobalto/85 [&_b]:text-sobre-cobalto" : "text-texto-2 [&_b]:text-texto",
+        "flex items-center justify-center",
+        tamanho === "md" ? "gap-3.5 text-base-celular" : "gap-2.5 text-base",
+        escuro ? "text-hint-texto [&_b]:text-hint-titulo" : "text-texto-apoio [&_b]:text-texto",
         className,
       )}
     >
-      <Brasao variante="escudo" className={tamanho === "md" ? "h-12" : "h-8"} />
+      <Brasao variante="escudo" className={tamanho === "md" ? "h-[46px]" : "h-[30px]"} />
       <span>
-        Um produto da <b className="font-extrabold">Dal Bosco Systems</b>
+        Um produto da <b className="font-forte">Dal Bosco Systems</b>
       </span>
     </div>
   );

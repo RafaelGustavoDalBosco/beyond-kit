@@ -1,249 +1,203 @@
-/* @dalbosco/kit: os tokens, o tema, a base e as utilities. Não importa o Tailwind: o projeto faz
-   `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`. */
+/* @dalbosco/kit: o desenho Lastro (CLAUDE.md, "Desenho: Lastro"). Não importa o Tailwind: o projeto faz
+   `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`.
 
-@font-face {
-  font-family: "Nunito Sans";
-  src: url("./fonts/NunitoSans-latin.woff2") format("woff2");
-  font-weight: 200 1000;
-  font-display: swap;
-}
+   - tokens.css: a fonte única de valores, nos dois temas (o escuro é só a troca das variáveis sob
+     `<html data-tema="escuro">`; nenhuma classe `dark:`). O tema padrão é o claro (tema/tema.ts).
+   - lastro.css: o visual dos componentes, um bloco por componente, na camada `components`. Os componentes React
+     do kit usam essas classes; o layout de cada tela fica em utilitários do Tailwind.
+   - publico.css: as telas sem login (home e acesso), que o Lastro não desenha, sobre os mesmos tokens. */
 
-/* Azul cheio, só claro: o cabeçalho é azul e o menu lateral é branco. Cor só com sentido, cada uma em par
-   claro/forte: azul é ação e seleção, verde é ganho, laranja é o que pede ação, vermelho é risco, cinza é neutro
-   e verde-água é ICMS-ST e entrada. Nada de degradê nem de brilho. */
+@import "./tokens.css";
+@import "./lastro.css" layer(components);
+@import "./publico.css" layer(components);
+
+/* A marca da Dal Bosco Systems (o dourado do fio da assinatura) e o painel de TV (a tela de ler de longe, sempre
+   escura, com os valores do tema escuro). */
 :root {
-  --fundo: #eef2f7;
-  --superficie: #ffffff;
-  --superficie-2: #f1f4f8;
-  --superficie-3: #e9edf3;
-  /* a borda de cartão, caixa e campo; o fio é a divisória entre as linhas de uma lista */
-  --linha: #dfe5ee;
-  --linha-forte: #b6c1cf;
-  --fio: #edf1f6;
-  /* o secundário nunca vai apagado: peso 600 a 700 */
-  --texto: #22303e;
-  --texto-2: #5f6f82;
-  --texto-3: #8a98a8;
-  /* a estrutura: o cabeçalho da tabela, o texto dele, a linha alternada e o fundo do modal de ficha */
-  --cabeca-tabela: #f4f7fb;
-  --texto-cabeca: #4a5a6c;
-  --zebra: #f8fafc;
-  --cabeca-detalhe: #f4f7fb;
-
-  --cobalto: #1463ff;
-  --cobalto-forte: #0f52d9;
-  --cobalto-suave: #e3edff;
-  --cobalto-tinta: #0b3fb3;
-  --sobre-cobalto: #ffffff;
-  /* o anel do foco de um campo e o contorno do cartão sob o mouse */
-  --cobalto-anel: #d6e4ff;
-
-  --ganho: #118a45;
-  --ganho-suave: #dcf7e6;
-  --aviso: #c25a00;
-  --aviso-suave: #fff0e0;
-  --risco: #d12d2d;
-  --risco-suave: #ffe4e4;
-  --risco-anel: #ffd9d9;
-  --neutro: #4a5a6c;
-  --neutro-suave: #eef1f5;
-  --agua: #0b8a68;
-  --agua-suave: #dcf7ef;
-
-  /* o cabeçalho do app, em azul cheio: a pílula translúcida da empresa e o texto sobre ele */
-  --cabecalho: #1463ff;
-  --cabecalho-2: rgb(255 255 255 / 0.16);
-  --cabecalho-3: rgb(255 255 255 / 0.26);
-  --cabecalho-texto: #ffffff;
-
-  /* o menu lateral, branco: o item sob o mouse, a borda, o texto, o ativo (texto azul no azul claro) e o sem tela */
-  --lateral: #ffffff;
-  --lateral-2: #f5f7fa;
-  --lateral-linha: #dfe5ee;
-  --lateral-texto: #4a5a6c;
-  --lateral-ativo: #1463ff;
-  --lateral-cheio: #e8f0ff;
-  --lateral-apagado: #9aa6b4;
-  --lateral-aviso: #c25a00;
-  --lateral-ganho: #118a45;
-
-  /* o BlocoDestaque: azul claro chapado (os três tons ficam iguais, sem degradê) */
-  --destaque-de: #e3edff;
-  --destaque-meio: #e3edff;
-  --destaque-ate: #e3edff;
-  --destaque-anel: #cfdcff;
-  --destaque-texto: #22303e;
-  --destaque-texto-2: #5f6f82;
-
-  /* a barra de lote, que flutua embaixo da lista */
-  --lote: #14213d;
-
-  /* o dourado do brasão da Dal Bosco Systems (o fio da assinatura) */
   --brasao-ouro: #b08a4a;
-
-  /* as séries de um gráfico, na ordem (sem sentido: o verde, o laranja e o vermelho ficam para ganho, aviso e risco) */
-  --serie-1: #1463ff;
-  --serie-2: #8fb4ff;
-  --serie-3: #cfdcff;
-  --serie-4: #0b3fb3;
-  --serie-5: #8a98a8;
-
-  /* sombra quase nenhuma em cartão, caixa, botão e campo; a forte só em menu (2), em modal e aviso (3), na gaveta
-     e na folha do celular */
-  --sombra-1: 0 1px 2px rgb(16 24 40 / 0.06);
-  --sombra-bloco: 0 1px 2px rgb(16 24 40 / 0.06);
-  --sombra-2: 0 12px 32px rgb(15 23 42 / 0.18);
-  --sombra-3: 0 24px 64px rgb(15 23 42 / 0.3);
-  --sombra-gaveta: -16px 0 40px rgb(26 31 54 / 0.07);
-  --sombra-folha: 0 -12px 40px rgb(15 23 42 / 0.2);
-  --veu: rgb(15 23 42 / 0.45);
+  --painel: #0a0d13;
+  --painel-2: #171c26;
+  --painel-3: rgb(255 255 255 / 0.05);
+  --painel-linha: #262d3a;
+  --painel-texto: #e6e9ef;
+  --painel-texto-2: #b9c0cc;
+  --painel-texto-3: #8e98a8;
+  --painel-destaque: #93a5ff;
+}
+:root[data-tema="escuro"] {
+  --brasao-ouro: #c9a55a;
 }
 
-/* O celular do kit: até 760px o menu lateral some, entra a barra de navegação embaixo, a gaveta vira folha e o
-   modal de ficha ocupa a tela. `celular:` vale só nele e `mesa:` só acima dele. */
-@custom-variant celular (@media (max-width: 760px));
-@custom-variant mesa (@media (min-width: 761px));
+/* O celular do Lastro: abaixo de 640px a lateral sai, entra a barra de baixo, o painel de detalhe vira folha e o
+   modal ocupa a tela. `celular:` vale só nele e `mesa:` só acima dele. */
+@custom-variant celular (@media (max-width: 639px));
+@custom-variant mesa (@media (min-width: 640px));
 
+/* Só os valores do Lastro existem como utilitário: as paletas, os tamanhos de fonte, os pesos, os raios e as
+   sombras padrão do Tailwind saem, para nenhuma tela usar cor ou medida fora dos tokens. O passo de espaçamento
+   (4px) é o mesmo do Lastro. */
 @theme inline {
-  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
-
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
   --color-fundo: var(--fundo);
-  --color-superficie: var(--superficie);
-  --color-superficie-2: var(--superficie-2);
-  --color-superficie-3: var(--superficie-3);
-  --color-linha: var(--linha);
-  --color-linha-forte: var(--linha-forte);
-  --color-fio: var(--fio);
+  --color-mesa: var(--superficie-mesa);
+  --color-ficha: var(--superficie-ficha);
+  --color-campo: var(--superficie-campo);
+  --color-sub: var(--superficie-sub);
+  --color-busca: var(--superficie-busca);
   --color-texto: var(--texto);
-  --color-texto-2: var(--texto-2);
-  --color-texto-3: var(--texto-3);
-  --color-cabeca-tabela: var(--cabeca-tabela);
-  --color-texto-cabeca: var(--texto-cabeca);
-  --color-zebra: var(--zebra);
-  --color-cabeca-detalhe: var(--cabeca-detalhe);
-  --color-cobalto: var(--cobalto);
-  --color-cobalto-forte: var(--cobalto-forte);
-  --color-cobalto-suave: var(--cobalto-suave);
-  --color-cobalto-tinta: var(--cobalto-tinta);
-  --color-sobre-cobalto: var(--sobre-cobalto);
-  --color-cobalto-anel: var(--cobalto-anel);
-  --color-ganho: var(--ganho);
-  --color-ganho-suave: var(--ganho-suave);
-  --color-aviso: var(--aviso);
-  --color-aviso-suave: var(--aviso-suave);
-  --color-risco: var(--risco);
-  --color-risco-suave: var(--risco-suave);
-  --color-risco-anel: var(--risco-anel);
-  --color-neutro: var(--neutro);
-  --color-neutro-suave: var(--neutro-suave);
-  --color-agua: var(--agua);
-  --color-agua-suave: var(--agua-suave);
-  --color-cabecalho: var(--cabecalho);
-  --color-cabecalho-2: var(--cabecalho-2);
-  --color-cabecalho-3: var(--cabecalho-3);
-  --color-cabecalho-texto: var(--cabecalho-texto);
-  --color-lateral: var(--lateral);
-  --color-lateral-2: var(--lateral-2);
-  --color-lateral-linha: var(--lateral-linha);
-  --color-lateral-texto: var(--lateral-texto);
-  --color-lateral-ativo: var(--lateral-ativo);
-  --color-lateral-cheio: var(--lateral-cheio);
-  --color-lateral-apagado: var(--lateral-apagado);
-  --color-lateral-aviso: var(--lateral-aviso);
-  --color-lateral-ganho: var(--lateral-ganho);
-  --color-destaque-de: var(--destaque-de);
-  --color-destaque-meio: var(--destaque-meio);
-  --color-destaque-ate: var(--destaque-ate);
-  --color-destaque-anel: var(--destaque-anel);
-  --color-destaque-texto: var(--destaque-texto);
-  --color-destaque-texto-2: var(--destaque-texto-2);
-  --color-brasao-ouro: var(--brasao-ouro);
-  --color-lote: var(--lote);
-  --color-veu: var(--veu);
+  --color-texto-secundario: var(--texto-secundario);
+  --color-texto-apoio: var(--texto-apoio);
+  --color-texto-inverso: var(--texto-inverso);
+  --color-borda: var(--borda);
+  --color-borda-suave: var(--borda-suave);
+  --color-borda-forte: var(--borda-forte);
+  --color-neutro-200: var(--neutro-200);
+  --color-neutro-300: var(--neutro-300);
+  --color-neutro-400: var(--neutro-400);
+  --color-neutro-500: var(--neutro-500);
+  --color-neutro-600: var(--neutro-600);
+  --color-neutro-700: var(--neutro-700);
+  --color-neutro-800: var(--neutro-800);
+  --color-neutro-900: var(--neutro-900);
+  --color-acao: var(--acao);
+  --color-acao-texto: var(--acao-texto);
+  --color-acao-sobre: var(--acao-sobre);
+  --color-acao-100: var(--acao-100);
+  --color-acao-200: var(--acao-200);
+  --color-acao-300: var(--acao-300);
+  --color-acao-400: var(--acao-400);
+  --color-acao-700: var(--acao-700);
+  --color-acao-800: var(--acao-800);
+  --color-positivo: var(--positivo);
+  --color-positivo-fundo: var(--positivo-fundo);
+  --color-positivo-sobre-escuro: var(--positivo-sobre-escuro);
+  --color-destaque: var(--destaque);
+  --color-destaque-fundo: var(--destaque-fundo);
+  --color-atencao: var(--atencao);
+  --color-atencao-fundo: var(--atencao-fundo);
+  --color-erro: var(--erro);
+  --color-erro-fundo: var(--erro-fundo);
+  --color-ok: var(--ok);
+  --color-estado-aberto: var(--estado-aberto);
+  --color-estado-aberto-fundo: var(--estado-aberto-fundo);
+  --color-estado-marcado: var(--estado-marcado);
+  --color-estado-marcado-fundo: var(--estado-marcado-fundo);
+  --color-estado-andamento: var(--estado-andamento);
+  --color-estado-andamento-fundo: var(--estado-andamento-fundo);
+  --color-estado-aplicado: var(--estado-aplicado);
+  --color-estado-aplicado-fundo: var(--estado-aplicado-fundo);
+  --color-estado-concluido: var(--estado-concluido);
+  --color-estado-concluido-fundo: var(--estado-concluido-fundo);
+  --color-estado-erro: var(--estado-erro);
+  --color-estado-erro-fundo: var(--estado-erro-fundo);
+  --color-estado-cancelado: var(--estado-cancelado);
+  --color-estado-conferir: var(--estado-conferir);
   --color-serie-1: var(--serie-1);
   --color-serie-2: var(--serie-2);
   --color-serie-3: var(--serie-3);
   --color-serie-4: var(--serie-4);
   --color-serie-5: var(--serie-5);
+  --color-hover: var(--hover);
+  --color-hint: var(--hint-fundo);
+  --color-hint-titulo: var(--hint-titulo);
+  --color-hint-texto: var(--hint-texto);
+  --color-veu: var(--veu-modal);
+  --color-veu-painel: var(--veu-painel);
+  --color-brasao-ouro: var(--brasao-ouro);
+  --color-painel: var(--painel);
+  --color-painel-2: var(--painel-2);
+  --color-painel-3: var(--painel-3);
+  --color-painel-linha: var(--painel-linha);
+  --color-painel-texto: var(--painel-texto);
+  --color-painel-texto-2: var(--painel-texto-2);
+  --color-painel-texto-3: var(--painel-texto-3);
+  --color-painel-destaque: var(--painel-destaque);
 
-  --shadow-1: var(--sombra-1);
-  --shadow-bloco: var(--sombra-bloco);
-  --shadow-2: var(--sombra-2);
-  --shadow-3: var(--sombra-3);
-  --shadow-gaveta: var(--sombra-gaveta);
-  --shadow-folha: var(--sombra-folha);
+  --font-*: initial;
+  --font-sans: var(--fonte);
 
-  /* campo 10, ícone e item de menu 12, cartão 14, caixa 16, modal de ficha 20; pílula e botão 20 */
-  --radius-controle: 10px;
-  --radius-icone: 12px;
-  --radius-cartao: 14px;
-  --radius-bloco: 16px;
-  --radius-ficha: 20px;
-  --radius-pilula: 20px;
+  --text-*: initial;
+  --text-micro: var(--tam-micro);
+  --text-apoio: var(--tam-apoio);
+  --text-base: var(--tam-base);
+  --text-base-celular: var(--tam-base-celular);
+  --text-enfase: var(--tam-enfase);
+  --text-botao-celular: var(--tam-botao-celular);
+  --text-subtitulo: var(--tam-subtitulo);
+  --text-titulo: var(--tam-titulo);
+  --text-numero-p: var(--tam-numero-p);
+  --text-numero-m: var(--tam-numero-m);
+  --text-numero-g: var(--tam-numero-g);
+  --text-numero-xg: var(--tam-numero-xg);
 
-  --animate-entrar: entrar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-subir: subir 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-brilhar: brilhar 1.4s ease-in-out infinite;
-  /* a gaveta entra pela direita; no celular, a folha sobe de baixo */
-  --animate-deslizar: deslizar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-folha: folha 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --font-weight-*: initial;
+  --font-weight-normal: var(--peso-normal);
+  --font-weight-medio: var(--peso-medio);
+  --font-weight-forte: var(--peso-forte);
+
+  --leading-texto: var(--linha-texto);
+  --leading-titulo: var(--linha-titulo);
+  --leading-numero: var(--linha-numero);
+  --tracking-titulo: var(--entreletra-titulo);
+
+  --radius-*: initial;
+  --radius-p: var(--raio-p);
+  --radius-m: var(--raio-m);
+  --radius-g: var(--raio-g);
+  --radius-pilula: var(--raio-pilula);
+
+  --shadow-*: initial;
+  --shadow-p: var(--sombra-p);
+  --shadow-m: var(--sombra-m);
+  --shadow-g: var(--sombra-g);
+  --shadow-topo: var(--sombra-topo);
+  --shadow-acao: var(--sombra-acao);
+
+  /* as durações do Lastro: hint 120ms, toast 180ms, painel 160ms */
+  --animate-entrar: kit-entrar 0.16s ease-out;
+  --animate-subir: kit-subir 0.18s ease-out;
+  --animate-deslizar: kit-deslizar 0.16s ease-out;
+  --animate-folha: kit-folha 0.18s ease-out;
   /* espera 200 ms invisível: a resposta rápida não chega a piscar */
-  --animate-surgir: surgir 0.15s ease-out 0.2s both;
-  --animate-correr: correr 1.2s ease-in-out infinite;
+  --animate-surgir: kit-surgir 0.15s ease-out 0.2s both;
+  --animate-correr: kit-correr 1.2s ease-in-out infinite;
 }
 
-@keyframes entrar {
+@keyframes kit-entrar {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes subir {
-  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+@keyframes kit-subir {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes brilhar {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
-}
-@keyframes deslizar {
-  from { opacity: 0; transform: translateX(30px); }
+@keyframes kit-deslizar {
+  from { opacity: 0; transform: translateX(24px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes folha {
+@keyframes kit-folha {
   from { opacity: 0.6; transform: translateY(40px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes reluzir {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-@keyframes surgir {
+@keyframes kit-surgir {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-@keyframes correr {
+@keyframes kit-correr {
   from { transform: translateX(-100%); }
   to { transform: translateX(300%); }
 }
 
-@layer base {
-  html {
-    color-scheme: light;
-  }
-  body {
-    margin: 0;
-    background: var(--fundo);
-    color: var(--texto);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-  ::selection {
-    background: var(--cobalto-suave);
-  }
-  :focus-visible {
-    outline: 2px solid var(--cobalto);
-    outline-offset: 2px;
+@media (prefers-reduced-motion: reduce) {
+  .hint,
+  .toast,
+  .pilha,
+  .flutuante,
+  .busca-caixa {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -255,70 +209,16 @@
   background-image: url("./marca/escudo.webp");
 }
 
-/* Número de tabela e código (CNPJ, NCM, CFOP, chave): algarismos de largura fixa, para as colunas alinharem.
-   Uma fonte só no front. */
+/* Número e código (CNPJ, chave, valor): algarismos de largura fixa, para as colunas alinharem. O body já liga o
+   tabular-nums; a classe fica para o que vem de fora do fluxo. */
 @utility numero {
   font-variant-numeric: tabular-nums;
 }
 
-/* O rótulo pequeno em caixa alta: só no grupo da paleta, nunca em título. */
-@utility rotulo {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* A cor padrão do rótulo fica abaixo das utilities: `rotulo text-cobalto` ganha sempre, em qualquer ordem. */
-@layer components {
-  .rotulo {
-    color: var(--texto-3);
-  }
-}
-
-/* O esqueleto da primeira carga: a faixa clara que passa sobre o cinza. */
-@utility reluzir {
-  background-image: linear-gradient(90deg, #e9eef4 25%, #f6f8fb 50%, #e9eef4 75%);
-  background-size: 200% 100%;
-  animation: reluzir 1.4s linear infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-/* A linha escolhida de uma lista: a barra azul de 3px à esquerda. */
-@utility barra-escolhida {
-  box-shadow: inset 3px 0 0 var(--cobalto);
-}
-
-/* A rolagem de lado sem a barra (as abas em pílula no celular). */
+/* A rolagem de lado sem a barra (as abas no celular). */
 @utility sem-barra {
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
-}
-
-/* O painel de TV (`PainelDeTv`): a única tela escura do kit, para ler de longe. */
-:root {
-  --painel: #0a1538;
-  --painel-2: #0f1d4a;
-  --painel-3: rgb(255 255 255 / 0.06);
-  --painel-linha: rgb(255 255 255 / 0.1);
-  --painel-texto: #ffffff;
-  --painel-texto-2: #c3cbe0;
-  --painel-texto-3: #8792b3;
-  /* a barra e o realce sobre o escuro: o cobalto do claro some no fundo */
-  --painel-destaque: #60a5fa;
-}
-
-@theme inline {
-  --color-painel: var(--painel);
-  --color-painel-2: var(--painel-2);
-  --color-painel-3: var(--painel-3);
-  --color-painel-linha: var(--painel-linha);
-  --color-painel-texto: var(--painel-texto);
-  --color-painel-texto-2: var(--painel-texto-2);
-  --color-painel-texto-3: var(--painel-texto-3);
-  --color-painel-destaque: var(--painel-destaque);
 }

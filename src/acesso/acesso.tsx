@@ -5,7 +5,7 @@
 // passa a chamada à API e os links (o Link do roteador dele). O token, o e-mail
 // e quem pode se cadastrar são do backend de cada projeto.
 
-import { CircleAlert, CircleCheck, Loader2, Lock, Mail, MailCheck, User, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { fraseDoErro } from "../aviso/aviso";
@@ -14,16 +14,15 @@ import { Brasao, SeloDalBosco } from "../marca/marca";
 import { Botao } from "../ui/botao";
 import { Caixa, Campo, Rotulado } from "../ui/campo";
 import { CampoDeSenha } from "../ui/campo-de-senha";
-import { PAR_DO_TOM, type TomDoEmblema } from "../ui/emblema";
 
 /**
- * A tela sem menu, dividida em duas: à esquerda o painel em azul cheio e à direita o formulário, no branco. O painel
- * `produto` (padrão) fala do produto: a marca, o título em frase grande, a frase de apoio, os `pontos` com ícone, a
- * `amostra` (um cartão branco com um pedaço do produto) e, no pé, o selo "Um produto da Dal Bosco Systems". O
- * painel `brasao` leva o brasão grande (o da própria Dal Bosco Systems, no hub), e aí o selo sai. Do lado do
- * formulário, `topo` é a linha do alto ("Ainda não usa?" com o link) e `pe`, os links de baixo (Termos,
- * Privacidade, Suporte). Até 860px o painel vira só uma faixa azul no alto, com a marca e o título, e o selo desce
- * para baixo do formulário. `marcaDoPainel` é a marca na versão clara, para o azul (sem ela, vale a `marca`).
+ * A tela sem menu, no modelo do Beyond Data, dividida em duas: à esquerda o painel escuro do produto (a família do
+ * hint) e à direita o formulário, no fundo da página. O painel `produto` (padrão) fala do produto: a marca, o
+ * `rotulo`, o título, a frase, os `pontos` com ícone, a `amostra` (um cartão claro com um pedaço do produto) e, no
+ * pé, o selo "Um produto da Dal Bosco Systems" e o `rodape`. O painel `brasao` (o hub) leva o brasão inteiro no lugar
+ * da marca, e aí o selo sai. Do lado do formulário, `topo` é a linha do alto ("Ainda não usa?" com o link) e `pe`, os
+ * links de baixo (Termos, Privacidade, Suporte). Até 1020px o painel vira a faixa do alto, com a marca e o título, e o
+ * selo desce para baixo do formulário. `marcaDoPainel` é a marca na versão para o escuro (sem ela, vale a `marca`).
  */
 export function MolduraPublica({
   marca,
@@ -48,7 +47,7 @@ export function MolduraPublica({
   frase?: ReactNode;
   /** Os pontos do painel do produto (três), cada um com o ícone no círculo. */
   pontos?: { icone: LucideIcon; texto: ReactNode }[];
-  /** O conteúdo do cartão branco do painel do produto: uma amostra do que o produto mostra. */
+  /** O conteúdo do cartão claro do painel do produto: uma amostra do que o produto mostra. */
   amostra?: ReactNode;
   /** A linha do pé do painel, embaixo do selo. */
   rodape?: ReactNode;
@@ -59,88 +58,62 @@ export function MolduraPublica({
   children: ReactNode;
 }) {
   return (
-    <div className="grid min-h-screen grid-cols-[minmax(0,1.1fr)_minmax(420px,1fr)] bg-superficie max-[860px]:grid-cols-1 max-[860px]:grid-rows-[auto_1fr]">
-      <aside className="flex flex-col overflow-hidden bg-cobalto px-14 py-10 text-sobre-cobalto max-[860px]:px-5 max-[860px]:pt-[22px] max-[860px]:pb-6">
-        {/* No painel do brasão a marca só aparece na faixa do celular: na tela larga o brasão já traz o nome. */}
-        <div
-          className={cn(
-            "flex items-center gap-2.5 text-xl font-extrabold tracking-[-0.01em]",
-            painel === "brasao" && "min-[861px]:hidden",
+    <div className={cn("pub pub-acesso", painel === "brasao" && "is-brasao")}>
+      <aside className="pub-painel">
+        <div>
+          {/* no painel do brasão a marca só aparece na faixa da tela estreita: na larga o brasão já traz o nome */}
+          <div className="pub-marca pub-painel-marca">{marcaDoPainel}</div>
+          {painel === "produto" && (
+            <div className="pub-painel-miolo">
+              {rotulo && <span className="pub-rotulo">{rotulo}</span>}
+              {titulo && <h2>{titulo}</h2>}
+              {frase && <p className="pub-painel-frase">{frase}</p>}
+              {pontos && pontos.length > 0 && (
+                <ul className="pub-pontos">
+                  {pontos.map(({ icone: Icone, texto }, i) => (
+                    <li key={i}>
+                      <b aria-hidden>
+                        <Icone />
+                      </b>
+                      {texto}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {amostra && <div className="pub-amostra">{amostra}</div>}
+            </div>
           )}
-        >
-          {marcaDoPainel}
         </div>
-        {painel === "produto" ? (
-          <div className="my-auto py-8 max-[860px]:my-0 max-[860px]:py-0">
-            {rotulo && <div className="mb-2 text-[13px] font-bold text-sobre-cobalto/85 max-[860px]:hidden">{rotulo}</div>}
-            {titulo && (
-              <h1 className="m-0 max-w-[520px] text-[38px] leading-[1.15] font-extrabold tracking-[-0.02em] max-[860px]:mt-[18px] max-[860px]:text-[22px]">
-                {titulo}
-              </h1>
-            )}
-            {frase && (
-              <p className="m-0 mt-3.5 max-w-[480px] text-base leading-[1.55] text-sobre-cobalto/85 max-[860px]:hidden">{frase}</p>
-            )}
-            {pontos && pontos.length > 0 && (
-              <ul className="m-0 mt-[26px] flex list-none flex-col gap-3 p-0 max-[860px]:hidden">
-                {pontos.map(({ icone: Icone, texto }, i) => (
-                  <li key={i} className="flex items-center gap-3 text-[15px] font-bold">
-                    <span aria-hidden className="grid size-[30px] shrink-0 place-items-center rounded-full bg-cabecalho-2">
-                      <Icone className="size-4" />
-                    </span>
-                    {texto}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {amostra && (
-              <div className="mt-[30px] max-w-[460px] rounded-bloco bg-superficie p-4 text-texto shadow-2 max-[860px]:hidden">
-                {amostra}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="my-auto flex flex-col items-center gap-4 py-8 text-center max-[860px]:my-0 max-[860px]:items-start max-[860px]:gap-0 max-[860px]:py-0 max-[860px]:text-left">
-            <Brasao className="w-[min(220px,60%)] max-[860px]:hidden" />
-            {rotulo && <div className="text-[13px] font-bold text-sobre-cobalto/85 max-[860px]:hidden">{rotulo}</div>}
-            {titulo && (
-              <h1 className="m-0 text-[28px] leading-tight font-extrabold tracking-[-0.02em] max-[860px]:mt-[18px] max-[860px]:text-[22px]">
-                {titulo}
-              </h1>
-            )}
-            {frase && <p className="m-0 max-w-[420px] text-base leading-[1.55] text-sobre-cobalto/85 max-[860px]:hidden">{frase}</p>}
+        {painel === "brasao" && (
+          <div className="pub-painel-brasao">
+            <Brasao className="w-[min(220px,60%)] max-[1020px]:hidden" />
+            {rotulo && <span className="pub-rotulo max-[1020px]:hidden">{rotulo}</span>}
+            {titulo && <h2>{titulo}</h2>}
+            {frase && <p className="pub-painel-frase">{frase}</p>}
           </div>
         )}
         {(selo || rodape) && (
-          <div className="flex flex-col items-start gap-3 max-[860px]:hidden">
-            {selo && <SeloDalBosco sobreCobalto className="justify-start" />}
-            {rodape && <div className="text-[13px] font-semibold text-sobre-cobalto/85">{rodape}</div>}
+          <div className="pub-painel-pe">
+            {selo && <SeloDalBosco sobreEscuro className="justify-start" />}
+            {rodape && <div className="pub-painel-rodape">{rodape}</div>}
           </div>
         )}
       </aside>
 
-      <div className="flex min-w-0 flex-col px-14 py-10 max-[860px]:px-5 max-[860px]:pt-7 max-[860px]:pb-[22px]">
-        {topo && (
-          <div className="flex justify-end font-semibold text-texto-2 max-[860px]:hidden [&_a]:ml-1.5 [&_a]:font-extrabold [&_a]:text-cobalto [&_a:hover]:underline">
-            {topo}
-          </div>
-        )}
-        <div className="m-auto w-full max-w-[400px] py-6 max-[860px]:my-0 max-[860px]:py-0">
+      <div className="pub-acesso-lado">
+        {topo && <div className="pub-acesso-topo">{topo}</div>}
+        <div className="pub-cartao">
           {children}
-          {selo && <SeloDalBosco tamanho="sm" className="mt-4 hidden max-[860px]:flex" />}
+          {selo && <SeloDalBosco tamanho="sm" className="mt-2.5 hidden max-[1020px]:flex" />}
         </div>
-        {pe && (
-          <div className="flex justify-center gap-[18px] text-[13px] font-bold text-texto-3 max-[860px]:mt-7 max-[860px]:flex-wrap [&_a]:text-texto-2 [&_a:hover]:text-cobalto">
-            {pe}
-          </div>
-        )}
+        {pe && <div className="pub-acesso-pe">{pe}</div>}
       </div>
     </div>
   );
 }
 
 /**
- * O bloco de um formulário de acesso, solto no lado branco da moldura (sem cartão em volta): a linha de cima
+ * O bloco de um formulário de acesso, solto no lado do formulário da moldura (sem cartão em volta): a linha de cima
  * (`rotulo`, só quando o app passa), o título, a frase, o conteúdo e os links do pé.
  */
 export function CartaoDeAcesso({
@@ -157,37 +130,36 @@ export function CartaoDeAcesso({
   children: ReactNode;
 }) {
   return (
-    <div className="w-full">
-      {rotulo && <div className="mb-1 text-[13px] font-bold text-cobalto">{rotulo}</div>}
-      <h2 className="m-0 text-[28px] leading-tight font-extrabold tracking-[-0.015em] text-texto max-[860px]:text-2xl">{titulo}</h2>
-      {frase && <p className="m-0 mt-1.5 leading-normal text-texto-2">{frase}</p>}
-      <div className="mt-[26px]">{children}</div>
-      {links && (
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-extrabold [&_a]:text-cobalto [&_a:hover]:underline">
-          {links}
-        </div>
-      )}
+    <div className="flex w-full flex-col gap-[18px]">
+      <div>
+        {rotulo && <span className="pub-rotulo mb-1.5">{rotulo}</span>}
+        <h1>{titulo}</h1>
+        {frase && <p className="pub-cartao-frase">{frase}</p>}
+      </div>
+      {children}
+      {links && <div className="pub-cartao-links">{links}</div>}
     </div>
   );
 }
 
-/** A faixa colorida que fica acima dos campos: a recusa, o que deu certo, o estado do link. */
+const AVISO_DO_TOM = { erro: "aviso-erro", positivo: "aviso-ok", neutro: "" } as const;
+
+/** O aviso do Lastro acima dos campos (o sinal vem do próprio aviso): a recusa, o que deu certo, o link em conferência
+ * (com o girador no lugar do sinal). */
 function Faixa({
   tom,
-  icone: Icone,
   papel,
   girando,
   children,
 }: {
-  tom: TomDoEmblema;
-  icone: LucideIcon;
+  tom: keyof typeof AVISO_DO_TOM;
   papel: "alert" | "status";
   girando?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div role={papel} className={cn("flex items-start gap-2.5 rounded-icone px-3.5 py-3 leading-[1.45] font-bold", PAR_DO_TOM[tom])}>
-      <Icone aria-hidden className={cn("mt-px size-[18px] shrink-0", girando && "animate-spin")} />
+    <div role={papel} className={cn("aviso", AVISO_DO_TOM[tom], girando && "items-center before:hidden")}>
+      {girando && <span aria-hidden className="girador" />}
       <span className="min-w-0">{children}</span>
     </div>
   );
@@ -197,7 +169,7 @@ function Faixa({
 function Recusa({ frase }: { frase: string | null }) {
   if (!frase) return null;
   return (
-    <Faixa tom="risco" icone={CircleAlert} papel="alert">
+    <Faixa tom="erro" papel="alert">
       {frase}
     </Faixa>
   );
@@ -209,10 +181,10 @@ function lido(dados: FormData, nome: string) {
   return typeof v === "string" ? v : "";
 }
 
-/** O que deu certo, na faixa verde (o link enviado, a entrada aceita, a senha trocada). */
+/** O que deu certo, no aviso verde (o link enviado, a entrada aceita, a senha trocada). */
 function Sucesso({ frase }: { frase: ReactNode }) {
   return (
-    <Faixa tom="ganho" icone={CircleCheck} papel="status">
+    <Faixa tom="positivo" papel="status">
       {frase}
     </Faixa>
   );
@@ -246,7 +218,7 @@ function useEnvio() {
   return { enviando, recusa, pronto, setRecusa, enviar };
 }
 
-/** O botão do formulário, em pílula na largura toda; enviando, o giro entra antes do texto. */
+/** O botão principal do formulário, na largura toda; enviando, o giro entra no lugar do texto. */
 function BotaoDeEnviar({ enviando, children }: { enviando: boolean; children: ReactNode }) {
   return (
     <Botao type="submit" tipo="primario" tamanho="lg" className="w-full" carregando={enviando}>
@@ -256,7 +228,7 @@ function BotaoDeEnviar({ enviando, children }: { enviando: boolean; children: Re
 }
 
 /**
- * O fim de um passo que não se repete (a senha trocada, a conta criada): a faixa fica no lugar do formulário, com
+ * O fim de um passo que não se repete (a senha trocada, a conta criada): o aviso fica no lugar do formulário, com
  * o passo seguinte embaixo.
  */
 function Pronto({ frase, acao }: { frase: ReactNode; acao?: ReactNode }) {
@@ -282,7 +254,7 @@ function problemaDaSenha(senha: string, repetida: string, minimo: number, frases
  * Entrar: o login (e-mail, por padrão) e a senha. `links` leva o "Criar conta"; `linkEsqueci` põe o "Esqueci minha
  * senha" na linha do rótulo da senha. `manterConectado` mostra a caixa "Manter conectado" (o valor é como ela
  * nasce, marcada ou não) e a escolha chega em `aoEntrar` como `manter`. Com `frasePronto`, a entrada aceita aparece
- * na faixa verde acima dos campos enquanto o app abre a tela seguinte.
+ * no aviso verde acima dos campos enquanto o app abre a tela seguinte.
  */
 export function Entrar({
   aoEntrar,
@@ -306,7 +278,7 @@ export function Entrar({
   linkEsqueci?: ReactNode;
   manterConectado?: boolean;
   rotuloDoManter?: ReactNode;
-  /** A frase da faixa verde depois que `aoEntrar` dá certo; sem ela, nada aparece. */
+  /** A frase do aviso verde depois que `aoEntrar` dá certo; sem ela, nada aparece. */
   frasePronto?: ReactNode;
 }) {
   const { enviando, recusa, pronto, enviar } = useEnvio();
@@ -323,15 +295,13 @@ export function Entrar({
           <Campo
             name="login"
             type={tipoDoLogin}
-            tamanho="lg"
-            icone={tipoDoLogin === "email" ? Mail : User}
             autoComplete="username"
             required
             autoFocus
           />
         </Rotulado>
         <Rotulado rotulo="Senha" acao={linkEsqueci}>
-          <CampoDeSenha name="senha" tamanho="lg" icone={Lock} autoComplete="current-password" required />
+          <CampoDeSenha name="senha" autoComplete="current-password" required />
         </Rotulado>
         {manterConectado !== undefined && (
           <Caixa name="manter" defaultChecked={manterConectado} className="mb-1.5 self-start">
@@ -348,7 +318,7 @@ export function Entrar({
  * Esqueci a senha: pede o link por e-mail. A resposta é a mesma exista ou não
  * a conta (não revela quem está cadastrado). Com `tipoDoLogin="text"` o campo
  * se chama `login` (com e-mail, `email`, como sempre). Depois de pedir, a
- * `frasePronto` fica na faixa verde acima do campo e o formulário continua à
+ * `frasePronto` fica no aviso verde acima do campo e o formulário continua à
  * vista (dá para pedir de novo).
  */
 export function EsqueciASenha({
@@ -379,8 +349,6 @@ export function EsqueciASenha({
           <Campo
             name={nome}
             type={tipoDoLogin}
-            tamanho="lg"
-            icone={tipoDoLogin === "email" ? Mail : User}
             autoComplete={tipoDoLogin === "email" ? "email" : "username"}
             required
             autoFocus
@@ -450,8 +418,6 @@ export function RedefinirASenha({
           <Rotulado rotulo="Senha nova" ajuda={ajuda ?? `Pelo menos ${minimo} caracteres.`}>
             <CampoDeSenha
               name="senha"
-              tamanho="lg"
-              icone={Lock}
               autoComplete="new-password"
               onChange={(e) => setSenha(e.target.value)}
               required
@@ -461,8 +427,6 @@ export function RedefinirASenha({
           <Rotulado rotulo="Repita a senha" erro={problema ?? undefined}>
             <CampoDeSenha
               name="senha_repetida"
-              tamanho="lg"
-              icone={Lock}
               autoComplete="new-password"
               onChange={(e) => setRepetida(e.target.value)}
               required
@@ -532,19 +496,17 @@ export function CriarConta({
         >
           <Recusa frase={recusa} />
           {contexto && (
-            <div className="rounded-icone bg-superficie-2 px-3.5 py-3 text-[13px] leading-normal font-semibold text-texto-2">{contexto}</div>
+            <div className="rounded-m bg-mesa px-3 py-2.5 text-texto-secundario">{contexto}</div>
           )}
           <Rotulado rotulo="Nome">
-            <Campo name="nome" tamanho="lg" icone={User} autoComplete="name" defaultValue={valoresIniciais?.nome} required autoFocus />
+            <Campo name="nome" autoComplete="name" defaultValue={valoresIniciais?.nome} required autoFocus />
           </Rotulado>
           <Rotulado rotulo="E-mail">
-            <Campo name="email" type="email" tamanho="lg" icone={Mail} autoComplete="email" defaultValue={valoresIniciais?.email} required />
+            <Campo name="email" type="email" autoComplete="email" defaultValue={valoresIniciais?.email} required />
           </Rotulado>
           <Rotulado rotulo="Senha" ajuda={ajuda ?? `Pelo menos ${minimo} caracteres.`}>
             <CampoDeSenha
               name="senha"
-              tamanho="lg"
-              icone={Lock}
               autoComplete="new-password"
               onChange={(e) => setSenha(e.target.value)}
               required
@@ -553,8 +515,6 @@ export function CriarConta({
           <Rotulado rotulo="Repita a senha" erro={problema ?? undefined}>
             <CampoDeSenha
               name="senha_repetida"
-              tamanho="lg"
-              icone={Lock}
               autoComplete="new-password"
               onChange={(e) => setRepetida(e.target.value)}
               required
@@ -569,9 +529,9 @@ export function CriarConta({
 }
 
 const ESTADO_DO_LINK = {
-  confirmando: { tom: "neutro", icone: Loader2, frase: "Conferindo o link…" },
-  confirmado: { tom: "ganho", icone: MailCheck, frase: "E-mail confirmado. Já dá para entrar." },
-  falhou: { tom: "risco", icone: CircleAlert, frase: "Este link não vale mais. Peça outro para confirmar o e-mail." },
+  confirmando: { tom: "neutro", frase: "Conferindo o link…" },
+  confirmado: { tom: "positivo", frase: "E-mail confirmado. Já dá para entrar." },
+  falhou: { tom: "erro", frase: "Este link não vale mais. Peça outro para confirmar o e-mail." },
 } as const;
 
 /**
@@ -588,11 +548,11 @@ export function ConfirmarEmail({
   frase?: ReactNode;
   acao?: ReactNode;
 }) {
-  const { tom, icone, frase: padrao } = ESTADO_DO_LINK[estado];
+  const { tom, frase: padrao } = ESTADO_DO_LINK[estado];
   return (
     <CartaoDeAcesso titulo="Confirmar o e-mail">
       <div className="flex flex-col gap-4">
-        <Faixa tom={tom} icone={icone} papel="status" girando={estado === "confirmando"}>
+        <Faixa tom={tom} papel="status" girando={estado === "confirmando"}>
           {frase ?? padrao}
         </Faixa>
         {estado !== "confirmando" && acao}

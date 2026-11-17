@@ -1,10 +1,9 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
-import { Fragment, type ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
+import { Fragment, useEffect, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { Emblema } from "./emblema";
 import type { LinkDoMenu } from "./menu-lateral";
 
 const LinkPadrao: LinkDoMenu = ({ href, children, ...resto }) => (
@@ -13,53 +12,70 @@ const LinkPadrao: LinkDoMenu = ({ href, children, ...resto }) => (
   </a>
 );
 
-/** A barra da tela, branca e presa embaixo do `CabecalhoDoApp`: o ícone da seção, a trilha (Comercial › Clientes), o
- * título em frase e as ações da tela à direita (o mês, os botões); a busca, o sino e o usuário ficam no cabeçalho. Os
- * itens da trilha podem ser o `Link` do roteador. `carregando` liga a linha fina no pé da barra, o sinal de que a
- * tela está trabalhando; o app diz quando (no TanStack, o `useIsFetching`). */
+// A barra entre os passos da trilha; o "/" que o `.trilha a::after` põe sai, para o `Link` do app não dobrar a barra.
+const BARRA = (
+  <span aria-hidden className="text-neutro-500">
+    /
+  </span>
+);
+
+/** A trilha da tela (`.trilha` do Lastro): a faixa de 36px presa embaixo do `CabecalhoDoApp`, com os passos até a tela
+ * (Comercial / Clientes), o `titulo` como o passo atual, a frase dela ao lado e as ações da tela à direita (o mês, os
+ * botões). Os passos podem ser o `Link` do roteador. `voltaUmPasso` liga o Alt ← (o `history.back()`) e a dica dele
+ * no canto, que some até 1180px. `carregando` corre a barra fina no pé da faixa, o sinal de que a tela está
+ * trabalhando; o app diz quando (no TanStack, o `useIsFetching`). */
 export function BarraDoTopo({
-  icone,
   trilha,
   titulo,
   subtitulo,
   acoes,
   carregando,
+  voltaUmPasso,
   className,
 }: {
+  /** @deprecated Sem efeito: a trilha do Lastro não leva ícone. */
   icone?: LucideIcon;
   trilha?: ReactNode[];
   titulo: ReactNode;
   subtitulo?: ReactNode;
   acoes?: ReactNode;
   carregando?: boolean;
+  voltaUmPasso?: boolean;
   className?: string;
 }) {
+  useEffect(() => {
+    if (!voltaUmPasso) return;
+    const tecla = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        e.preventDefault();
+        history.back();
+      }
+    };
+    document.addEventListener("keydown", tecla);
+    return () => document.removeEventListener("keydown", tecla);
+  }, [voltaUmPasso]);
+
   return (
-    <header className={cn("sticky top-15 z-20 h-16 border-b border-linha bg-superficie px-7 celular:top-14 celular:px-3.5", className)}>
-      <div className="flex h-full items-center gap-3">
-        {icone && <Emblema icone={icone} forma="quadrado" className="celular:hidden" />}
-        <div className="min-w-0 flex-1">
-          {trilha && trilha.length > 0 && (
-            <nav aria-label="Trilha" className="mb-0.5 flex items-center gap-1 leading-none">
-              {trilha.map((t, i) => (
-                <Fragment key={i}>
-                  {i > 0 && <ChevronRight className="size-3 shrink-0 text-texto-3" />}
-                  <span className="truncate text-xs font-bold text-texto-2 [&_a:hover]:text-cobalto">{t}</span>
-                </Fragment>
-              ))}
-            </nav>
-          )}
-          <h1 className="m-0 truncate text-lg leading-tight font-extrabold tracking-[-0.01em]">{titulo}</h1>
-          {subtitulo && <p className="m-0 truncate text-[13px] leading-snug font-semibold text-texto-2 celular:hidden">{subtitulo}</p>}
-        </div>
-        {acoes && <div className="flex shrink-0 items-center gap-2">{acoes}</div>}
+    <nav aria-label="Onde estou" className={cn("trilha top-14 z-20 h-9 [&_a]:after:content-none", className)}>
+      {trilha?.map((t, i) => (
+        <Fragment key={i}>
+          <span className="shrink-0 text-texto-apoio [&_a]:text-texto-apoio [&_a:hover]:text-acao-texto">{t}</span>
+          {BARRA}
+        </Fragment>
+      ))}
+      {/* o título da tela é o passo atual: o `h1` com o desenho do `.trilha b` */}
+      <h1 className="m-0 truncate text-apoio leading-[inherit] font-medio tracking-normal">{titulo}</h1>
+      {subtitulo && <span className="min-w-0 truncate text-texto-apoio celular:hidden">{subtitulo}</span>}
+      <div className="ml-auto flex shrink-0 items-center gap-3">
+        {voltaUmPasso && <small>Alt ← volta um passo</small>}
+        {acoes && <div className="flex items-center gap-2">{acoes}</div>}
       </div>
       {carregando && (
-        <div role="progressbar" aria-label="Carregando" className="animate-surgir absolute inset-x-0 -bottom-px h-[3px] overflow-hidden">
-          <div className="animate-correr h-full w-1/3 rounded-full bg-cobalto" />
+        <div role="progressbar" aria-label="Carregando" className="carregando-barra top-auto bottom-0">
+          <i />
         </div>
       )}
-    </header>
+    </nav>
   );
 }
 
@@ -69,8 +85,8 @@ const LARGURAS = {
   larga: "max-w-7xl",
 };
 
-// Os respiros da área da tela: 24 em cima, 28 dos lados e 48 embaixo; no celular, 16, 14 e 30.
-const RESPIRO = "px-7 pt-6 pb-12 celular:px-3.5 celular:pt-4 celular:pb-[30px]";
+// Os respiros da área da tela, os do conteúdo do Lastro: 14 em cima, 24 dos lados e embaixo; no celular, 16 dos lados.
+const RESPIRO = "px-6 pt-3.5 pb-6 celular:px-4";
 
 /** O conteúdo da tela no meio da área, com largura máxima, nunca esticado na tela toda: `estreita` no formulário e
  * no registro simples, `media` no registro com coluna lateral, `larga` (padrão) na lista e no início. `respiro` dá
@@ -96,11 +112,11 @@ export type PassoDaTrilha = {
   aoAbrir?: () => void;
 };
 
-const PASSO_QUE_LEVA = "flex cursor-pointer items-center gap-1 text-cobalto transition-colors hover:text-cobalto-forte";
+const PASSO_QUE_LEVA = "cursor-pointer border-0 bg-transparent p-0 text-texto-apoio hover:text-acao-texto hover:no-underline";
 
-/** O alto da tela, dentro da área: o título em frase (24px, 800), a frase embaixo e as ações à direita (o seletor de
- * mês em pílula, os botões). `trilha` é o "‹ Tela › Subtela" acima do título, para a tela que não está no menu;
- * `rotulo` é a linha pequena do assunto sobre o título. */
+/** O alto da tela, dentro da área: o título em frase (20px, 600; 18 no celular), a frase embaixo e as ações à direita
+ * (o seletor de mês, os botões). `trilha` são os passos acima do título (Tela / Subtela), para a tela que não está no
+ * menu; `rotulo` é a linha pequena do assunto sobre o título. */
 export function CabecaDaTela({
   rotulo,
   titulo,
@@ -118,41 +134,32 @@ export function CabecaDaTela({
   Link?: LinkDoMenu;
 }) {
   return (
-    <div className="mb-[18px] celular:mb-3.5">
+    <div className="mb-3.5">
       {trilha && trilha.length > 0 && (
-        <nav aria-label="Trilha" className="mb-2 flex flex-wrap items-center gap-1.5 text-[13px] font-bold text-texto-2">
-          {trilha.map((passo, i) => {
-            // o primeiro passo é o Voltar: leva a seta
-            const miolo = (
-              <>
-                {i === 0 && <ChevronLeft className="size-3.5 shrink-0" />}
-                {passo.rotulo}
-              </>
-            );
-            return (
-              <Fragment key={i}>
-                {i > 0 && <span aria-hidden>›</span>}
-                {passo.href ? (
-                  <Link href={passo.href} onClick={passo.aoAbrir} className={PASSO_QUE_LEVA}>
-                    {miolo}
-                  </Link>
-                ) : passo.aoAbrir ? (
-                  <button type="button" onClick={passo.aoAbrir} className={PASSO_QUE_LEVA}>
-                    {miolo}
-                  </button>
-                ) : (
-                  <span>{passo.rotulo}</span>
-                )}
-              </Fragment>
-            );
-          })}
+        <nav aria-label="Trilha" className="mb-1.5 flex flex-wrap items-center gap-2 text-apoio text-texto-apoio">
+          {trilha.map((passo, i) => (
+            <Fragment key={i}>
+              {i > 0 && BARRA}
+              {passo.href ? (
+                <Link href={passo.href} onClick={passo.aoAbrir} className={PASSO_QUE_LEVA}>
+                  {passo.rotulo}
+                </Link>
+              ) : passo.aoAbrir ? (
+                <button type="button" onClick={passo.aoAbrir} className={PASSO_QUE_LEVA}>
+                  {passo.rotulo}
+                </button>
+              ) : (
+                <span>{passo.rotulo}</span>
+              )}
+            </Fragment>
+          ))}
         </nav>
       )}
       <div className="flex flex-wrap items-end justify-between gap-4 celular:items-start">
         <div className="min-w-0">
-          {rotulo && <div className="mb-0.5 text-[13px] font-bold text-texto-2">{rotulo}</div>}
-          <h1 className="m-0 text-2xl leading-tight font-extrabold tracking-[-0.01em] celular:text-[21px]">{titulo}</h1>
-          {descricao && <p className="m-0 mt-0.5 text-sm font-semibold text-texto-2">{descricao}</p>}
+          {rotulo && <div className="mb-0.5 text-apoio font-medio text-texto-apoio">{rotulo}</div>}
+          <h1 className="m-0 text-titulo leading-titulo font-forte tracking-titulo celular:text-subtitulo">{titulo}</h1>
+          {descricao && <p className="m-0 mt-0.5 text-base text-texto-secundario">{descricao}</p>}
         </div>
         {acoes && <div className="flex flex-wrap items-center gap-2">{acoes}</div>}
       </div>

@@ -1,29 +1,45 @@
 "use client";
 
-import { ArrowLeft, Check, ChevronRight, Link, X, type LucideIcon } from "lucide-react";
-import { Dialog } from "radix-ui";
-import { useState, type ReactNode } from "react";
+import { Check, Link, X, type LucideIcon } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "../lib/cn";
 import { Botao } from "../ui/botao";
 
 import type { Ficha, UsePilha } from "./pilha";
 
-/** O que o consumidor diz de cada tipo de ficha: o nome, o título curto da trilha e o conteúdo. */
+/** O que o consumidor diz de cada tipo de ficha: o nome, o título curto da lombada e o conteúdo. */
 export type DefinicaoDaFicha = {
-  /** @deprecated Sem efeito no modal: a trilha é só texto, e o ícone da ficha vai na `CabecaDaFicha`. */
+  /** @deprecated Sem efeito: os painéis empilhados do Lastro não levam ícone. */
   icone?: LucideIcon;
   rotulo: string;
-  /** O nome curto na trilha; sem ele, o rótulo e o id. */
+  /** O nome curto na lombada; sem ele, o rótulo e o id. */
   titulo?: (id: string) => ReactNode;
   render: (id: string) => ReactNode;
 };
 
 export type RegistroDeFichas<T extends string = string> = Record<T, DefinicaoDaFicha>;
 
-/** O modal de ficha: a pilha vem do `usePilha` do adaptador e cada tipo, do registro `fichas`. Um modal só, de até
- * 1180 × 880 (a tela toda no celular), com a trilha da pilha no alto e a ficha do topo embaixo; fecha pelo × e volta
- * pelo Voltar ou pelo Esc, nunca pelo clique fora. */
+/** O nome de uma ficha na lombada: "Produto · Refrigerante cola 2 L", ou o rótulo e o id. */
+function nomeDaFicha<T extends string>(def: DefinicaoDaFicha, f: Ficha<T>) {
+  return def.titulo ? (
+    <>
+      {def.rotulo} · {def.titulo(f.id)}
+    </>
+  ) : (
+    <>
+      {def.rotulo} <span className="numero">{f.id}</span>
+    </>
+  );
+}
+
+/**
+ * Os painéis empilhados do Lastro: a pilha vem do `usePilha` do adaptador (mora na URL) e cada tipo, do registro
+ * `fichas`. Cada ficha abre num painel de 560px à direita, por cima da tela, sem trocá-la; as anteriores viram lombadas
+ * à esquerda dele, e clicar numa volta até ela. Esc ou Alt ← volta um nível; o ✕ ou o clique fora fecham tudo. No
+ * celular o painel ocupa a tela e as lombadas saem (o Voltar faz o papel delas).
+ */
 export function PilhaDeFichas<T extends string = string>({
   usePilha,
   fichas,
@@ -32,62 +48,94 @@ export function PilhaDeFichas<T extends string = string>({
   fichas: Record<T, DefinicaoDaFicha>;
 }) {
   const { pilha, voltar, voltarPara, fechar } = usePilha();
+  const painel = useRef<HTMLElement>(null);
+  const aberta = pilha.length > 0;
+  // o portal só depois de montar: no servidor não há document
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
 
-  return (
-    <Dialog.Root open={pilha.length > 0} onOpenChange={(aberto) => !aberto && fechar()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 animate-entrar bg-veu" />
-        {/* a moldura cobre a tela e o véu em volta não fecha; o clique no que fica fora da árvore do modal (um aviso
-            por cima, com o Desfazer e o ×) também não */}
-        <Dialog.Content
-          aria-describedby={undefined}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onEscapeKeyDown={(e) => {
-            e.preventDefault();
-            voltar();
-          }}
-          className="fixed inset-0 z-50 grid place-items-center p-7 outline-none celular:p-0"
-        >
-          <Dialog.Title className="sr-only">Ficha</Dialog.Title>
-          <section className="flex h-[min(880px,100%)] w-[min(1180px,100%)] animate-subir flex-col overflow-hidden rounded-ficha bg-cabeca-detalhe shadow-3 celular:size-full celular:rounded-none">
-            <Trilha pilha={pilha} fichas={fichas} aoVoltar={voltar} aoVoltarPara={voltarPara} aoFechar={fechar} />
-            {pilha.map((f, i) => {
-              // As duas fichas logo abaixo da do topo ficam montadas, escondidas: voltar a elas não perde a aba nem o
-              // que estava digitado.
-              const recuo = pilha.length - 1 - i;
-              if (recuo > 2) return null;
-              const def = fichas[f.tipo];
-              if (!def) return null;
-              return (
-                <div
-                  key={`${i}-${f.tipo}-${f.id}`}
-                  className={cn("min-h-0 flex-1 overflow-y-auto", recuo === 0 ? "animate-entrar" : "hidden")}
-                >
-                  {def.render(f.id)}
-                </div>
-              );
-            })}
-          </section>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+  // o `voltar` do adaptador muda a cada render: a tecla lê o de agora
+  const voltarAgora = useRef(voltar);
+  voltarAgora.current = voltar;
+
+  // o foco entra no painel só quando a pilha abre, nunca a cada render (tiraria o foco de um campo da ficha)
+  useEffect(() => {
+    if (aberta && montado) painel.current?.focus({ preventScroll: true });
+  }, [aberta, montado]);
+
+  useEffect(() => {
+    if (!aberta) return;
+    // Na captura da janela, antes da gaveta de baixo (que veria o Esc já atendido). O Esc dado com o foco num modal,
+    // menu ou lista que abriu por cima fica com ele.
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return;
+      if (e.key !== "Escape" && !(e.altKey && e.key === "ArrowLeft")) return;
+      const alvo = e.target instanceof Element ? e.target : null;
+      const naPilha = alvo && painel.current?.parentElement?.contains(alvo);
+      if (alvo && !naPilha && alvo.closest('[role="dialog"], [role="menu"], [role="listbox"]')) return;
+      e.preventDefault();
+      voltarAgora.current();
+    };
+    window.addEventListener("keydown", aoTeclar, true);
+    return () => window.removeEventListener("keydown", aoTeclar, true);
+  }, [aberta]);
+
+  if (!aberta || !montado) return null;
+  const topo = pilha.at(-1)!;
+  const defDoTopo = fichas[topo.tipo];
+
+  // o véu fica acima da folha da gaveta no celular (z 45) e abaixo dos modais (z 50)
+  return createPortal(
+    <div
+      className="pilha-veu top-14 z-46 celular:top-0"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) fechar();
+      }}
+    >
+      <div className="pilha" role="dialog" aria-modal="true" aria-label={defDoTopo?.rotulo ?? "Ficha"}>
+        {pilha.slice(0, -1).map((f, i) => {
+          const def = fichas[f.tipo];
+          if (!def) return null;
+          return (
+            <button
+              key={`${i}-${f.tipo}-${f.id}`}
+              type="button"
+              className="pilha-lombada celular:hidden"
+              title="Voltar a esta ficha"
+              onClick={() => voltarPara(i)}
+            >
+              <span>{nomeDaFicha(def, f)}</span>
+            </button>
+          );
+        })}
+        <section ref={painel} tabIndex={-1} className="pilha-painel outline-none celular:w-screen celular:max-w-none">
+          <Topo nivel={pilha.length} aoVoltar={voltar} aoFechar={fechar} />
+          {pilha.map((f, i) => {
+            // As duas fichas logo abaixo da do topo ficam montadas, escondidas: voltar a elas não perde a aba nem o
+            // que estava digitado.
+            const recuo = pilha.length - 1 - i;
+            if (recuo > 2) return null;
+            const def = fichas[f.tipo];
+            if (!def) return null;
+            return (
+              <div
+                key={`${i}-${f.tipo}-${f.id}`}
+                className={cn("pilha-corpo min-h-0 flex-1", recuo === 0 ? "animate-entrar" : "hidden")}
+              >
+                {def.render(f.id)}
+              </div>
+            );
+          })}
+        </section>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
-function Trilha<T extends string>({
-  pilha,
-  fichas,
-  aoVoltar,
-  aoVoltarPara,
-  aoFechar,
-}: {
-  pilha: Ficha<T>[];
-  fichas: Record<T, DefinicaoDaFicha>;
-  aoVoltar: () => void;
-  aoVoltarPara: (i: number) => void;
-  aoFechar: () => void;
-}) {
+/** A linha do alto do painel: o Voltar (com mais de um nível), o nível, o copiar o link (a pilha mora na URL) e o ✕
+ * que fecha tudo. */
+function Topo({ nivel, aoVoltar, aoFechar }: { nivel: number; aoVoltar: () => void; aoFechar: () => void }) {
   const [copiado, setCopiado] = useState(false);
   const copiar = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -96,49 +144,20 @@ function Trilha<T extends string>({
   };
 
   return (
-    <header className="flex shrink-0 items-center gap-2 border-b border-fio bg-superficie px-[22px] py-2.5 text-[13px] font-bold text-texto-2 celular:px-3.5">
-      {pilha.length > 1 && (
-        <>
-          <button type="button" onClick={aoVoltar} className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md text-cobalto hover:text-cobalto-forte">
-            <ArrowLeft className="size-3.5" />
-            Voltar
-          </button>
-          <span aria-hidden>·</span>
-        </>
+    <header className="pilha-topo">
+      {nivel > 1 && (
+        <Botao tipo="secundario" tamanho="sm" title="Voltar um nível (Esc ou Alt ←)" onClick={aoVoltar}>
+          ‹ Voltar
+        </Botao>
       )}
-      <nav aria-label="Trilha" className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap">
-        {pilha.map((f, i) => {
-          const def = fichas[f.tipo];
-          if (!def) return null;
-          const ultimo = i === pilha.length - 1;
-          const nome = def.titulo ? (
-            def.titulo(f.id)
-          ) : (
-            <>
-              {def.rotulo} <span className="numero">{f.id}</span>
-            </>
-          );
-          return (
-            <span key={i} className={cn("flex items-center gap-1.5", ultimo ? "min-w-0" : "shrink-0")}>
-              {i > 0 && <ChevronRight aria-hidden className="size-3.5 shrink-0 text-texto-3" />}
-              {ultimo ? (
-                <span aria-current="page" className="truncate text-texto">
-                  {nome}
-                </span>
-              ) : (
-                <button type="button" onClick={() => aoVoltarPara(i)} className="cursor-pointer rounded-md hover:text-cobalto">
-                  {nome}
-                </button>
-              )}
-            </span>
-          );
-        })}
-      </nav>
-      <Botao tipo="fantasma" tamanho="sm" aria-label={copiado ? "Copiado" : "Copiar o link"} onClick={copiar}>
+      <span className="pilha-nivel">
+        Nível <span className="numero">{nivel}</span>
+      </span>
+      <Botao tipo="fantasma" tamanho="sm" className="ml-auto" aria-label={copiado ? "Copiado" : "Copiar o link"} onClick={copiar}>
         {copiado ? <Check /> : <Link />}
         <span className="celular:hidden">{copiado ? "Copiado" : "Copiar o link"}</span>
       </Botao>
-      <Botao tipo="fantasma" tamanho="icone" aria-label="Fechar" title="Fechar" onClick={aoFechar} className="bg-superficie-2 text-neutro hover:bg-superficie-3">
+      <Botao tipo="fantasma" tamanho="icone-sm" aria-label="Fechar tudo" title="Fechar tudo" onClick={aoFechar}>
         <X />
       </Botao>
     </header>

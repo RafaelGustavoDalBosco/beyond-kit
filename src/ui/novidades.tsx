@@ -1,9 +1,8 @@
 "use client";
 
-import { Bug, Rocket, Sparkles, Wrench, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { Emblema, type TomDoEmblema } from "./emblema";
+import { cn } from "../lib/cn";
 import { Vazio } from "./estados";
 
 /** Uma versão publicada nas Novidades, como o hub entrega: o app formata `publicado_em` em `data`; chave e título do
@@ -14,14 +13,15 @@ export type VersaoDasNovidades = {
   itens: { tipo: "novo" | "melhoria" | "correcao"; texto: ReactNode }[];
 };
 
-const SECOES: { tipo: VersaoDasNovidades["itens"][number]["tipo"]; titulo: string; icone: LucideIcon; tom: TomDoEmblema }[] = [
-  { tipo: "novo", titulo: "Novidades", icone: Sparkles, tom: "cobalto" },
-  { tipo: "melhoria", titulo: "Melhorias", icone: Wrench, tom: "ganho" },
-  { tipo: "correcao", titulo: "Correções", icone: Bug, tom: "aviso" },
+const SECOES: { tipo: VersaoDasNovidades["itens"][number]["tipo"]; titulo: string }[] = [
+  { tipo: "novo", titulo: "Novidades" },
+  { tipo: "melhoria", titulo: "Melhorias" },
+  { tipo: "correcao", titulo: "Correções" },
 ];
 
-/** A tela de Novidades inteira: o cabeçalho e a linha do tempo das versões (a mais nova no alto, marcada em azul
- * cheio), cada uma numa caixa com as seções Novidades, Melhorias e Correções; seção sem item não aparece. */
+/** A tela de Novidades inteira: o alto da tela e a linha do tempo das versões, discreta (o fio à esquerda com um ponto
+ * por versão; a mais nova no alto, com o ponto em azul), cada uma com as seções Novidades, Melhorias e Correções;
+ * seção sem item não aparece. */
 export function Novidades({
   versoes,
   titulo = "Novidades",
@@ -35,53 +35,48 @@ export function Novidades({
 }) {
   return (
     <div>
-      <div className="mb-[18px] flex items-center gap-3">
-        <Emblema icone={Sparkles} />
-        <div className="min-w-0">
-          <h1 className="m-0 text-2xl leading-tight font-extrabold tracking-[-0.01em]">{titulo}</h1>
-          {frase && <p className="m-0 mt-0.5 text-texto-2">{frase}</p>}
-        </div>
+      <div className="mb-5">
+        <h1 className="m-0 text-titulo leading-titulo font-forte tracking-titulo celular:text-subtitulo">{titulo}</h1>
+        {frase && <p className="m-0 mt-0.5 text-texto-secundario">{frase}</p>}
       </div>
 
       {versoes.length === 0 ? (
-        <Vazio titulo={vazio} icone={Sparkles} />
+        <Vazio titulo={vazio} />
       ) : (
-        <div className="relative">
-          {/* o fio da linha do tempo, pelo meio dos círculos de 42px */}
-          <div aria-hidden className="absolute top-2 bottom-2 left-5 w-0.5 bg-linha" />
-          <ol className="m-0 flex list-none flex-col gap-3.5 p-0">
-            {versoes.map((v, n) => (
-              <li key={v.versao} className="relative flex items-start gap-3.5">
-                <Emblema icone={Rocket} tom={n === 0 ? "cobalto" : "neutro"} cheio={n === 0} className="relative z-10" />
-                <div className="min-w-0 flex-1 rounded-bloco bg-superficie px-[18px] py-4 shadow-bloco">
-                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-                    <h2 className="numero m-0 text-base font-extrabold">{v.versao}</h2>
-                    <span className="text-[13px] font-semibold text-texto-2">{v.data}</span>
+        // o fio da linha do tempo é a borda da lista; o ponto de cada versão (10px) fica centrado nele
+        <ol className="m-0 ml-1.5 flex list-none flex-col gap-7 border-l border-borda p-0 pl-6">
+          {versoes.map((v, n) => (
+            <li key={v.versao} className="relative">
+              <span
+                aria-hidden
+                className={cn(
+                  "absolute top-[5px] -left-[29.5px] size-2.5 rounded-full border-2",
+                  n === 0 ? "border-acao bg-acao" : "border-borda-forte bg-fundo",
+                )}
+              />
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                <h2 className="numero m-0 text-enfase leading-titulo font-forte tracking-normal">{v.versao}</h2>
+                <span className="text-apoio text-texto-apoio">{v.data}</span>
+              </div>
+              {SECOES.map((s) => {
+                const itens = v.itens.filter((i) => i.tipo === s.tipo);
+                if (itens.length === 0) return null;
+                return (
+                  <div key={s.tipo} className="mt-3">
+                    <h3 className="m-0 text-apoio font-medio tracking-normal text-texto-apoio">{s.titulo}</h3>
+                    <ul className="m-0 mt-1 flex list-disc flex-col gap-1 pl-4 marker:text-texto-apoio">
+                      {itens.map((i, k) => (
+                        <li key={k} className="whitespace-pre-line">
+                          {i.texto}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  {SECOES.map((s) => {
-                    const itens = v.itens.filter((i) => i.tipo === s.tipo);
-                    if (itens.length === 0) return null;
-                    return (
-                      <div key={s.tipo} className="mt-4">
-                        <h3 className="m-0 flex items-center gap-2 text-sm font-extrabold">
-                          <Emblema icone={s.icone} tom={s.tom} tamanho="xs" />
-                          {s.titulo}
-                        </h3>
-                        <ul className="m-0 mt-2 flex list-disc flex-col gap-1.5 pl-9 marker:text-texto-3">
-                          {itens.map((i, k) => (
-                            <li key={k} className="text-sm leading-relaxed whitespace-pre-line text-texto-2">
-                              {i.texto}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+                );
+              })}
+            </li>
+          ))}
+        </ol>
       )}
     </div>
   );

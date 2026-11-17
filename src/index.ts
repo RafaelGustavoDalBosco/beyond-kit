@@ -10,6 +10,7 @@ export * from "./ui/cabecalho";
 export * from "./ui/campo";
 export * from "./ui/campo-de-senha";
 export * from "./ui/campo-moeda";
+export * from "./ui/camada-de-hint";
 export * from "./ui/carregamento";
 export * from "./ui/com-coluna";
 export * from "./ui/confirmacao";
@@ -53,6 +54,8 @@ export * from "./ficha/PilhaDeFichas";
 export * from "./ficha/Gaveta";
 
 export * from "./busca/Paleta";
+
+export * from "./tema/tema";
 
 export * from "./tv/painel";
 

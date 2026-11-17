@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CircleAlert, Search, type LucideIcon } from "lucide-react";
+import { Check, Search, type LucideIcon } from "lucide-react";
 import {
   createContext,
   useContext,
@@ -17,24 +17,23 @@ import {
 import { cn } from "../lib/cn";
 import { Dica, type ConteudoDaDica } from "./dica";
 
-// O contorno de todo campo: a borda, o anel azul no foco, o cinza do desabilitado e, com erro (`aria-invalid`), a
-// borda e o anel vermelhos. A altura, o raio e o respiro vêm do tamanho.
-const base =
-  "w-full border-[1.5px] border-linha bg-superficie text-texto outline-none transition-[border-color,box-shadow] placeholder:text-texto-3 focus:border-cobalto focus:ring-3 focus:ring-cobalto-anel disabled:cursor-default disabled:bg-superficie-2 disabled:text-texto-3 aria-invalid:border-risco aria-invalid:focus:ring-risco-anel";
+// O campo é o `.input` do Lastro (34px, raio 7, a borda azul e o anel claro no foco, o cinza do desabilitado); com
+// erro (`aria-invalid`, que o `Rotulado` com erro põe), a borda fica vermelha.
+const base = "input placeholder:text-texto-apoio aria-invalid:border-erro aria-invalid:outline-erro-fundo";
 
 const TAMANHO_DO_CAMPO = {
-  md: "h-[42px] rounded-controle px-3 text-sm",
-  lg: "h-12 rounded-icone px-3.5 text-[15px]",
+  md: "",
+  lg: "h-12 px-3.5 text-enfase",
 } as const;
 
 // O ícone à esquerda e o recuo que o texto ganha por causa dele.
 const ICONE_DO_CAMPO = {
-  md: "left-3 size-4",
+  md: "left-2.5 size-4",
   lg: "left-3.5 size-[18px]",
 } as const;
 
 const RECUO_DO_ICONE = {
-  md: "pl-9",
+  md: "pl-8",
   lg: "pl-[42px]",
 } as const;
 
@@ -61,11 +60,11 @@ export type PropsDoCampo = InputHTMLAttributes<HTMLInputElement> & {
    * largura do pai e o `className` segue no input: a classe de posição (`flex-1`, `col-span-2`, `w-48`) vai num
    * elemento de fora. */
   icone?: LucideIcon;
-  /** `lg` é o campo de 48px do login. */
+  /** `lg` é o campo de 48px do login e do celular. */
   tamanho?: keyof typeof TAMANHO_DO_CAMPO;
 };
 
-/** O campo de texto: 42px, com o anel azul no foco; dentro de um `Rotulado` com erro, a borda fica vermelha. */
+/** O campo de texto (`.input` do Lastro); dentro de um `Rotulado` com erro, a borda fica vermelha. */
 export function Campo({ className, id, icone: Icone, tamanho = "md", ...props }: PropsDoCampo) {
   const controle = useControle(id);
   const campo = (
@@ -81,7 +80,7 @@ export function Campo({ className, id, icone: Icone, tamanho = "md", ...props }:
     <div className="relative w-full min-w-0">
       <Icone
         aria-hidden
-        className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-texto-3", ICONE_DO_CAMPO[tamanho])}
+        className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-texto-apoio", ICONE_DO_CAMPO[tamanho])}
       />
       {campo}
     </div>
@@ -95,21 +94,21 @@ export function Busca({ className, id, ...props }: InputHTMLAttributes<HTMLInput
     <div className={cn("relative", className)}>
       <Search
         aria-hidden
-        className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-texto-3", ICONE_DO_CAMPO.md)}
+        className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-texto-apoio", ICONE_DO_CAMPO.md)}
       />
-      <input {...controle} type="search" className={cn(base, TAMANHO_DO_CAMPO.md, RECUO_DO_ICONE.md)} {...props} />
+      <input {...controle} type="search" className={cn(base, RECUO_DO_ICONE.md)} {...props} />
     </div>
   );
 }
 
 /**
- * O rótulo em cima, o controle e, embaixo, a ajuda ou o erro da validação (a
- * frase com o ícone; o controle do kit de dentro ganha a borda vermelha). O
- * `<label>` fica só no texto (`htmlFor`); os controles do kit de dentro pegam o
- * id dele sozinhos. Controle nativo de fora do kit: passe `htmlFor` e o mesmo
- * `id` no controle. `obrigatorio` põe o asterisco, `opcional` o "(opcional)",
- * `dica` o (?) que explica o termo e `acao` vai à direita do rótulo (o
- * "Esqueceu a senha?").
+ * O rótulo em cima (o `.field` do Lastro: 12px, cinza), o controle e, embaixo,
+ * a ajuda ou o erro da validação (o controle do kit de dentro ganha a borda
+ * vermelha). O `<label>` fica só no texto (`htmlFor`); os controles do kit de
+ * dentro pegam o id dele sozinhos. Controle nativo de fora do kit: passe
+ * `htmlFor` e o mesmo `id` no controle. `obrigatorio` põe o asterisco,
+ * `opcional` o "(opcional)", `dica` o (?) que explica o termo e `acao` vai à
+ * direita do rótulo (o "Esqueceu a senha?").
  */
 export function Rotulado({
   rotulo,
@@ -143,28 +142,27 @@ export function Rotulado({
   const id = htmlFor ?? gerado;
   return (
     <div
-      className={cn("flex min-w-0 flex-col gap-[5px]", ocupa && "sm:col-span-(--ocupa)", className)}
+      className={cn("field flex min-w-0 flex-col", ocupa && "sm:col-span-(--ocupa)", className)}
       style={ocupa ? ({ "--ocupa": ocupa } as CSSProperties) : undefined}
     >
-      <div className="flex items-baseline gap-1.5">
-        <label id={`${id}-rotulo`} htmlFor={id} className="text-[13px] font-bold text-texto">
+      <div className="mb-[5px] flex items-baseline gap-1.5">
+        <label id={`${id}-rotulo`} htmlFor={id} className="text-apoio font-medio text-texto-secundario">
           {rotulo}
           {obrigatorio && (
             <>
-              <span aria-hidden className="ml-0.5 text-cobalto">*</span>
+              <span aria-hidden className="ml-0.5 text-texto-apoio">*</span>
               <span className="sr-only"> obrigatório</span>
             </>
           )}
         </label>
         {dica && <Dica conteudo={dica} />}
-        {opcional && <span className="text-[12.5px] font-semibold text-texto-3">(opcional)</span>}
-        {acao && <div className="ml-auto text-[13px] font-bold [&_a]:text-cobalto [&_a:hover]:underline">{acao}</div>}
+        {opcional && <span className="text-apoio text-texto-apoio">(opcional)</span>}
+        {acao && <div className="ml-auto text-apoio">{acao}</div>}
       </div>
       <DoRotulado.Provider value={{ id, comErro: Boolean(erro) }}>{children}</DoRotulado.Provider>
-      {ajuda && !erro && <span className="text-[12.5px] leading-relaxed font-semibold text-texto-2">{ajuda}</span>}
+      {ajuda && !erro && <span className="field-ajuda">{ajuda}</span>}
       {erro && (
-        <span className="flex items-center gap-[5px] text-[12.5px] font-bold text-risco">
-          <CircleAlert aria-hidden className="size-3.5 shrink-0" />
+        <span className="field-erro" role="alert">
           {erro}
         </span>
       )}
@@ -194,7 +192,7 @@ export function GradeDoFormulario({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("grid grid-cols-1 gap-4", COLUNAS_DA_GRADE[colunas], className)}>
+    <div className={cn("grid grid-cols-1 gap-x-4 gap-y-3.5", COLUNAS_DA_GRADE[colunas], className)}>
       {children}
     </div>
   );
@@ -214,8 +212,8 @@ export function SecaoDoFormulario({
 }) {
   return (
     <section className={className}>
-      <h3 className="m-0 mb-4 flex items-center gap-2 border-b border-fio pb-2.5 text-[15px] font-extrabold text-texto">
-        {Icone && <Icone aria-hidden className="size-4 shrink-0 text-cobalto" />}
+      <h3 className="m-0 mb-3.5 flex items-center gap-2 border-b border-borda-suave pb-2 text-enfase font-forte text-texto">
+        {Icone && <Icone aria-hidden className="size-4 shrink-0 text-texto-apoio" />}
         {titulo}
       </h3>
       {children}
@@ -225,13 +223,7 @@ export function SecaoDoFormulario({
 
 /** O texto longo (a descrição, a mensagem): o mesmo contorno do campo, com altura livre. */
 export function AreaDeTexto({ className, id, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      {...useControle(id)}
-      className={cn(base, "h-auto min-h-[78px] resize-y rounded-controle px-3 py-2.5 text-sm leading-relaxed", className)}
-      {...props}
-    />
-  );
+  return <textarea {...useControle(id)} className={cn(base, "min-h-[78px] resize-y py-2 leading-texto", className)} {...props} />;
 }
 
 /**
@@ -248,7 +240,7 @@ export function Escolha({
   ...props
 }: SelectHTMLAttributes<HTMLSelectElement> & { opcoes?: ReadonlyArray<readonly [string, string]>; vazio?: string | false }) {
   return (
-    <select {...useControle(id)} className={cn(base, TAMANHO_DO_CAMPO.md, "cursor-pointer px-2.5", className)} {...props}>
+    <select {...useControle(id)} className={cn(base, "cursor-pointer pr-2", className)} {...props}>
       {vazio !== false && <option value="">{vazio}</option>}
       {opcoes.map(([valor, rotulo]) => (
         <option key={valor} value={valor}>
@@ -260,12 +252,11 @@ export function Escolha({
   );
 }
 
-// A escolha segmentada: o trilho cinza em pílula e, dentro, cada opção (um radio escondido no rótulo); a marcada
-// fica branca.
-const TRILHO_DOS_SEGMENTOS = "inline-flex max-w-full rounded-pilula bg-neutro-suave p-[3px]";
-
+// A escolha segmentada: o `.seg` do Lastro. Cada opção é um radio escondido no rótulo; a marcada ganha o texto e o
+// contorno azul de dentro (o `.seg-opt.is-ativa`, pelo `has-checked`, que vale também sem `value`). O `.seg`
+// corta o que sai dele: o anel de foco vai por dentro.
 const SEGMENTO =
-  "relative cursor-pointer rounded-pilula px-3.5 py-1.5 text-[13.5px] font-bold whitespace-nowrap text-texto-2 transition-[background-color,color,box-shadow] hover:text-texto has-checked:bg-superficie has-checked:text-texto has-checked:shadow-1 has-focus-visible:ring-3 has-focus-visible:ring-cobalto-anel has-disabled:cursor-default has-disabled:opacity-60";
+  "seg-opt relative whitespace-nowrap has-checked:text-acao-texto has-checked:shadow-[inset_0_0_0_1px_var(--acao)] has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-acao has-disabled:cursor-default has-disabled:opacity-45";
 
 // Sem `name`, o nome gerado só agrupa os radios (é ele que dá a seta do teclado): o `form` vazio os deixa sem
 // formulário dono, fora do envio do `<form>` em volta, como o select sem nome.
@@ -295,7 +286,7 @@ export function EscolhaSegmentada<V extends string = string>({
 }) {
   const gerado = useId();
   return (
-    <div role="radiogroup" {...useGrupo(id)} aria-label={rotulo} className={cn(TRILHO_DOS_SEGMENTOS, className)}>
+    <div role="radiogroup" {...useGrupo(id)} aria-label={rotulo} className={cn("seg max-w-full", className)}>
       {opcoes.map(([v, r]) => (
         <label key={v} className={SEGMENTO}>
           <input
@@ -336,7 +327,7 @@ export function SimNao({
 }: Omit<SelectHTMLAttributes<HTMLSelectElement>, "children">) {
   const gerado = useId();
   return (
-    <div role="radiogroup" {...useGrupo(id)} aria-label={rotulo} className={cn(TRILHO_DOS_SEGMENTOS, className)}>
+    <div role="radiogroup" {...useGrupo(id)} aria-label={rotulo} className={cn("seg max-w-full", className)}>
       {SIM_NAO.map(([v, r]) => (
         <label key={v} className={SEGMENTO}>
           <input
@@ -366,25 +357,30 @@ export function SimNao({
   );
 }
 
-/** A caixa de seleção: o quadrado azul com a marca quando ligada, com o rótulo ao lado. */
+// O rótulo ao lado da caixa e da alternativa: o texto do corpo; desligado, apagado.
+const AO_LADO = "inline-flex cursor-pointer items-center gap-2 text-base text-texto has-disabled:cursor-default has-disabled:opacity-45";
+
+/** A caixa de seleção do Lastro (o `.caixa`: 14px, raio 2, o ✓ azul na caixa branca), com o rótulo ao lado. */
 export function Caixa({ children, className, ...props }: InputHTMLAttributes<HTMLInputElement> & { children?: ReactNode }) {
   return (
-    <label className={cn("group inline-flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-texto has-disabled:cursor-default has-disabled:opacity-60", className)}>
-      <span className="relative flex size-[19px] shrink-0 items-center justify-center">
-        <input type="checkbox" className="peer absolute inset-0 m-0 size-[19px] cursor-pointer appearance-none rounded-md border-[1.5px] border-linha-forte bg-superficie outline-none transition-[background-color,border-color,box-shadow] checked:border-cobalto checked:bg-cobalto hover:border-cobalto focus-visible:ring-3 focus-visible:ring-cobalto-anel disabled:cursor-default" {...props} />
-        <Check aria-hidden className="pointer-events-none relative size-3 text-sobre-cobalto opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
+    <label className={cn(AO_LADO, className)}>
+      <span className="relative flex size-3.5 shrink-0 items-center justify-center">
+        <input
+          type="checkbox"
+          className="peer absolute inset-0 m-0 size-3.5 cursor-pointer appearance-none rounded-[2px] border border-borda-forte bg-campo checked:border-acao disabled:cursor-default disabled:border-borda disabled:bg-mesa"
+          {...props}
+        />
+        <Check aria-hidden className="pointer-events-none relative size-2.5 text-acao-texto opacity-0 peer-checked:opacity-100" strokeWidth={3} />
       </span>
       {children && <span className="min-w-0 flex-1">{children}</span>}
     </label>
   );
 }
 
-const ALTERNATIVA =
-  "group inline-flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-texto has-disabled:cursor-default has-disabled:opacity-60";
-
-// O cartão da escolha com explicação: sem o ponto do radio; o marcado leva a borda azul e o fundo azul claro.
+// O cartão da escolha com explicação: sem o ponto do radio; o marcado leva a borda azul e o fundo azul claro (a
+// seleção, como a linha aberta da tabela).
 const ALTERNATIVA_EM_CARTAO =
-  "group relative flex min-w-0 cursor-pointer flex-col gap-0.5 rounded-icone border-[1.5px] border-linha bg-superficie px-3 py-2.5 text-left text-sm text-texto transition-[background-color,border-color,box-shadow] hover:border-linha-forte has-checked:border-cobalto has-checked:bg-cobalto-suave has-checked:ring-1 has-checked:ring-cobalto has-focus-visible:ring-3 has-focus-visible:ring-cobalto-anel has-disabled:cursor-default has-disabled:opacity-60";
+  "relative flex min-w-0 cursor-pointer flex-col gap-0.5 rounded-m border border-borda bg-campo px-3 py-2.5 text-left text-base text-texto hover:border-borda-forte has-checked:border-acao has-checked:bg-acao-100 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-acao has-disabled:cursor-default has-disabled:opacity-45";
 
 /**
  * A alternativa (o radio): uma entre várias do mesmo `name`, com o ponto azul
@@ -411,16 +407,20 @@ export function Alternativa({
     return (
       <label className={cn(ALTERNATIVA_EM_CARTAO, className)}>
         <input type="radio" className="sr-only" {...props} />
-        {titulo && <span className="font-extrabold">{titulo}</span>}
-        {descricao && <span className="text-[12.5px] font-semibold text-texto-2">{descricao}</span>}
+        {titulo && <span className="font-medio">{titulo}</span>}
+        {descricao && <span className="text-apoio text-texto-apoio">{descricao}</span>}
         {children}
       </label>
     );
   return (
-    <label className={cn(ALTERNATIVA, className)}>
-      <span className="relative flex size-[19px] shrink-0 items-center justify-center">
-        <input type="radio" className="peer absolute inset-0 m-0 size-[19px] cursor-pointer appearance-none rounded-full border-[1.5px] border-linha-forte bg-superficie outline-none transition-[border-color,box-shadow] checked:border-cobalto hover:border-cobalto focus-visible:ring-3 focus-visible:ring-cobalto-anel disabled:cursor-default" {...props} />
-        <span className="pointer-events-none relative size-[9px] rounded-full bg-cobalto opacity-0 transition-opacity peer-checked:opacity-100" />
+    <label className={cn(AO_LADO, className)}>
+      <span className="relative flex size-3.5 shrink-0 items-center justify-center">
+        <input
+          type="radio"
+          className="peer absolute inset-0 m-0 size-3.5 cursor-pointer appearance-none rounded-full border border-borda-forte bg-campo checked:border-acao disabled:cursor-default disabled:border-borda disabled:bg-mesa"
+          {...props}
+        />
+        <span className="pointer-events-none relative size-1.5 rounded-full bg-acao opacity-0 peer-checked:opacity-100" />
       </span>
       {children && <span className="min-w-0 flex-1">{children}</span>}
     </label>

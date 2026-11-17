@@ -6,11 +6,12 @@ import { createContext, useContext, type ComponentProps, type ReactNode } from "
 
 import { cn } from "../lib/cn";
 
-// Abas em pílula (o padrão): a ativa em azul cheio, as outras em cinza claro, a contagem dentro do texto; no celular
-// o trilho rola de lado. Sublinhadas (a variante): texto sobre um fio, a ativa em azul com o traço embaixo.
+// Abas: as sublinhadas do Lastro (`.abas`/`.aba`: texto sobre o fio, a ativa em azul escuro com o traço de 2px e
+// peso 600, a contagem no texto: "Pendentes 12"); no celular o trilho rola de lado. `largo` é o segmentado do
+// Lastro (`.seg`), que ocupa a largura toda e reparte entre as abas (o modal, o detalhe do cadastro).
 
-// A `Aba` sabe se o trilho é sublinhado.
-const Sublinhado = createContext(false);
+// A `Aba` sabe se o trilho é o segmentado.
+const Segmentado = createContext(false);
 
 // O Radix não aceita value "" (o filtro "Todos"); por dentro o "" vira este sentinela e volta na saída.
 const VAZIO = "__vazio__";
@@ -34,12 +35,11 @@ export function ConteudoDaAba({ value, ...props }: ComponentProps<typeof Tabs.Co
   return <Tabs.Content value={dentro(value)} {...props} />;
 }
 
-/** O trilho das abas, em pílulas; no celular não quebra: rola de lado. `largo` ocupa a largura toda e reparte entre
- * as abas (o modal, o detalhe do cadastro); `sublinhado` troca as pílulas por abas de texto sobre um fio. */
+/** O trilho das abas, sublinhadas sobre o fio; no celular não quebra: rola de lado. `largo` troca pelo segmentado
+ * da largura toda. `sublinhado` fica aceito por compatibilidade: as abas do Lastro já são sublinhadas. */
 export function TrilhoDeAbas({
   children,
   largo,
-  sublinhado,
   className,
   "aria-label": rotulo,
 }: {
@@ -50,20 +50,19 @@ export function TrilhoDeAbas({
   "aria-label"?: string;
 }) {
   return (
-    <Sublinhado.Provider value={!!sublinhado}>
+    <Segmentado.Provider value={!!largo}>
       <Tabs.List
         aria-label={rotulo}
         className={cn(
-          sublinhado
-            ? "flex gap-6 border-b border-linha"
-            : "max-w-full min-w-0 items-center gap-2 celular:flex-nowrap celular:overflow-x-auto celular:sem-barra",
-          largo ? "flex w-full *:flex-1 *:justify-center" : !sublinhado && "inline-flex flex-wrap",
+          largo
+            ? "seg flex w-full *:flex-1 *:justify-center"
+            : "abas max-w-full min-w-0 celular:overflow-x-auto celular:sem-barra",
           className,
         )}
       >
         {children}
       </Tabs.List>
-    </Sublinhado.Provider>
+    </Segmentado.Provider>
   );
 }
 
@@ -81,7 +80,7 @@ export function Aba({
   contagem?: number | null;
   className?: string;
 }) {
-  const sublinhado = useContext(Sublinhado);
+  const segmentado = useContext(Segmentado);
   // O Radix foca a aba por script no mousedown e o Chrome mostra o anel nesse foco: o clique marca a aba e o anel
   // volta na próxima tecla (ou quando o foco sai).
   const tirarMarca = (e: { currentTarget: HTMLElement }) => delete e.currentTarget.dataset.peloMouse;
@@ -92,22 +91,18 @@ export function Aba({
       onKeyDown={tirarMarca}
       onBlur={tirarMarca}
       className={cn(
-        "inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-[13.5px] font-bold whitespace-nowrap transition-colors data-pelo-mouse:outline-none",
-        sublinhado
-          ? "-mb-px border-b-2 border-transparent px-0.5 py-2.5 text-texto-2 data-[state=active]:border-cobalto data-[state=active]:text-cobalto data-[state=inactive]:hover:text-texto"
-          : // no celular o trilho rola e cortaria o anel de foco de fora: ali o anel vai por dentro da pílula (branco na ativa)
-            "h-8 rounded-pilula bg-superficie-2 px-3.5 text-neutro data-[state=active]:bg-cobalto data-[state=active]:text-sobre-cobalto data-[state=inactive]:hover:bg-superficie-3 celular:focus-visible:outline-offset-[-4px] celular:data-[state=active]:focus-visible:outline-sobre-cobalto",
+        "shrink-0 whitespace-nowrap data-pelo-mouse:outline-none",
+        segmentado
+          ? // o `.seg` corta o que sai dele: o anel de foco vai por dentro; a ativa é o `.seg-opt.is-ativa`
+            "seg-opt justify-center focus-visible:-outline-offset-2 data-[state=active]:text-acao-texto data-[state=active]:shadow-[inset_0_0_0_1px_var(--acao)]"
+          : // a ativa é o `.aba[aria-selected=true]`, que o Radix marca; no celular o trilho rola e o anel vai por dentro
+            "aba inline-flex items-center gap-1.5 celular:focus-visible:-outline-offset-2",
         className,
       )}
     >
-      {Icone && <Icone className="size-4 shrink-0" />}
+      {Icone && <Icone aria-hidden className="size-4 shrink-0" />}
       {children}
-      {contagem != null &&
-        (sublinhado ? (
-          <span className="numero rounded-pilula bg-superficie-2 px-[7px] py-px text-[11px] text-texto-2">{contagem}</span>
-        ) : (
-          <span className="numero">{contagem}</span>
-        ))}
+      {contagem != null && <span className="numero">{contagem}</span>}
     </Tabs.Trigger>
   );
 }

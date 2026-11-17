@@ -1,33 +1,35 @@
 "use client";
 
-// O menu lateral branco da casca, com a borda à direita e só a navegação: os itens com ícone e os grupos que abrem e
-// fecham. A marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele. No celular
-// (até 760px) ele some: o caminho é a `BarraDeNavegacao`; a gaveta continua para quem passa `aberto` (o botão do
-// cabeçalho ou um item "Menu" da barra). O kit não conhece o roteador: o consumidor passa o `Link` dele e diz qual
-// item está ativo.
+// O menu lateral da casca (`.lateral` do Lastro): fundo de mesa, a borda à direita e só a navegação, em texto, sem
+// ícone. O grupo é o rótulo pequeno (`.lateral-grupo`) com os itens embaixo; ele abre e fecha, um aberto por vez. O
+// item ativo vai na ficha, com o texto em azul e a sombra pequena; a contagem fica à direita, em texto de apoio. A
+// marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele. Até 960px ele vira
+// gaveta, aberta por `aberto` (o ☰ do cabeçalho ou um item "Menu" da `BarraDeNavegacao`). O kit não conhece o
+// roteador: o consumidor passa o `Link` dele e diz qual item está ativo.
 
 import { ChevronDown, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-/** A largura do menu no desktop, em px. */
-export const LARGURA_DO_MENU = 230;
+/** A largura do menu no desktop, em px (o `--lateral-largura` do Lastro). */
+export const LARGURA_DO_MENU = 200;
 
-/** O recuo do conteúdo ao lado do menu fixo: vai no `main` da casca. */
-export const RECUO_DO_MENU = "mesa:pl-[230px]";
+/** O recuo do conteúdo ao lado do menu fixo, acima de 960px (abaixo, o menu é gaveta): vai no `main` da casca. */
+export const RECUO_DO_MENU = "min-[961px]:pl-[200px]";
 
 /** Um item do menu. Com `filhos`, vira grupo que abre e fecha (o `href` do grupo não é usado); o grupo de um filho
- * só vira item direto, com o nome e o ícone do grupo e o destino do filho. Sem `href` e sem filhos, é o item sem
- * tela: apagado e sem clique. */
+ * só vira item direto, com o nome do grupo e o destino do filho. Sem `href` e sem filhos, é o item sem tela: apagado
+ * e sem clique. */
 export type ItemDoMenu = {
   rotulo: string;
-  icone: LucideIcon;
+  /** @deprecated Sem efeito: o menu do Lastro é só texto. */
+  icone?: LucideIcon;
   href?: string;
   /** Decidido pelo app; sem ele vale a função `ativo` do menu. */
   ativo?: boolean;
   filhos?: ItemDoMenu[];
-  /** O número no selo à direita (as novidades não lidas); 0 ou vazio esconde. */
+  /** O número à direita (as novidades não lidas); 0 ou vazio esconde. */
   contagem?: number;
 };
 
@@ -37,6 +39,7 @@ export type LinkDoMenu = ComponentType<{
   className?: string;
   title?: string;
   onClick?: () => void;
+  "aria-current"?: "page";
   children?: ReactNode;
 }>;
 
@@ -51,44 +54,51 @@ export type PropsDoMenuLateral = {
   itens: ItemDoMenu[];
   /** Diz se o `href` é a rota atual, para o item sem `ativo`. */
   ativo?: (href: string) => boolean;
-  /** A gaveta do celular, aberta pelo botão do `CabecalhoDoApp` (`menuAberto` e `aoAlternarMenu`) ou por um item da
-   * `BarraDeNavegacao`; sem `aberto`, o menu não aparece no celular. */
+  /** A gaveta até 960px, aberta pelo ☰ do `CabecalhoDoApp` (`menuAberto` e `aoAlternarMenu`) ou por um item da
+   * `BarraDeNavegacao`; sem `aberto`, o menu não aparece até 960px. */
   aberto?: boolean;
   aoFechar?: () => void;
+  /** A linha de situação no pé (`.lateral-pe`, com o ponto verde do CSS): "ERP lido às 09:42". */
+  pe?: ReactNode;
   Link?: LinkDoMenu;
 };
 
-/** O menu lateral da casca, só com a navegação: aside fixo sob o cabeçalho acima de 760px, gaveta no celular. */
+/** O menu lateral da casca, só com a navegação: fixo sob o cabeçalho acima de 960px, gaveta abaixo. */
 export function MenuLateral(props: PropsDoMenuLateral) {
-  const { aberto, aoFechar } = props;
+  const { aberto, aoFechar, pe } = props;
   const fechar = () => aoFechar?.();
+
+  // Esc fecha a gaveta.
+  useEffect(() => {
+    if (!aberto) return;
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === "Escape") aoFechar?.();
+    };
+    document.addEventListener("keydown", tecla);
+    return () => document.removeEventListener("keydown", tecla);
+  }, [aberto, aoFechar]);
 
   return (
     <>
-      <aside className="fixed top-15 bottom-0 left-0 z-30 w-[230px] celular:hidden">
+      {/* até 960px o `lastro.css` tira a lateral para a esquerda (transform) e a desliza de volta quando aberta */}
+      <aside
+        aria-label="Navegação"
+        className={cn("lateral fixed top-14 bottom-0 left-0 z-30 h-auto w-[200px] motion-reduce:transition-none max-[961px]:w-60", aberto && "[transform:none]")}
+      >
         <Conteudo {...props} fechar={fechar} />
+        {pe && <div className="lateral-pe">{pe}</div>}
       </aside>
-
-      {/* celular: a gaveta abre embaixo do cabeçalho (56px lá), que continua à mostra, e por cima da barra de navegação */}
-      {aberto && (
-        <div className="fixed inset-x-0 top-14 bottom-0 z-35 mesa:hidden">
-          <div className="absolute inset-0 bg-veu" onClick={fechar} />
-          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] shadow-3">
-            <Conteudo {...props} fechar={fechar} />
-          </aside>
-        </div>
-      )}
+      {aberto && <div className="fixed inset-x-0 top-14 bottom-0 z-[29] bg-veu-painel min-[961px]:hidden" onClick={fechar} />}
     </>
   );
 }
 
 type Interno = PropsDoMenuLateral & { fechar: () => void };
 
-const ITEM = "flex w-full items-center gap-3 rounded-icone px-3 py-2.5 text-left text-sm font-bold transition-colors";
-const SOLTO = "text-lateral-texto hover:bg-lateral-2";
-const ATIVO = "bg-lateral-cheio text-lateral-ativo";
-// O filho do grupo entra alinhado ao rótulo do pai (o respiro, o ícone de 18 e o vão).
-const ANINHADO = "pl-[42px]";
+// O `.lateral a` desenha o link; o ativo também vai por classe, para o `Link` que não repassa o `aria-current`.
+const ATIVO = "bg-ficha font-medio text-acao-texto shadow-p [&>span]:[color:inherit]";
+// O grupo fechado com o item ativo dentro acende o rótulo.
+const GRUPO = "lateral-grupo flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent text-left hover:text-texto";
 
 function Conteudo(props: Interno) {
   const { itens, ativo, fechar } = props;
@@ -104,63 +114,54 @@ function Conteudo(props: Interno) {
   }, [grupoAtivo]);
   const alternar = (rotulo: string) => setAberto((a) => (a === rotulo ? null : rotulo));
 
-  const link = (item: ItemDoMenu, aninhado = false) => {
-    const Icone = item.icone;
+  const link = (item: ItemDoMenu) => {
     const miolo = (
       <>
-        <Icone size={aninhado ? 16 : 18} className="shrink-0" />
-        <span className="min-w-0 flex-1 leading-snug">{item.rotulo}</span>
-        {!!item.contagem && (
-          <span className="numero flex size-5 shrink-0 items-center justify-center rounded-full bg-cobalto text-xs font-extrabold text-sobre-cobalto">
-            {item.contagem > 9 ? "9+" : item.contagem}
-          </span>
-        )}
+        <span className="min-w-0 truncate [color:inherit]">{item.rotulo}</span>
+        {!!item.contagem && <span className="numero shrink-0 pl-2">{item.contagem}</span>}
       </>
     );
     // O item sem tela fica à mostra, apagado e sem clique.
     if (!item.href)
       return (
-        <div key={item.rotulo} className={cn(ITEM, "cursor-default text-lateral-apagado", aninhado && ANINHADO)}>
+        <div key={item.rotulo} className="flex cursor-default justify-between rounded-[6px] px-2 py-1.5 text-texto-apoio">
           {miolo}
         </div>
       );
+    const noAr = estaAtivo(item);
     return (
-      <Link key={item.href} href={item.href} onClick={fechar} className={cn(ITEM, aninhado && ANINHADO, estaAtivo(item) ? ATIVO : SOLTO)}>
+      <Link key={item.href} href={item.href} onClick={fechar} aria-current={noAr ? "page" : undefined} className={cn(noAr && ATIVO)}>
         {miolo}
       </Link>
     );
   };
 
   return (
-    <div className="flex h-full flex-col border-r border-lateral-linha bg-lateral">
-      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
-        {itens.map((item) => {
-          const filhos = item.filhos ?? [];
-          const [primeiro] = filhos;
-          if (!primeiro) return link(item);
-          // O grupo de um item só não vira grupo: vai direto ao filho, com o nome e o ícone do grupo (o nome do
-          // filho sozinho perde o assunto).
-          if (filhos.length === 1) return link({ ...primeiro, rotulo: item.rotulo, icone: item.icone });
-          const Icone = item.icone;
-          const expandido = aberto === item.rotulo;
-          const temAtivo = filhos.some(estaAtivo);
-          return (
-            <div key={item.rotulo}>
-              <button
-                type="button"
-                onClick={() => alternar(item.rotulo)}
-                aria-expanded={expandido}
-                className={cn(ITEM, "cursor-pointer", !expandido && temAtivo ? "bg-lateral-2 text-lateral-ativo" : SOLTO)}
-              >
-                <Icone size={18} className="shrink-0" />
-                <span className="min-w-0 flex-1 leading-snug">{item.rotulo}</span>
-                <ChevronDown size={16} className={cn("shrink-0 transition-transform", expandido && "rotate-180")} />
-              </button>
-              {expandido && <div className="mt-0.5 flex flex-col gap-0.5">{filhos.map((f) => link(f, true))}</div>}
-            </div>
-          );
-        })}
-      </nav>
-    </div>
+    <nav className="flex flex-col gap-px">
+      {itens.map((item) => {
+        const filhos = item.filhos ?? [];
+        const [primeiro] = filhos;
+        if (!primeiro) return link(item);
+        // O grupo de um item só não vira grupo: vai direto ao filho, com o nome do grupo (o nome do filho sozinho
+        // perde o assunto).
+        if (filhos.length === 1) return link({ ...primeiro, rotulo: item.rotulo });
+        const expandido = aberto === item.rotulo;
+        const temAtivo = filhos.some(estaAtivo);
+        return (
+          <div key={item.rotulo} className="flex flex-col gap-px">
+            <button
+              type="button"
+              onClick={() => alternar(item.rotulo)}
+              aria-expanded={expandido}
+              className={cn(GRUPO, !expandido && temAtivo && "text-acao-texto")}
+            >
+              {item.rotulo}
+              <ChevronDown aria-hidden className={cn("size-3 shrink-0 transition-transform", expandido && "rotate-180")} />
+            </button>
+            {expandido && filhos.map((f) => link(f))}
+          </div>
+        );
+      })}
+    </nav>
   );
 }

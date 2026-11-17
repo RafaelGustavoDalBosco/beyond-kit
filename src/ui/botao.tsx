@@ -1,55 +1,48 @@
 "use client";
 
-import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-// Botão em pílula. Um primário por área (a ação principal); o secundário tem o contorno azul; o fantasma é a ação
-// leve, só texto; o neutro é o Cancelar; vermelho só no que apaga ou rejeita. A borda de 1,5px existe em todos
-// (transparente no cheio), para as alturas baterem lado a lado.
-const estilo = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center border-[1.5px] font-extrabold whitespace-nowrap transition-colors select-none disabled:cursor-not-allowed disabled:opacity-45 [&_svg]:shrink-0",
-  {
-    variants: {
-      tipo: {
-        primario: "border-transparent bg-cobalto text-sobre-cobalto hover:bg-cobalto-forte",
-        secundario: "border-cobalto bg-superficie text-cobalto hover:bg-cobalto-suave/50",
-        fantasma: "border-transparent text-cobalto hover:bg-cobalto-suave/50",
-        /** O Cancelar: contorno cinza. */
-        neutro: "border-linha bg-superficie text-texto hover:bg-superficie-2",
-        ganho: "border-transparent bg-ganho text-white hover:bg-ganho/90",
-        perigo: "border-risco bg-superficie text-risco hover:bg-risco-suave",
-        "perigo-cheio": "border-transparent bg-risco text-white hover:bg-risco/90",
-        /** Sobre o menu lateral branco (e, com as cores trocadas pelo `className`, no cabeçalho azul). */
-        lateral: "border-transparent text-lateral-texto hover:bg-lateral-2",
-      },
-      // O raio vai em cada tamanho: no lg (48px) a pílula de 20 deixaria um trecho reto, então ele fecha inteiro.
-      // md e sm têm a altura do botão só de ícone do mesmo tamanho (38 e 30), para baterem na mesma linha.
-      tamanho: {
-        lg: "h-12 gap-2 rounded-full px-6 text-[15px] [&_svg]:size-[18px]",
-        md: "h-[38px] gap-[7px] rounded-pilula px-[18px] text-sm [&_svg]:size-4",
-        sm: "h-[30px] gap-1.5 rounded-pilula px-3 text-[13px] [&_svg]:size-3.5",
-        icone: "size-[38px] rounded-full [&_svg]:size-[18px]",
-        "icone-sm": "size-[30px] rounded-full [&_svg]:size-4",
-      },
-    },
-    compoundVariants: [
-      // o botão de texto encosta mais no conteúdo
-      { tipo: "fantasma", tamanho: ["lg", "md", "sm"], class: "px-2" },
-      // só o ícone (fechar, mais ações, paginar): cinza, com o fundo claro sob o mouse
-      {
-        tipo: ["fantasma", "neutro"],
-        tamanho: ["icone", "icone-sm"],
-        class: "text-texto-2 hover:bg-superficie-2 hover:text-texto",
-      },
-    ],
-    defaultVariants: { tipo: "secundario", tamanho: "md" },
-  },
-);
+// Botão: o `.btn` do Lastro (raio 7, 32px). Um primário (azul cheio) por área; o secundário e o neutro (o
+// Cancelar) são o branco com contorno cinza; o fantasma é a ação leve, só texto azul; vermelho só no que apaga ou
+// rejeita. `lg` é o botão de 48px do celular e do login.
+const TIPO = {
+  primario: "btn-primary",
+  secundario: "btn-secondary",
+  fantasma: "btn-ghost",
+  /** O Cancelar: o secundário cinza. */
+  neutro: "btn-secondary",
+  positivo: "border-transparent bg-positivo text-acao-sobre hover:bg-positivo/90",
+  perigo: "btn-perigo",
+  "perigo-cheio": "border-transparent bg-erro text-acao-sobre hover:bg-erro/90",
+  /** O item discreto (o menu lateral, o cabeçalho): texto cinza, o fundo leve sob o mouse. */
+  lateral: "text-texto-secundario hover:bg-hover",
+} as const;
 
-export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof estilo> & {
+// md e icone têm os 32px do `.btn` e do `.btn-icon`; sm e icone-sm, 28px, para baterem na mesma linha.
+const TAMANHO = {
+  lg: "min-h-12 px-5 text-botao-celular [&_svg]:size-[18px]",
+  md: "h-8 [&_svg]:size-4",
+  sm: "h-7 px-2.5 [&_svg]:size-3.5",
+  icone: "size-8 p-0 [&_svg]:size-[17px]",
+  "icone-sm": "size-7 p-0 [&_svg]:size-4",
+} as const;
+
+export type TipoDoBotao = keyof typeof TIPO;
+export type TamanhoDoBotao = keyof typeof TAMANHO;
+
+function classeDoBotao(tipo: TipoDoBotao, tamanho: TamanhoDoBotao) {
+  // só o ícone (fechar, mais ações, paginar), no fantasma, no neutro e no lateral: o `.btn-icon` cinza, sem contorno
+  const soIcone = (tamanho === "icone" || tamanho === "icone-sm") && (tipo === "fantasma" || tipo === "neutro" || tipo === "lateral");
+  // o `.btn` desabilitado não recebe o mouse; aqui recebe, para o `title` aparecer (o clique continua sem disparar)
+  return cn("btn shrink-0 select-none disabled:pointer-events-auto [&_svg]:shrink-0", soIcone ? "btn-icon" : TIPO[tipo], TAMANHO[tamanho]);
+}
+
+export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  tipo?: TipoDoBotao | null;
+  tamanho?: TamanhoDoBotao | null;
   /** O filho único (o `Link` do roteador, um `<a>`) leva o visual do botão. */
   asChild?: boolean;
   /** Enquanto a ação corre: o giro no lugar do ícone (ou antes do texto), desabilitado. Não vale com `asChild`. */
@@ -58,40 +51,32 @@ export type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<
   textoCarregando?: ReactNode;
 };
 
-/** O botão do kit, em pílula; desabilitado, guarda o `title` no hover e o clique não dispara. */
+/** O botão do kit (`.btn` do Lastro); desabilitado, guarda o `title` no hover e o clique não dispara. */
 export function Botao({ className, tipo, tamanho, type = "button", asChild, carregando, textoCarregando, children, ...props }: BotaoProps) {
+  const classe = classeDoBotao(tipo ?? "secundario", tamanho ?? "md");
   if (asChild)
     return (
-      <Slot.Root className={cn(estilo({ tipo, tamanho }), className)} {...props}>
+      <Slot.Root className={cn(classe, className)} {...props}>
         {children}
       </Slot.Root>
     );
   return (
     <button
       type={type}
-      className={cn(estilo({ tipo, tamanho }), carregando && "disabled:cursor-wait [&>svg]:hidden", className)}
+      className={cn(classe, carregando && "disabled:cursor-wait [&>svg]:hidden", className)}
       {...props}
       disabled={props.disabled || carregando}
       aria-busy={carregando || undefined}
     >
       {carregando && (
-        <span aria-hidden className="size-[15px] shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent" />
+        <span aria-hidden className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent" />
       )}
       {carregando && textoCarregando !== undefined ? textoCarregando : children}
     </button>
   );
 }
 
-/** A tecla de um atalho (`Ctrl K`, `Esc`, `Enter`). */
+/** A tecla de um atalho (`Ctrl K`, `Esc`, `Enter`): o `.tecla` do Lastro. */
 export function Tecla({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <kbd
-      className={cn(
-        "numero inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-md border border-b-2 border-linha bg-superficie px-1.5 font-sans text-[11.5px] font-extrabold text-texto-2",
-        className,
-      )}
-    >
-      {children}
-    </kbd>
-  );
+  return <kbd className={cn("tecla", className)}>{children}</kbd>;
 }

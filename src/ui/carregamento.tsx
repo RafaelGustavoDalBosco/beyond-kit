@@ -1,27 +1,27 @@
 "use client";
 
 // O carregamento depois da primeira carga (o esqueleto dela é o `Carregando`): a barra fina no alto da área e a lista
-// antiga apagada no lugar ao trocar aba, filtro ou mês, e a tarefa longa com as etapas marcadas. Nenhum deles mostra
+// antiga apagada no lugar ao trocar aba, filtro ou mês, e a tarefa longa com os passos marcados. Nenhum deles mostra
 // um giro sozinho no meio da tela.
 
-import { Check, Loader2 } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
 import { LinhaDeDemora, useDemora } from "./estados";
 
-const COR_DA_BARRA = { cobalto: "bg-cobalto", ganho: "bg-ganho", aviso: "bg-aviso", risco: "bg-risco" };
+const COR_DA_BARRA = { acao: "bg-acao", positivo: "bg-positivo", atencao: "bg-atencao", erro: "bg-erro" };
 
-/** A barra de progresso do envio ou do processamento, de 8px; `esperando` pulsa enquanto o total não chegou e `tom`
- * pinta o preenchimento (o uso que chega ao limite fica aviso ou risco). Sem `rotulo` nem `valor`, só a barra (a das
- * `Etapas`). Mora aqui, e não no envio, para o `ui/carregamento` não puxar a `Tabela` (e o `@tanstack/react-table`). */
+/** A barra de progresso do envio ou do processamento (`.barra` do Lastro, 6px); `esperando` pulsa enquanto o total não
+ * chegou e `tom` pinta o preenchimento (o uso que chega ao limite fica `atencao`; `erro` só para a falha). Sem
+ * `rotulo` nem `valor`, só a barra (a das `Etapas`). Mora aqui, e não no envio, para o `ui/carregamento` não puxar a
+ * `Tabela` (e o `@tanstack/react-table`). */
 export function BarraDeProgresso({
   rotulo,
   valor,
   parte,
   esperando,
-  tom = "cobalto",
+  tom = "acao",
 }: {
   rotulo?: string;
   valor?: string;
@@ -30,16 +30,22 @@ export function BarraDeProgresso({
   tom?: keyof typeof COR_DA_BARRA;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       {(rotulo || valor) && (
-        <div className="flex justify-between gap-3 text-[13px]">
-          <span className="font-bold">{rotulo}</span>
-          <span className="numero font-semibold text-texto-2">{valor}</span>
+        <div className="flex justify-between gap-3">
+          <span className="font-medio">{rotulo}</span>
+          <span className="numero text-texto-apoio">{valor}</span>
         </div>
       )}
-      <div className="h-2 overflow-hidden rounded-full bg-fio">
-        <div
-          className={cn("h-full rounded-full transition-[width] duration-500", COR_DA_BARRA[tom], esperando && "animate-brilhar")}
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={esperando ? undefined : Math.min(100, Math.round(parte * 100))}
+        className="barra"
+      >
+        <i
+          className={cn("transition-[width] duration-500 motion-reduce:transition-none", COR_DA_BARRA[tom], esperando && "animate-pulse")}
           style={{ width: `${Math.min(100, Math.round(parte * 100))}%` }}
         />
       </div>
@@ -47,39 +53,21 @@ export function BarraDeProgresso({
   );
 }
 
-/** A barra fina de 3px no alto da área enquanto a aba, o filtro ou o mês trocam: cresce até três quartos e, quando a
- * carga chega (`ativa` volta a `false`), completa e some. Fica presa ao alto do ancestral posicionado (`relative`). */
+/** A barra fina de 2px que corre no alto da área enquanto a aba, o filtro ou o mês trocam (`.carregando-barra` do
+ * Lastro). Fica presa ao alto do ancestral posicionado (`relative`). */
 export function BarraDeCarga({ ativa, className }: { ativa: boolean; className?: string }) {
-  const barra = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = barra.current;
-    if (!ativa || !el) return;
-    // Parte do zero sem transição; ler a largura faz o navegador aplicar o zero antes de crescer.
-    el.style.transition = "none";
-    el.style.width = "0";
-    el.style.opacity = "1";
-    void el.offsetWidth;
-    el.style.transition = "width 1.1s ease";
-    el.style.width = "75%";
-    return () => {
-      el.style.transition = "width 0.25s ease, opacity 0.3s ease 0.25s";
-      el.style.width = "100%";
-      el.style.opacity = "0";
-    };
-  }, [ativa]);
+  if (!ativa) return null;
   return (
-    <div
-      ref={barra}
-      aria-hidden
-      className={cn("pointer-events-none absolute top-0 left-0 z-[2] h-[3px] w-0 rounded-r-full bg-cobalto opacity-0", className)}
-    />
+    <div aria-hidden className={cn("carregando-barra z-[2]", className)}>
+      <i />
+    </div>
   );
 }
 
 /**
  * O invólucro da lista que recarrega: enquanto `ativa`, o conteúdo antigo fica no lugar, apagado, sem clique e sem
  * foco, até o novo chegar (as abas e os filtros que disparam a troca ficam fora dele). Depois de uns 2,5 s entra a
- * linha com o giro e a frase de `demora`. `barra` põe a `BarraDeCarga` no alto do próprio invólucro (quando a área
+ * linha com o girador e a frase de `demora`. `barra` põe a `BarraDeCarga` no alto do próprio invólucro (quando a área
  * inteira é ele).
  */
 export function Recarregando({
@@ -102,19 +90,22 @@ export function Recarregando({
       {barra && <BarraDeCarga ativa={ativa} />}
       {ativa && demorou && demora && <LinhaDeDemora>{demora}</LinhaDeDemora>}
       {/* inert tira o clique e também o foco: pelo teclado a linha antiga não abre nada */}
-      <div inert={ativa} className={cn("transition-opacity duration-200", ativa && "opacity-45")}>
+      <div inert={ativa} className={cn("transition-opacity duration-200 motion-reduce:transition-none", ativa && "opacity-45")}>
         {children}
       </div>
     </div>
   );
 }
 
-/** Uma etapa da tarefa longa: já feita, a atual (com o giro) ou ainda pendente. */
+/** Uma etapa da tarefa longa: já feita, a atual ou ainda pendente. */
 export type Etapa = { rotulo: ReactNode; estado: "feito" | "atual" | "pendente" };
 
+const CLASSE_DA_ETAPA = { feito: "is-feito", atual: "is-atual", pendente: "" };
+
 /**
- * A tarefa longa (gerar um PDF, sincronizar): o título com a ação à direita, a barra de progresso e as etapas marcadas.
- * `parte` é a fração já feita, de 0 a 1; sem ela, vale a das etapas feitas sobre o total.
+ * A tarefa longa (gerar um PDF, sincronizar): o título com a ação à direita, a barra de progresso e os passos
+ * (`.passos` do Lastro: o número no círculo, o feito com ✓ e o fio verde, o atual em azul). `parte` é a fração já
+ * feita, de 0 a 1; sem ela, vale a dos passos feitos sobre o total.
  */
 export function Etapas({
   titulo,
@@ -132,33 +123,23 @@ export function Etapas({
 }) {
   const feitas = itens.filter((e) => e.estado === "feito").length;
   return (
-    <div className={cn("rounded-cartao border border-linha bg-superficie p-4", className)}>
+    <div className={cn("rounded-m border border-borda bg-ficha px-4 py-3.5", className)}>
       {(titulo || acao) && (
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h4 className="m-0 text-[15px] font-extrabold">{titulo}</h4>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <h4 className="m-0 text-enfase font-forte">{titulo}</h4>
           {acao}
         </div>
       )}
       <BarraDeProgresso parte={parte ?? feitas / itens.length} />
-      <ol className="m-0 mt-3.5 list-none p-0">
+      {/* o `.passos` reparte em quatro colunas; com menos passos, uma coluna por passo */}
+      <ol
+        className="passos mt-3.5"
+        style={itens.length < 4 ? { gridTemplateColumns: `repeat(${itens.length}, minmax(0, 1fr))` } : undefined}
+      >
         {itens.map((etapa, i) => (
-          <li
-            key={i}
-            aria-current={etapa.estado === "atual" ? "step" : undefined}
-            className={cn("flex items-center gap-2.5 py-[5px] font-bold", etapa.estado === "pendente" ? "text-texto-3" : "text-texto")}
-          >
-            <span
-              aria-hidden
-              className={cn(
-                "grid size-5 shrink-0 place-items-center rounded-full",
-                etapa.estado === "feito" && "bg-ganho text-white",
-                etapa.estado === "pendente" && "border-2 border-linha",
-              )}
-            >
-              {etapa.estado === "feito" && <Check className="size-3" strokeWidth={3} />}
-              {etapa.estado === "atual" && <Loader2 className="size-4 animate-spin text-cobalto" />}
-            </span>
-            {etapa.rotulo}
+          <li key={i} aria-current={etapa.estado === "atual" ? "step" : undefined} className={CLASSE_DA_ETAPA[etapa.estado]}>
+            <i aria-hidden>{etapa.estado === "feito" ? "✓" : i + 1}</i>
+            <b>{etapa.rotulo}</b>
           </li>
         ))}
       </ol>

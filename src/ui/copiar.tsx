@@ -11,7 +11,8 @@ import { Botao, type BotaoProps } from "./botao";
  * O botão de copiar com rótulo: copia `valor` e mostra o Check e o `copiado` por 1,4 s.
  * `tamanho` "icone"/"icone-sm": só o ícone, com o rótulo (ou o `copiado`) como nome acessível.
  * `onClick` corre antes de copiar (ex.: stopPropagation dentro de uma linha clicável);
- * `avisoAoCopiar` também mostra o toast de sucesso. Sem `tipo`, é o botão neutro (contorno cinza).
+ * `avisoAoCopiar` também mostra o toast de sucesso. Sem `tipo`, é o botão neutro (o secundário cinza do Lastro);
+ * copiado, o ✓ fica no verde de "ok".
  */
 export function BotaoDeCopiar({
   valor,
@@ -47,7 +48,7 @@ export function BotaoDeCopiar({
         }
       }}
     >
-      {ok ? <Check aria-hidden /> : <Copy aria-hidden />}
+      {ok ? <Check aria-hidden className="text-ok" /> : <Copy aria-hidden />}
       {soIcone ? <span className="sr-only">{texto}</span> : texto}
     </Botao>
   );

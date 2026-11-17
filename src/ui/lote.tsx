@@ -17,8 +17,9 @@ import { cn } from "../lib/cn";
 
 import { Botao, type BotaoProps } from "./botao";
 
-/** A barra escura que flutua embaixo da lista enquanto há linha marcada: a `contagem` (a frase vem do app), o
- * `total`, as ações (os filhos) e o × que limpa a seleção. No celular, fica acima da barra de navegação. */
+/** A barra escura do Lastro (a família do hint) que flutua embaixo da lista enquanto há linha marcada: a `contagem`
+ * (a frase vem do app), o `total` no positivo sobre o escuro, as ações (os filhos) e o × que limpa a seleção. No
+ * celular, fica acima da barra de navegação. */
 export function BarraDeLote({
   contagem,
   total,
@@ -37,14 +38,19 @@ export function BarraDeLote({
   return (
     <div
       className={cn(
-        // 78px no celular: os 66 da barra de navegação e o mesmo respiro de 12
-        "sticky bottom-3 z-20 mx-auto mt-3 flex w-max max-w-full animate-entrar flex-wrap items-center gap-x-3.5 gap-y-2 rounded-bloco bg-lote py-2 pr-2 pl-[18px] text-sm font-bold text-white shadow-2 celular:bottom-[78px]",
+        // 61px no celular: os 49 da barra de navegação e o mesmo respiro de 12
+        "sticky bottom-3 z-20 mx-auto mt-3 flex w-max max-w-full animate-entrar flex-wrap items-center gap-x-3 gap-y-2 rounded-g bg-hint py-1.5 pr-1.5 pl-4 text-base font-medio text-hint-titulo shadow-g celular:bottom-[61px]",
         className,
       )}
     >
       <span className="numero" aria-live="polite">
         {contagem}
-        {total != null && <> · {total}</>}
+        {total != null && (
+          <>
+            <span className="text-hint-texto"> · </span>
+            <span className="text-positivo-sobre-escuro">{total}</span>
+          </>
+        )}
       </span>
       {children}
       <button
@@ -52,7 +58,7 @@ export function BarraDeLote({
         onClick={aoLimpar}
         aria-label={rotuloDeLimpar}
         title={rotuloDeLimpar}
-        className="grid size-[30px] shrink-0 cursor-pointer place-items-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
+        className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-m text-hint-texto transition-colors hover:bg-hint-titulo/10 hover:text-hint-titulo"
       >
         <X className="size-4" />
       </button>
@@ -68,7 +74,7 @@ export function AcaoDoLote({ className, ...props }: BotaoProps) {
       tipo="secundario"
       tamanho="sm"
       {...props}
-      className={cn("border-white/40 bg-transparent text-white hover:bg-white/10", className)}
+      className={cn("border-hint-texto/40 bg-transparent text-hint-titulo shadow-none hover:border-hint-texto hover:bg-hint-titulo/10", className)}
     />
   );
 }

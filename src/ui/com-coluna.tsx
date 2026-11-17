@@ -20,15 +20,15 @@ export function ComColuna({
   largura = 340,
   ponto = "4xl",
   lado = "direita",
-  topo = 76,
+  topo = 72,
   children,
   className,
 }: {
   coluna: ReactNode;
   /** A largura da coluna, em px. */
   largura?: number;
-  /** Onde a coluna presa para, em px do alto da janela: 76 sob o `CabecalhoDoApp` (60px + 16), ou 140 sob ele e a
-   * `BarraDoTopo` presa (60 + 64 + 16). */
+  /** Onde a coluna presa para, em px do alto da janela: 72 sob o `CabecalhoDoApp` (56px + 16), ou 108 sob ele e a
+   * `BarraDoTopo` presa (56 + 36 + 16). */
   topo?: number;
   ponto?: keyof typeof PONTO;
   lado?: "direita" | "esquerda";
@@ -39,8 +39,8 @@ export function ComColuna({
   const grade = lado === "direita" ? `minmax(0,1fr) ${largura}px` : `${largura}px minmax(0,1fr)`;
   return (
     <div className="@container">
-      <div className={cn("grid grid-cols-1 gap-4", p.grade, className)} style={{ "--grade": grade, "--topo": `${topo}px` } as CSSProperties}>
-        <div className={cn("flex min-w-0 flex-col gap-4", p.coluna, lado === "direita" && p.direita)}>{coluna}</div>
+      <div className={cn("grid grid-cols-1 gap-x-6 gap-y-[18px]", p.grade, className)} style={{ "--grade": grade, "--topo": `${topo}px` } as CSSProperties}>
+        <div className={cn("flex min-w-0 flex-col gap-3.5", p.coluna, lado === "direita" && p.direita)}>{coluna}</div>
         <div className="min-w-0">{children}</div>
       </div>
     </div>

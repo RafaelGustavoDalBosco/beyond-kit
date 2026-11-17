@@ -1,0 +1,163 @@
+/* ============================================================
+   TELAS PÚBLICAS: a home (home/home.tsx) e a moldura das telas sem login (acesso/acesso.tsx).
+   O Lastro não desenha essas telas; o modelo é o publico.css do Beyond Data, sobre os tokens do kit.
+   O painel escuro e a chamada final usam a família do hint (fundo escuro com texto claro nos dois temas).
+   Nenhum herói em azul cheio; o único valor fora do tokens.css é o ouro do fio da assinatura (kit.css).
+   Peso máximo 600 (--peso-forte), como no resto do kit. O que tem `display` em utilitário (o Brasao, o
+   SeloDalBosco) se esconde no TSX: o utilitário vence esta camada.
+   ============================================================ */
+
+/* cada bloco da home funciona solto (o projeto monta a página com eles), por isso o texto base vale em todos */
+:where(.pub, .pub-topo, .pub-heroi, .pub-secao, .pub-chamada, .pub-rodape, .pub-acesso) { color: var(--texto); font-size: 15px; line-height: 1.55; }
+:where(.pub, .pub-topo, .pub-heroi, .pub-secao, .pub-chamada, .pub-rodape, .pub-acesso) :is(h1, h2, h3) { margin: 0; font-weight: var(--peso-forte); line-height: 1.15; letter-spacing: var(--entreletra-titulo); text-wrap: balance; }
+:where(.pub, .pub-topo, .pub-heroi, .pub-secao, .pub-chamada, .pub-rodape, .pub-acesso) p { margin: 0; }
+.pub { min-height: 100%; background: var(--fundo); }
+.pub-envolve { max-width: 1180px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.pub-btn, .pub-topo-acoes .btn, .pub-heroi-botoes .btn, .pub-chamada .btn { height: 44px; padding-inline: 18px; font-size: 15px; }
+.pub-rotulo { display: block; font-size: 12px; font-weight: var(--peso-forte); letter-spacing: .08em; text-transform: uppercase; color: var(--acao-texto); }
+.pub-marca { display: inline-flex; align-items: center; gap: 9px; font-weight: var(--peso-forte); font-size: 17px; color: var(--texto); text-decoration: none; }
+.pub-marca a { color: inherit; }
+.pub-marca a:hover, .pub-marca:hover { text-decoration: none; }
+
+/* ---------- cabeçalho ---------- */
+.pub-topo { position: sticky; top: 0; z-index: 9; background: color-mix(in srgb, var(--fundo) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--borda); }
+.pub-topo > div { display: flex; align-items: center; gap: 28px; height: 68px; }
+.pub-topo nav { display: flex; gap: 22px; font-size: 14px; font-weight: var(--peso-medio); }
+.pub-topo nav a { color: var(--texto-secundario); text-decoration: none; }
+.pub-topo nav a:hover { color: var(--acao-texto); }
+.pub-topo-acoes { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* ---------- herói: a frase e a tela do produto ---------- */
+.pub-heroi { padding-block: 56px 72px; overflow: hidden; }
+.pub-heroi > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 56px; align-items: center; }
+.pub-heroi.is-sem-midia > div { grid-template-columns: minmax(0, 1fr); }
+.pub-heroi h1 { font-size: clamp(34px, 4.6vw, 56px); margin: 14px 0 18px; }
+.pub-heroi h1 em { font-style: normal; color: var(--acao-texto); }
+.pub-heroi-frase { font-size: 18px; color: var(--texto-secundario); max-width: 34em; }
+.pub-heroi-botoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.pub-provas { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; font-size: 14px; color: var(--texto-apoio); }
+.pub-provas span::before { content: "●"; color: var(--texto-apoio); font-size: 9px; margin-right: 8px; vertical-align: 2px; }
+.pub-provas b { color: var(--texto); font-weight: var(--peso-forte); }
+
+.pub-palco { position: relative; perspective: 1600px; }
+.pub-tela { border-radius: var(--raio-g); background: var(--superficie-ficha); border: 1px solid var(--borda); box-shadow: var(--sombra-g); overflow: hidden; transform: rotateY(-9deg) rotateX(4deg) rotateZ(.4deg); transform-origin: left center; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.pub-palco:hover .pub-tela { transform: rotateY(-3deg) rotateX(1deg); }
+.pub-tela-barra { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; background: var(--superficie-mesa); border-bottom: 1px solid var(--borda); }
+.pub-tela-barra i { width: 9px; height: 9px; border-radius: 50%; background: var(--borda-forte); }
+.pub-tela img { display: block; width: 100%; height: auto; }
+
+/* ---------- seções ---------- */
+.pub-secao { padding-block: 88px; scroll-margin-top: 68px; }
+.pub-secao + .pub-secao { padding-top: 24px; }
+.pub-secao-cab { max-width: 640px; margin-bottom: 48px; }
+.pub-secao-cab h2 { font-size: clamp(28px, 3.4vw, 40px); margin-top: 10px; }
+.pub-secao-cab p { margin-top: 14px; color: var(--texto-secundario); font-size: 17px; }
+
+/* ---------- como funciona: os passos numerados ---------- */
+.pub-passos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.pub-passo { position: relative; padding: 26px 26px 26px 72px; border-radius: var(--raio-g); border: 1px solid var(--borda); background: var(--superficie-ficha); }
+.pub-passo-n { position: absolute; left: 24px; top: 24px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: var(--peso-forte); font-size: 14px; background: var(--superficie-mesa); color: var(--texto-secundario); }
+.pub-passo h3 { font-size: 18px; }
+.pub-passo p { margin-top: 8px; color: var(--texto-secundario); }
+
+/* ---------- recursos ---------- */
+.pub-recursos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.pub-recurso { padding: 24px; border-radius: var(--raio-g); background: var(--superficie-ficha); border: 1px solid var(--borda); }
+.pub-recurso-ic { width: 40px; height: 40px; border-radius: var(--raio-g); display: grid; place-items: center; background: var(--superficie-mesa); color: var(--texto-secundario); margin-bottom: 18px; }
+.pub-recurso-ic svg { width: 20px; height: 20px; }
+.pub-recurso h3 { font-size: 17px; }
+.pub-recurso p { margin-top: 8px; color: var(--texto-secundario); font-size: 14px; }
+
+/* ---------- chamada final ---------- */
+.pub-chamada { background: var(--hint-fundo); color: var(--hint-titulo); }
+.pub-chamada > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding-block: 64px; }
+.pub-chamada h2 { font-size: clamp(26px, 3vw, 36px); max-width: 18em; }
+.pub-chamada p { color: var(--hint-texto); margin-top: 10px; }
+.pub-chamada-acao { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- rodapé: a marca, as colunas de links e a assinatura da Dal Bosco ---------- */
+.pub-rodape { border-top: 1px solid var(--borda); }
+.pub-rodape-grade { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(var(--colunas, 3), minmax(0, 1fr)); gap: 24px; padding-block: 48px 32px; }
+.pub-rodape-sobre { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--texto-secundario); }
+.pub-rodape-coluna b { display: block; margin-bottom: 10px; font-size: 14px; font-weight: var(--peso-forte); }
+.pub-rodape-coluna ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.pub-rodape-coluna a { color: var(--texto-secundario); text-decoration: none; }
+.pub-rodape-coluna a:hover { color: var(--acao-texto); }
+.pub-rodape-assinatura { border-top: 1px solid var(--borda-suave); padding-block: 28px 40px; }
+
+/* ---------- moldura das telas sem login: o painel do produto e o formulário ---------- */
+.pub-acesso { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--fundo); }
+.pub-painel { position: relative; overflow: hidden; background: var(--hint-fundo); color: var(--hint-titulo); display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding: 48px max(48px, env(safe-area-inset-left, 0px)); }
+.pub-painel::after { content: ""; position: absolute; right: -180px; bottom: -180px; width: 520px; height: 520px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--hint-texto) 16%, transparent); box-shadow: 0 0 0 70px color-mix(in srgb, var(--hint-texto) 5%, transparent), 0 0 0 140px color-mix(in srgb, var(--hint-texto) 3%, transparent); pointer-events: none; }
+.pub-painel > * { position: relative; z-index: 1; }
+.pub-painel .pub-marca { color: var(--hint-titulo); }
+.pub-painel .pub-rotulo { color: var(--acao-300); }
+.pub-painel-miolo { margin-top: 56px; }
+.pub-painel h2 { font-size: clamp(28px, 3vw, 40px); max-width: 14em; margin-top: 14px; }
+.pub-painel-frase { color: var(--hint-texto); margin-top: 14px; max-width: 30em; font-size: 16px; }
+.pub-pontos { list-style: none; padding: 0; margin: 28px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.pub-pontos li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--hint-texto); }
+.pub-pontos b { width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--acao-300); background: color-mix(in srgb, var(--hint-texto) 10%, transparent); }
+.pub-pontos b svg { width: 14px; height: 14px; }
+/* a amostra é um pedaço do produto: o cartão claro sobre o painel, com as cores normais da tela */
+.pub-amostra { margin-top: 30px; max-width: 460px; padding: 16px; border-radius: var(--raio-g); background: var(--superficie-ficha); color: var(--texto); box-shadow: var(--sombra-m); font-size: var(--tam-base); }
+.pub-painel-pe { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.pub-painel-rodape { font-size: 14px; color: var(--hint-texto); }
+.pub-painel-rodape a { color: var(--hint-titulo); }
+/* o painel do brasão (o hub): o brasão inteiro no meio, no lugar da marca do produto */
+.pub-painel-brasao { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+.pub-painel-brasao h2 { margin-top: 0; max-width: 16em; }
+.pub-painel-brasao .pub-painel-frase { margin-top: 0; }
+.pub-acesso.is-brasao .pub-painel-marca { display: none; }
+
+.pub-acesso-lado { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 48px max(24px, env(safe-area-inset-right, 0px)) 40px 24px; }
+.pub-acesso-topo { align-self: stretch; text-align: right; font-size: 14px; color: var(--texto-apoio); }
+.pub-acesso-topo a { margin-left: 6px; font-weight: var(--peso-medio); }
+.pub-cartao { width: min(400px, 100%); margin-block: auto; display: flex; flex-direction: column; gap: 18px; }
+.pub-cartao h1 { font-size: 28px; }
+.pub-cartao-frase { margin-top: 6px; color: var(--texto-secundario); }
+.pub-cartao .btn-primary { min-height: 48px; width: 100%; font-size: 15px; }
+.pub-cartao-links { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 14px; }
+.pub-acesso-pe { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; font-size: 13px; color: var(--texto-apoio); }
+.pub-acesso-pe a { color: var(--texto-apoio); }
+.pub-acesso-pe a:hover { color: var(--acao-texto); }
+.pub-voltar { font-size: 14px; color: var(--texto-apoio); text-decoration: none; align-self: flex-start; }
+.pub-voltar:hover { color: var(--acao-texto); text-decoration: none; }
+.pub-versao { font-size: 12px; color: var(--texto-apoio); text-align: center; }
+
+/* ---------- tela estreita: o painel vira a faixa do alto (o selo desce para baixo do formulário, em acesso.tsx) ---------- */
+@media (max-width: 1020px) {
+  .pub-topo nav { display: none; }
+  .pub-heroi > div { grid-template-columns: minmax(0, 1fr); }
+  .pub-tela { transform: rotateX(6deg); transform-origin: center top; }
+  .pub-passos { grid-template-columns: minmax(0, 1fr); }
+  .pub-recursos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pub-rodape-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pub-rodape-grade > :first-child { grid-column: 1 / -1; }
+  .pub-acesso { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .pub-painel { padding: 24px max(20px, env(safe-area-inset-left, 0px)) 28px; gap: 0; }
+  .pub-painel::after { width: 300px; height: 300px; right: -120px; bottom: -160px; }
+  .pub-painel-miolo { margin-top: 0; }
+  .pub-painel-frase, .pub-pontos, .pub-amostra, .pub-painel-pe { display: none; }
+  .pub-painel h2 { font-size: 24px; margin-top: 18px; }
+  .pub-painel-brasao { align-items: flex-start; text-align: left; gap: 0; }
+  .pub-acesso.is-brasao .pub-painel-marca { display: inline-flex; }
+  .pub-acesso-topo { display: none; }
+  .pub-acesso-lado { padding: 28px max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); }
+  .pub-cartao { margin-block: 0; }
+}
+@media (max-width: 640px) {
+  .pub-topo-acoes .btn-primary { display: none; }
+  .pub-heroi { padding-block: 28px 56px; }
+  .pub-heroi-frase { font-size: 16px; }
+  .pub-heroi-botoes .btn { flex: 1 1 100%; height: 48px; }
+  .pub-secao { padding-block: 64px; }
+  .pub-passo { padding: 20px 18px 20px 60px; }
+  .pub-passo-n { left: 16px; top: 20px; }
+  .pub-recursos { grid-template-columns: minmax(0, 1fr); }
+  .pub-rodape-grade { grid-template-columns: minmax(0, 1fr); }
+  .pub-chamada .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pub-tela, .pub-palco:hover .pub-tela { transform: none; transition: none; }
+}

@@ -1,13 +1,13 @@
-import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
 import { SemValor } from "./estados";
 
-/** O valor antigo e o novo de um campo, em caixa clara: o antigo, a seta e o novo em azul; `null` é o `SemValor`.
- * `rotulo` vai em cima. `tamanho="destaque"` é o de-para que é a decisão inteira (a gaveta, a ficha): a caixa larga,
- * com "De" e "Para" em cima de cada valor. */
+/** O valor antigo e o novo de um campo, no → para do Lastro; `null` é o `SemValor`. `rotulo` vai em cima.
+ * Normal é o de linha: o antigo riscado, a seta e o novo em peso 600. `tamanho="destaque"` é o de-para que é a
+ * decisão inteira (a gaveta, a ficha): o bloco `.de-para`, com o antigo afundado e riscado, o novo no contorno azul e
+ * "De" e "Para" em cima de cada valor (no celular, um embaixo do outro, sem a seta). */
 export function DePara({
   de,
   para,
@@ -29,40 +29,31 @@ export function DePara({
 }) {
   const valores =
     tamanho === "destaque" ? (
-      <span
-        className={cn(
-          "numero grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2.5 rounded-icone bg-superficie-2 px-3.5 py-3",
-          !rotulo && className,
-        )}
-      >
-        <span className="min-w-0">
-          <span className="mb-0.5 block text-xs font-bold text-texto-2">{rotuloDe}</span>
-          <span className="block font-extrabold [overflow-wrap:anywhere]">{de ?? <SemValor />}</span>
-        </span>
-        <ArrowRight className="size-4 shrink-0 text-texto-3" />
-        <span className="min-w-0">
-          <span className="mb-0.5 block text-xs font-bold text-texto-2">{rotuloPara}</span>
-          <span className="block font-extrabold text-cobalto [overflow-wrap:anywhere]">{para ?? <SemValor />}</span>
-        </span>
-      </span>
+      <div className={cn("de-para numero", !rotulo && className)}>
+        <div className="de-para-de min-w-0">
+          <small>{rotuloDe}</small>
+          {/* o `div` do `.de-para-de` vem riscado; sem valor, o traço não risca */}
+          {de != null ? <div className="[overflow-wrap:anywhere]">{de}</div> : <span className="mt-[3px] block"><SemValor /></span>}
+        </div>
+        <div className="de-para-seta" aria-hidden>
+          →
+        </div>
+        <div className="de-para-para min-w-0">
+          <small>{rotuloPara}</small>
+          <div className="[overflow-wrap:anywhere]">{para ?? <SemValor />}</div>
+        </div>
+      </div>
     ) : (
-      <span
-        className={cn(
-          "numero inline-flex max-w-full flex-wrap items-center gap-2 rounded-controle bg-superficie-2 px-2.5 py-1 text-[13px]",
-          !rotulo && className,
-        )}
-      >
-        <span className={cn("font-semibold text-texto-2 [overflow-wrap:anywhere]", de != null && "line-through decoration-texto-3")}>
-          {de ?? <SemValor />}
-        </span>
-        <ArrowRight className="size-3.5 shrink-0 text-texto-3" />
-        <span className="font-bold text-cobalto [overflow-wrap:anywhere]">{para ?? <SemValor />}</span>
+      <span className={cn("numero inline-flex max-w-full flex-wrap items-baseline gap-1.5", !rotulo && className)}>
+        {de != null ? <s className="[overflow-wrap:anywhere]">{de}</s> : <SemValor />}
+        <span aria-hidden className="text-texto-apoio">→</span>
+        <b className="font-forte [overflow-wrap:anywhere]">{para ?? <SemValor />}</b>
       </span>
     );
   if (!rotulo) return valores;
   return (
     <div className={cn("flex min-w-0 flex-col items-start gap-1", tamanho === "destaque" && "items-stretch", className)}>
-      <span className="text-[13px] font-bold text-texto-2">{rotulo}</span>
+      <span className="text-apoio font-medio text-texto-apoio">{rotulo}</span>
       {valores}
     </div>
   );

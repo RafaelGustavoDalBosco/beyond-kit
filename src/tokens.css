@@ -1,0 +1,195 @@
+/* ============================================================
+   @dalbosco/kit · TOKENS (desenho Lastro)
+   Os valores são os do tokens.css da entrega do Lastro; os nomes do que era fiscal
+   viraram genéricos (CLAUDE.md, "Nomes das cores"). Nenhum hex fora deste arquivo.
+   ============================================================ */
+:root{
+  /* ---------- FUNDO E SUPERFÍCIES ----------
+     Três tons próximos separam "onde navego / onde percorro / onde decido"
+     sem blocos de cor. */
+  --fundo:#f1f3f6;              /* chão da aplicação, atrás de tudo */
+  --superficie-mesa:#e9ecf1;    /* barra lateral, valor "de", áreas recuadas */
+  --superficie-ficha:#fafbfc;   /* cabeçalho, painéis, cartões, painel de detalhe */
+  --superficie-campo:#ffffff;   /* campos de formulário e botões secundários */
+  --superficie-sub:#f6f7f9;     /* faixa da trilha, cabeçalho de tabela dentro de painel */
+
+  /* ---------- TEXTO ---------- */
+  --texto:#1c2433;              /* valores oficiais, títulos, corpo */
+  --texto-secundario:#3d4657;   /* códigos sob o título da linha, itens de navegação */
+  --texto-apoio:#5b6577;        /* rótulos, legendas, origem do número (mín. 4,5:1 no fundo) */
+  --texto-inverso:#fafbfc;      /* texto sobre fundo escuro (barra de lote, selo confirmada) */
+
+  /* ---------- BORDAS ---------- */
+  --borda:#dfe3ea;              /* contorno de painéis, campos, divisões fortes */
+  --borda-suave:#e6e9ee;        /* fio entre linhas de tabela */
+  --borda-forte:#b3bac6;        /* hover de campo, caixa de seleção */
+
+  /* ---------- NEUTROS (rampa) ---------- */
+  --neutro-200:#e6e9ee; --neutro-300:#d5dae2; --neutro-400:#b3bac6; --neutro-500:#8b94a3;
+  --neutro-600:#6b7585; --neutro-700:#5b6577; --neutro-800:#3d4657; --neutro-900:#1c2433;
+
+  /* ---------- AÇÃO (azul) ----------
+     Azul é só interação: link, botão, seleção, foco. Nenhum dado é azul. */
+  --acao:#2747d8;               /* botão principal, borda de seleção, foco */
+  --acao-texto:#1d37ad;         /* links e texto de ação (contraste de texto pequeno) */
+  --acao-sobre:#ffffff;         /* texto sobre --acao */
+  --acao-100:#eef1fd;           /* fundo da linha selecionada, hover de botão-texto */
+  --acao-200:#e2e7f8;           /* fundo de selo de ação, seleção de texto */
+  --acao-300:#b9c4f3;           /* texto de ação sobre fundo escuro */
+  --acao-400:#8fa0ec;           /* borda de ação sobre fundo escuro */
+  --acao-600:#2747d8;
+  --acao-700:#1d37ad;           /* hover do botão principal */
+  --acao-800:#182c8a;           /* texto da aba e do filtro selecionados */
+  --acao-pressionado:#182c8a;   /* botão principal pressionado */
+
+  /* ---------- OS TRÊS TONS DE SENTIDO ----------
+     Cada um com cor e, onde couber, sinal em texto, para não depender só de cor. */
+  --positivo:#0f7a57;  --positivo-fundo:#e3f4ec;  /* entrou, deu certo, ganho */
+  --destaque:#6b3fd4;  --destaque-fundo:#efe9fb;  /* o segundo realce, que não é ação (violeta, longe do azul) */
+  --atencao:#a45308;   --atencao-fundo:#fbeedd;   /* vencido, atrasado, pede olho (◇) */
+  --positivo-sobre-escuro:#a8d5b8; /* número positivo sobre a barra escura de lote */
+
+  /* ---------- ERRO ----------
+     Só falha de sistema (a integração recusou, sem conexão, senha errada).
+     Fica fora dos tons de sentido: atenção ≠ falha técnica. */
+  --erro:#c0362c; --erro-fundo:#fbe9e7;
+  --ok:#12805c;                 /* ponto de "conectado" e o toast de sucesso */
+
+  /* ---------- ESTADOS DE UM REGISTRO ----------
+     texto / fundo de cada selo, no ciclo de qualquer registro. O sinal (○ ◔ → ◑ ● ✕ ?) acompanha sempre. */
+  --estado-aberto:#3d4657;        --estado-aberto-fundo:#e9ecf1;       /* ○ em aberto */
+  --estado-marcado:#1d37ad;      --estado-marcado-fundo:#e2e7f8;     /* ◔ marcado na tela (ato de quem usa = azul) */
+  --estado-andamento:#0b6477;     --estado-andamento-fundo:#dff1f5;    /* → em andamento, a caminho */
+  --estado-aplicado:#0b6477;      --estado-aplicado-fundo:#c9e8ef;     /* ◑ aplicado, falta a confirmação */
+  --estado-concluido:#fafbfc;    --estado-concluido-fundo:#1c2433;   /* ● concluído (único selo cheio: fim do ciclo) */
+  --estado-erro:#c0362c;          --estado-erro-fundo:#fbe9e7;         /* ✕ com erro */
+  --estado-cancelado:#5b6577;     --estado-cancelado-fundo:transparent;/* cancelado (riscado) */
+  --estado-conferir:#3d4657;      --estado-conferir-fundo:transparent; /* ? para conferir (borda pontilhada, como estimativa) */
+
+  /* ---------- SÉRIES ----------
+     Para séries de gráfico, legenda e ponto nas abas, na ordem. Tons calmos, longe
+     dos tons de sentido e do azul de ação. */
+  --serie-1:#27364b;
+  --serie-2:#6b7f99;
+  --serie-3:#0f766e;
+  --serie-4:#38a3b8;
+  --serie-5:#a08a6c;
+
+  /* ---------- TIPOGRAFIA ---------- */
+  --fonte:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --tam-micro:11px;         /* cabeçalho de tabela, atalho de teclado, contagem */
+  --tam-apoio:12px;         /* rótulos, legendas, linha de código sob o título */
+  --tam-base:13px;          /* corpo, tabelas, botões (desktop) */
+  --tam-base-celular:14px;  /* corpo no celular */
+  --tam-enfase:15px;        /* marca, título de bloco */
+  --tam-botao-celular:16px; /* botões de 48px no celular */
+  --tam-subtitulo:18px;     /* h3, contagem das pendências */
+  --tam-titulo:20px;        /* título de painel e de ficha */
+  --tam-numero-p:24px;      /* número de cartão secundário */
+  --tam-numero-m:28px;      /* número de destaque, total de ficha */
+  --tam-numero-g:34px;      /* número principal da tela */
+  --tam-numero-xg:54px;     /* número único de uma leitura simples */
+  --peso-normal:400; --peso-medio:500; --peso-forte:600;
+  --linha-texto:1.45; --linha-titulo:1.2; --linha-numero:1.1;
+  --entreletra-titulo:-.02em;
+  /* Números: sempre font-variant-numeric: tabular-nums (aplicado no body). */
+
+  /* ---------- ESPAÇAMENTO (passo de 4px) ---------- */
+  --esp-1:4px; --esp-2:8px; --esp-3:12px; --esp-4:16px; --esp-5:20px; --esp-6:24px; --esp-8:32px;
+
+  /* ---------- RAIOS ---------- */
+  --raio-p:4px;    /* selo, caixa de seleção, tecla */
+  --raio-m:7px;    /* botão, campo, bloco de → para */
+  --raio-g:10px;   /* painel, cartão, modal */
+  --raio-pilula:99px; /* filtros */
+
+  /* ---------- SOMBRAS ---------- */
+  --sombra-p:0 1px 2px rgba(28,36,51,.07);    /* cartão, item ativo da navegação */
+  --sombra-m:0 4px 14px rgba(28,36,51,.10);   /* painel de detalhe sobre a lista */
+  --sombra-g:0 16px 40px rgba(28,36,51,.20);  /* modal */
+  --sombra-topo:0 1px 3px rgba(28,36,51,.05); /* cabeçalho fixo */
+  --sombra-acao:0 1px 2px rgba(39,71,216,.35);/* botão principal */
+  --veu-modal:rgba(28,36,51,.45);             /* fundo atrás do modal */
+
+  /* ---------- APOIO ---------- */
+  --hover:rgba(28,36,51,.04);          /* fundo de linha ou item sob o cursor */
+  --superficie-busca:#eceff3;          /* campo de busca do cabeçalho */
+  --veu-painel:rgba(28,36,51,.18);     /* fundo atrás dos painéis empilhados */
+  color-scheme:light;
+
+  /* ---------- HINT E TOAST ----------
+     Hint: janelinha escura de leitura, ao passar o mouse. Toast: confirmação que sobe no rodapé. */
+  --hint-fundo:#1c2433; --hint-titulo:#fafbfc; --hint-texto:#d5dae2;
+  --toast-sucesso-fundo:#12805c;   /* gravou com sucesso (verde, o mesmo de "ok") */
+  --toast-info-fundo:#1c2433;      /* aviso neutro: rejeitada, movida, copiada */
+  --toast-erro-fundo:#c0362c;      /* não gravou; fica até ser fechado */
+  --toast-texto:#ffffff;
+  --toast-duracao:2s;              /* some sozinho; 4s quando tem "Desfazer" */
+
+  /* ---------- MEDIDAS DA CASCA ---------- */
+  --topo-altura:56px; --trilha-altura:36px; --lateral-largura:200px; --painel-largura:500px;
+}
+
+/* ============================================================
+   TEMA ESCURO
+   Mesmas variáveis, outros valores. Ativado por <html data-tema="escuro"> (ver tema.js).
+   Regras: as três superfícies continuam distintas (mesa mais funda, ficha mais alta);
+   tons de sentido, ação e erro clareiam para manter contraste de texto ≥ 4,5:1 no fundo escuro;
+   a rampa de neutros se inverte de papel (200 = preenchimento discreto, 800 = traço forte).
+   ============================================================ */
+:root[data-tema="escuro"]{
+  color-scheme:dark;
+  --fundo:#0f131a; --superficie-mesa:#0a0d13; --superficie-ficha:#171c26; --superficie-campo:#1d2330; --superficie-sub:#131821;
+  --texto:#e6e9ef; --texto-secundario:#b9c0cc; --texto-apoio:#8e98a8; --texto-inverso:#f1f3f6;
+  --borda:#262d3a; --borda-suave:#1f2531; --borda-forte:#3a4354;
+  --neutro-200:#232a37; --neutro-300:#2e3646; --neutro-400:#465064; --neutro-500:#5f6a7e;
+  --neutro-600:#7d8798; --neutro-700:#8e98a8; --neutro-800:#c3c9d4; --neutro-900:#2a3242;
+  --acao:#4664e8; --acao-texto:#93a5ff; --acao-sobre:#ffffff;
+  --acao-100:#1a2140; --acao-200:#232c57; --acao-300:#b9c4f3; --acao-400:#8fa0ec;
+  --acao-600:#4664e8; --acao-700:#3c58d6; --acao-800:#c5cffb; --acao-pressionado:#3049bd;
+  --positivo:#3fbf8f;   --positivo-fundo:#12291f;
+  --destaque:#a78bfa; --destaque-fundo:#231a3d;
+  --atencao:#e0a04a;   --atencao-fundo:#2e2110;
+  --positivo-sobre-escuro:#8fd9b6;
+  --erro:#f0736a; --erro-fundo:#331715; --ok:#3fbf8f;
+  --estado-aberto:#b9c0cc;     --estado-aberto-fundo:#232a37;
+  --estado-marcado:#93a5ff;   --estado-marcado-fundo:#1e2750;
+  --estado-andamento:#6cc5d6;  --estado-andamento-fundo:#10303a;
+  --estado-aplicado:#6cc5d6;   --estado-aplicado-fundo:#164350;
+  --estado-concluido:#0f131a; --estado-concluido-fundo:#e6e9ef;
+  --estado-erro:#f0736a;       --estado-erro-fundo:#331715;
+  --estado-cancelado:#8e98a8;  --estado-conferir:#b9c0cc;
+  --serie-1:#a9b6cc; --serie-2:#6b7f99; --serie-3:#3db5a8; --serie-4:#5cc0d4; --serie-5:#c2ab8a;
+  --sombra-p:0 1px 2px rgba(0,0,0,.4); --sombra-m:0 4px 14px rgba(0,0,0,.45); --sombra-g:0 16px 40px rgba(0,0,0,.6);
+  --sombra-topo:0 1px 3px rgba(0,0,0,.4); --sombra-acao:0 1px 2px rgba(0,0,0,.5); --veu-modal:rgba(0,0,0,.6);
+  --hover:rgba(255,255,255,.05); --superficie-busca:#1d2330; --veu-painel:rgba(0,0,0,.45);
+  --hint-fundo:#2a3242; --hint-titulo:#ffffff; --hint-texto:#c3c9d4;
+  --toast-info-fundo:#2a3242;
+}
+
+/* FONTE HOSPEDADA NO PROJETO (src/fontes, com o OFL.txt): Onest variável, 100 a 900, nos recortes que as telas usam
+   (latim, latim estendido, as setas e os sinais de estado; o ≈ do recorte de matemática). */
+@font-face{
+  font-family:'Onest';
+  src:url('./fontes/onest-latin-wght-normal.woff2') format('woff2');
+  font-weight:100 900; font-style:normal; font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:'Onest';
+  src:url('./fontes/onest-latin-ext-wght-normal.woff2') format('woff2');
+  font-weight:100 900; font-style:normal; font-display:swap;
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face{
+  font-family:'Onest';
+  src:url('./fontes/onest-symbols-wght-normal.woff2') format('woff2');
+  font-weight:100 900; font-style:normal; font-display:swap;
+  unicode-range:U+2190,U+2192,U+2194-2199,U+2218-2219,U+2299,U+22C4-22C6,U+25A0-27BF;
+}
+@font-face{
+  font-family:'Onest';
+  src:url('./fontes/onest-math-wght-normal.woff2') format('woff2');
+  font-weight:100 900; font-style:normal; font-display:swap;
+  unicode-range:U+2248,U+2260-2265,U+2295-2298;
+}

@@ -3,44 +3,47 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-/** O significado fixo de uma cor, sempre em par claro/forte: azul ação, verde ganho, laranja pede ação, vermelho
- * risco, cinza neutro e verde-água ICMS-ST e entrada. */
-export type TomDoEmblema = "cobalto" | "ganho" | "aviso" | "risco" | "neutro" | "agua";
+/** O sentido fixo de uma cor, sempre em par claro/forte: o azul é só ação (o que se clica ou se marcou); o
+ * positivo é o que entrou ou deu certo; o destaque é o segundo realce, que não é ação; a atenção pede olho (vencido,
+ * atrasado); o erro é só falha de sistema e o que apaga; o andamento é o que está a caminho; o neutro, o resto. */
+export type TomDoEmblema = "neutro" | "acao" | "positivo" | "destaque" | "atencao" | "erro" | "andamento";
 
 /** O par claro/forte de cada tom (fundo claro, conteúdo forte), para quem pinta um bloco pelo significado. */
 export const PAR_DO_TOM: Record<TomDoEmblema, string> = {
-  cobalto: "bg-cobalto-suave text-cobalto",
-  ganho: "bg-ganho-suave text-ganho",
-  aviso: "bg-aviso-suave text-aviso",
-  risco: "bg-risco-suave text-risco",
-  neutro: "bg-neutro-suave text-neutro",
-  agua: "bg-agua-suave text-agua",
+  neutro: "bg-mesa text-texto-secundario",
+  acao: "bg-acao-100 text-acao-texto",
+  positivo: "bg-positivo-fundo text-positivo",
+  destaque: "bg-destaque-fundo text-destaque",
+  atencao: "bg-atencao-fundo text-atencao",
+  erro: "bg-erro-fundo text-erro",
+  andamento: "bg-estado-andamento-fundo text-estado-andamento",
 };
 
-const CHEIO: Record<TomDoEmblema, string> = {
-  cobalto: "bg-cobalto text-sobre-cobalto",
-  ganho: "bg-ganho text-white",
-  aviso: "bg-aviso text-white",
-  risco: "bg-risco text-white",
-  neutro: "bg-neutro text-white",
-  agua: "bg-agua text-white",
+// O traço do ícone na cor do tom, sobre o fundo recuado: o Lastro não pinta ícone em bloco de cor.
+const TRACO: Record<TomDoEmblema, string> = {
+  neutro: "text-texto-secundario",
+  acao: "text-acao-texto",
+  positivo: "text-positivo",
+  destaque: "text-destaque",
+  atencao: "text-atencao",
+  erro: "text-erro",
+  andamento: "text-estado-andamento",
 };
 
 const TAMANHO = {
-  xs: "size-7 text-[10px] [&_svg]:size-3.5",
-  sm: "size-[34px] text-[11px] [&_svg]:size-4",
-  md: "size-[42px] text-xs [&_svg]:size-5",
-  lg: "size-[52px] text-sm [&_svg]:size-6",
+  xs: "size-6 text-micro [&_svg]:size-3.5",
+  sm: "size-7 text-micro [&_svg]:size-4",
+  md: "size-8 text-apoio [&_svg]:size-[17px]",
+  lg: "size-10 text-base [&_svg]:size-5",
 } as const;
 
-/** O ícone colorido do kit: em círculo (cartão de número, estado, confirmação, aviso, notificação) ou em quadrado
- * de raio 12 (a linha de lista, com a sigla `ICMS`, `ST`, `NCM` ou o ícone da operação; o cabeçalho da ficha).
- * `cheio` inverte o par: fundo forte, conteúdo branco. */
+/** O ícone de apoio do kit, discreto: o quadrado de raio 7 no fundo recuado (`bg-mesa`), com o ícone (ou a sigla
+ * `ICMS`, `ST`, `NCM`) no traço do tom. `cheio` pinta o quadrado no par claro/forte do tom. `forma` fica aceita por
+ * compatibilidade: o Lastro não tem ícone em círculo. */
 export function Emblema({
   icone: Icone,
   sigla,
-  tom = "cobalto",
-  forma = "circulo",
+  tom = "neutro",
   tamanho = "md",
   cheio,
   className,
@@ -58,10 +61,9 @@ export function Emblema({
     <span
       aria-hidden
       className={cn(
-        "inline-grid shrink-0 place-items-center font-extrabold",
-        forma === "circulo" ? "rounded-full" : "rounded-icone",
+        "inline-grid shrink-0 place-items-center rounded-m font-forte",
         TAMANHO[tamanho],
-        cheio ? CHEIO[tom] : PAR_DO_TOM[tom],
+        cheio ? PAR_DO_TOM[tom] : ["bg-mesa", TRACO[tom]],
         className,
       )}
     >

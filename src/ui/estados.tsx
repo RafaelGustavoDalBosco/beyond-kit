@@ -1,33 +1,33 @@
 "use client";
 
-import { CircleAlert, Inbox, Loader2, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-import { Botao } from "./botao";
-import { Emblema, type TomDoEmblema } from "./emblema";
+import type { TomDoEmblema } from "./emblema";
 
-/** Liga o `SemValor` compacto (o ponto) em tudo o que estiver dentro; a `Tabela` densa já liga. */
+/** Liga o `SemValor` compacto em tudo o que estiver dentro; a `Tabela` densa já liga. */
 export const SemValorCompacto = createContext(false);
 
-/** null é "sem valor", nunca zero nem travessão; o rótulo vem do consumidor. `compacto` (ou a `Tabela` densa em volta)
- * mostra só um ponto apagado, com o rótulo no `title` e para o leitor de tela. */
-export function SemValor({ rotulo = "sem valor", compacto }: { rotulo?: string; compacto?: boolean }) {
+/** null é "sem dado", nunca zero nem travessão (`.sem-dado` do Lastro: em itálico, no texto de apoio); o rótulo vem do
+ * consumidor ("não avaliável", "não se aplica"). `compacto` (ou a `Tabela` densa em volta) escreve só "sem dado", com
+ * o rótulo no `title`. */
+export function SemValor({ rotulo = "sem dado", compacto }: { rotulo?: string; compacto?: boolean }) {
   const noCompacto = useContext(SemValorCompacto);
   if (compacto ?? noCompacto)
     return (
-      <span role="img" aria-label={rotulo} title={rotulo} className="text-texto-3">
-        ·
+      <span title={rotulo} className="sem-dado">
+        sem dado
       </span>
     );
-  return <span className="text-texto-3 italic">{rotulo}</span>;
+  return <span className="sem-dado">{rotulo}</span>;
 }
 
-/** O traço do esqueleto, com o brilho passando; a largura e a altura vêm pelo `className`. */
+/** O traço do esqueleto (`.esq` do Lastro), com o brilho passando; a largura e a altura vêm pelo `className`. */
 export function Esqueleto({ className }: { className?: string }) {
-  return <div className={cn("reluzir rounded-lg", className)} />;
+  return <div className={cn("esq", className)} />;
 }
 
 // A partir de quando a espera ganha frase, em ms.
@@ -48,15 +48,12 @@ export function useDemora(ativa = true, ms = DEMORA) {
   return demorou;
 }
 
-/** A linha da espera que passou do normal: o giro e a frase, que vem de quem chama. Nunca sozinha no meio da tela:
+/** A linha da espera que passou do normal: o girador e a frase, que vem de quem chama. Nunca sozinha no meio da tela:
  * fica em cima do esqueleto ou da lista antiga. */
 export function LinhaDeDemora({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div
-      role="status"
-      className={cn("flex animate-entrar items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-bold text-texto-2", className)}
-    >
-      <Loader2 aria-hidden className="size-[15px] shrink-0 animate-spin" />
+    <div role="status" className={cn("flex animate-entrar items-center gap-2.5 py-2.5 font-medio text-texto-secundario", className)}>
+      <span aria-hidden className="girador" />
       {children}
     </div>
   );
@@ -68,66 +65,56 @@ type Forma = "linhas" | "tabela" | "lista" | "grafico" | "cartoes" | "caixa" | "
 const LARGURAS = ["w-2/5", "w-3/5", "w-1/2", "w-2/3", "w-1/3"];
 const ALTURAS = ["h-[45%]", "h-[70%]", "h-[55%]", "h-[85%]", "h-[60%]", "h-full"];
 
-// A caixa branca que segura as linhas: o esqueleto só aparece sobre o branco.
-const CAIXA = "overflow-hidden rounded-bloco bg-superficie shadow-bloco";
-
-/** Os cartões de número em esqueleto: o círculo do ícone, o rótulo, o valor e a linha pequena. */
+/** Os cartões de número em esqueleto, no `.cartao-numero`: o rótulo, o valor e a nota. */
 function CartoesEmEsqueleto({ quantos }: { quantos: number }) {
   return (
-    <div className="grid grid-cols-4 gap-3.5 celular:grid-cols-2 celular:gap-2.5">
+    <div className="grid grid-cols-4 gap-3 celular:grid-cols-2 celular:gap-2.5">
       {Array.from({ length: quantos }, (_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-3 rounded-cartao bg-superficie p-4 shadow-1 celular:flex-col celular:items-start celular:p-3"
-        >
-          <div className="reluzir size-[42px] shrink-0 rounded-full" />
-          <div className="min-w-0 flex-1 celular:w-full celular:flex-none">
-            <Esqueleto className="h-3 w-3/5" />
-            <Esqueleto className="mt-2.5 h-5 w-4/5" />
-            <Esqueleto className="mt-2.5 h-3 w-2/5" />
-          </div>
+        <div key={i} className="cartao-numero">
+          <Esqueleto className="w-[90px] max-w-full" />
+          <Esqueleto className="my-2 h-7 w-[150px] max-w-full" />
+          <Esqueleto className="w-[110px] max-w-full" />
         </div>
       ))}
     </div>
   );
 }
 
-/** As linhas de lista em esqueleto: o ícone quadrado, o título com o apoio, o valor e o selo. Os respiros são os da
- * `LinhaDeLista`, para nada andar quando o dado chega. */
+/** As linhas de lista em esqueleto, com os respiros da `.table` (9px): o título com a linha de baixo, o valor e o selo,
+ * para nada andar quando o dado chega. */
 function LinhasEmEsqueleto({ quantos }: { quantos: number }) {
   return Array.from({ length: quantos }, (_, i) => (
     <div
       key={i}
-      className="grid grid-cols-[40px_minmax(0,1fr)_110px_76px] items-center gap-3.5 border-t border-fio px-[18px] py-3 first:border-t-0 celular:grid-cols-[40px_minmax(0,1fr)_76px] celular:gap-3 celular:px-3.5"
+      className="grid grid-cols-[minmax(0,1fr)_80px_90px] items-center gap-4 border-b border-borda-suave px-2.5 py-2.5 last:border-b-0 celular:grid-cols-[minmax(0,1fr)_90px]"
     >
-      <div className="reluzir size-10 rounded-icone" />
       <div>
-        <Esqueleto className={cn("h-3", LARGURAS[i % LARGURAS.length])} />
-        <Esqueleto className="mt-[7px] h-2.5 w-1/3" />
+        <Esqueleto className={LARGURAS[i % LARGURAS.length]} />
+        <Esqueleto className="mt-2 h-2.5 w-1/4" />
       </div>
-      <Esqueleto className="h-3 celular:hidden" />
-      <div className="reluzir h-[22px] rounded-full" />
+      <Esqueleto className="celular:hidden" />
+      <Esqueleto className="h-[18px]" />
     </div>
   ));
 }
+
+// A caixa da lista: a ficha com a borda, onde o esqueleto das linhas mora.
+const CAIXA = "overflow-hidden rounded-m border border-borda bg-ficha";
 
 /** O desenho do esqueleto em cada forma; `quantos` é o número de linhas ou de cartões (o gráfico tem as barras dele).
  * `demora` é a linha da espera longa, que nas formas com caixa entra em cima das linhas. */
 function FormaDoEsqueleto({ forma, quantos, demora }: { forma: Forma; quantos: number; demora: ReactNode }) {
   const vezes = Array.from({ length: quantos }, (_, i) => i);
+  // A área inteira do Lastro: o rótulo, o número grande e as linhas, que apagam no fim.
   if (forma === "tela")
     return (
-      <div className="flex flex-col gap-[18px]">
-        <CartoesEmEsqueleto quantos={4} />
-        <div className={CAIXA}>
-          <div className="flex gap-2 px-[18px] py-3.5 celular:px-3.5 celular:py-3">
-            <div className="reluzir h-8 w-16 rounded-full" />
-            <div className="reluzir h-8 w-[72px] rounded-full" />
-            <div className="reluzir h-8 w-20 rounded-full" />
-          </div>
-          {demora}
-          <LinhasEmEsqueleto quantos={quantos} />
-        </div>
+      <div className="flex flex-col gap-3">
+        <Esqueleto className="w-[140px]" />
+        <Esqueleto className="esq-numero max-w-full" />
+        {demora}
+        {vezes.map((i) => (
+          <Esqueleto key={i} className="esq-linha" />
+        ))}
       </div>
     );
   if (forma === "cartoes") return <CartoesEmEsqueleto quantos={quantos} />;
@@ -138,60 +125,50 @@ function FormaDoEsqueleto({ forma, quantos, demora }: { forma: Forma; quantos: n
         <LinhasEmEsqueleto quantos={quantos} />
       </div>
     );
-  // Um cartão solto por item, como o `ItemDaLista` do `MestreDetalhe`.
+  // Uma ficha solta por item, como o `ItemDaLista` do `MestreDetalhe`.
   if (forma === "lista")
     return (
       <div className="flex flex-col gap-2">
         {vezes.map((i) => (
-          <div key={i} className="flex flex-col gap-2 rounded-cartao bg-superficie px-4 py-3 shadow-1">
-            <Esqueleto className={cn("h-3.5", LARGURAS[i % LARGURAS.length])} />
-            <Esqueleto className="h-3 w-1/4" />
+          <div key={i} className="flex flex-col gap-2 rounded-m border border-borda bg-ficha px-3.5 py-3">
+            <Esqueleto className={LARGURAS[i % LARGURAS.length]} />
+            <Esqueleto className="h-2.5 w-1/4" />
           </div>
         ))}
       </div>
     );
   if (forma === "tabela")
     return vezes.map((i) => (
-      <div key={i} className="flex h-11 items-center gap-6 border-b border-fio px-4 last:border-0">
-        <Esqueleto className={cn("h-3.5", LARGURAS[i % LARGURAS.length])} />
-        <Esqueleto className="ml-auto h-3.5 w-20" />
-        <Esqueleto className="h-3.5 w-16" />
+      <div key={i} className="flex h-[38px] items-center gap-6 border-b border-borda-suave px-2.5 last:border-0">
+        <Esqueleto className={LARGURAS[i % LARGURAS.length]} />
+        <Esqueleto className="ml-auto w-20" />
+        <Esqueleto className="w-16" />
       </div>
     ));
   if (forma === "grafico")
     return (
-      <div className="flex h-44 items-end gap-4 border-b border-linha px-5">
+      <div className="flex h-44 items-end gap-4 border-b border-borda px-5">
         {ALTURAS.map((altura) => (
-          <Esqueleto key={altura} className={cn("flex-1 rounded-t-md rounded-b-none", altura)} />
+          <Esqueleto key={altura} className={cn("flex-1 rounded-b-none", altura)} />
         ))}
       </div>
     );
   return (
-    <div className="flex flex-col gap-3 p-5">
+    <div className="flex flex-col gap-3">
       {vezes.map((i) => (
-        <Esqueleto key={i} className="h-4" />
+        <Esqueleto key={i} className={i === quantos - 1 ? "w-3/5" : undefined} />
       ))}
     </div>
   );
 }
 
-// O recuo da linha de demora, para ela alinhar com o conteúdo de cada forma.
-const RECUO_DA_DEMORA: Record<Forma, string> = {
-  linhas: "px-5",
-  grafico: "px-5",
-  tabela: "px-4",
-  lista: "px-4",
-  caixa: "px-[18px] celular:px-3.5",
-  tela: "px-[18px] celular:px-3.5",
-  cartoes: "px-0",
-};
-
 /**
- * O esqueleto da primeira carga, na `forma` do que vem: `tela` (os cartões de número, as abas e as linhas de lista),
- * `cartoes` (os cartões de número), `caixa` (a caixa branca com as linhas de lista), `lista` (um cartão por item, a
- * lista do `MestreDetalhe`), `tabela`, `grafico` ou `linhas`, com `linhas` dizendo quantas linhas ou cartões. `rotulo`
- * quando a espera tem nome ("Consultando o GitHub…"). Só aparece depois de 200 ms, para a resposta rápida não piscar, e
- * ocupa o lugar desde o início. Depois de uns 2,5 s entra a linha com o giro e a frase de `demora`.
+ * O esqueleto da primeira carga (`.carregando` do Lastro: a barra fina correndo no alto, o girador com o que está
+ * sendo lido e o esqueleto no lugar do conteúdo), na `forma` do que vem: `tela` (o rótulo, o número grande e as
+ * linhas), `cartoes` (os cartões de número), `caixa` (a ficha com as linhas de lista), `lista` (uma ficha por item, a
+ * lista do `MestreDetalhe`), `tabela`, `grafico` ou `linhas`, com `linhas` dizendo quantas linhas ou cartões.
+ * `rotulo` é o que está sendo lido ("Lendo 3.418 notas do ERP…"). Só aparece depois de 200 ms, para a resposta rápida
+ * não piscar, e ocupa o lugar desde o início. Depois de uns 2,5 s entra a linha com o girador e a frase de `demora`.
  */
 export function Carregando({
   linhas = 4,
@@ -208,54 +185,66 @@ export function Carregando({
   const demorou = useDemora();
   const muito = useDemora(true, MUITA_DEMORA);
   const frase = demora ?? (muito ? "Está demorando mais que o normal." : "Ainda carregando…");
-  // As formas que desenham as próprias superfícies brancas, direto no fundo da área.
-  const naArea = forma === "tela" || forma === "caixa" || forma === "lista" || forma === "cartoes";
-  // As que têm a caixa das linhas, onde a linha de demora entra por dentro.
-  const naCaixa = forma === "tela" || forma === "caixa";
-  const linhaDeDemora = demorou && <LinhaDeDemora className={RECUO_DA_DEMORA[forma]}>{frase}</LinhaDeDemora>;
+  // As que têm a caixa das linhas, onde a linha de demora entra por dentro (com o respiro da linha).
+  const naCaixa = forma === "caixa";
+  const linhaDeDemora = demorou && <LinhaDeDemora className={cn(naCaixa && "px-2.5")}>{frase}</LinhaDeDemora>;
   return (
-    <div className="animate-surgir">
-      {rotulo && <div className={cn("text-sm font-semibold text-texto-2", naArea ? "pb-3" : "px-5 pt-5")}>{rotulo}</div>}
-      {!naCaixa && linhaDeDemora}
-      <FormaDoEsqueleto forma={forma} quantos={linhas} demora={naCaixa && linhaDeDemora} />
+    <div role="status" aria-busy="true" className="carregando animate-surgir pt-3">
+      <div aria-hidden className="carregando-barra">
+        <i />
+      </div>
+      {rotulo && (
+        <div className="mb-3 flex items-center gap-2.5 font-medio text-texto-secundario">
+          <span aria-hidden className="girador" />
+          {rotulo}
+        </div>
+      )}
+      {/* com o rótulo, o girador já está à vista: a demora troca só a frase */}
+      {!naCaixa && forma !== "tela" && !rotulo && linhaDeDemora}
+      <FormaDoEsqueleto forma={forma} quantos={linhas} demora={(naCaixa || forma === "tela") && !rotulo && linhaDeDemora} />
     </div>
   );
 }
 
-/** A forma comum do vazio e do erro: o emblema em círculo, o título, a frase e a saída. */
+/** A forma comum dos estados (`.estado-caixa` do Lastro): o título, a frase e a saída, no meio. `tela` ocupa a área da
+ * tela inteira (`.estado-tela`); `contorno` põe a ficha com a borda em volta (fora de um bloco). */
 function Estado({
-  tom,
-  icone,
+  erro,
   titulo,
   descricao,
   acao,
   contorno,
+  tela,
 }: {
-  tom: TomDoEmblema;
-  icone: LucideIcon;
+  erro?: boolean;
   titulo: ReactNode;
   descricao?: ReactNode;
   acao?: ReactNode;
   contorno?: boolean;
+  tela?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-2 px-5 py-7 text-center",
-        contorno && "rounded-cartao border border-linha bg-superficie",
+        "grid place-items-center",
+        tela ? "estado-tela" : "px-5 py-7",
+        erro && "estado-erro",
+        contorno && "rounded-m border border-borda bg-ficha",
       )}
     >
-      <Emblema icone={icone} tom={tom} tamanho="lg" className="mb-1" />
-      <div className="text-[15px] font-extrabold">{titulo}</div>
-      {descricao && <p className="m-0 max-w-[40ch] text-sm font-semibold text-texto-2">{descricao}</p>}
-      {acao && <div className="mt-1.5">{acao}</div>}
+      <div className="estado-caixa">
+        <h3 className={cn(!tela && "text-enfase")}>{titulo}</h3>
+        {descricao && <p>{descricao}</p>}
+        {acao && <div className="mt-1">{acao}</div>}
+      </div>
     </div>
   );
 }
 
 /**
- * A recusa, na forma do vazio em vermelho: o emblema, a frase pronta, a referência (o request id) e o "Tentar de novo".
- * Com `titulo`, a frase desce para a linha de baixo. `contorno` põe o cartão branco em volta (fora de um bloco).
+ * A recusa (`.estado-erro` do Lastro, a caixa vermelha clara com o título em vermelho): a frase pronta, a referência
+ * (o request id) e o "Tentar de novo". Com `titulo`, a frase desce para a linha de baixo. `contorno` põe a ficha em
+ * volta (fora de um bloco); `tela` ocupa a área da tela inteira.
  */
 export function Erro({
   frase,
@@ -264,7 +253,7 @@ export function Erro({
   tentar,
   rotuloTentar = "Tentar de novo",
   contorno,
-  icone = CircleAlert,
+  tela,
 }: {
   frase: string;
   titulo?: ReactNode;
@@ -272,13 +261,14 @@ export function Erro({
   tentar?: () => void;
   rotuloTentar?: ReactNode;
   contorno?: boolean;
+  tela?: boolean;
+  /** @deprecated Sem efeito: o estado do Lastro não leva ícone. */
   icone?: LucideIcon;
 }) {
-  const codigo = referencia ? <span className="numero block text-xs text-texto-3">{referencia}</span> : null;
+  const codigo = referencia ? <span className="numero block text-apoio text-texto-apoio">{referencia}</span> : null;
   return (
     <Estado
-      tom="risco"
-      icone={icone}
+      erro
       titulo={titulo ?? frase}
       descricao={
         titulo ? (
@@ -292,36 +282,39 @@ export function Erro({
       }
       acao={
         tentar && (
-          <Botao tipo="primario" tamanho="sm" onClick={tentar}>
+          <button type="button" className="btn btn-secondary" onClick={tentar}>
             {rotuloTentar}
-          </Botao>
+          </button>
         )
       }
       contorno={contorno}
+      tela={tela}
     />
   );
 }
 
 /**
- * A lista sem item: o emblema em círculo, o título, a frase e a saída (a ação para começar ou para limpar o filtro).
- * `solto` tira o contorno (dentro de um bloco); `icone` e `tom` são os do assunto (o verde do "nada em aberto").
+ * A lista sem item: o título, a frase e a saída (a ação para começar ou para limpar o filtro). `solto` tira o
+ * contorno (dentro de um bloco); `tela` ocupa a área da tela inteira.
  */
 export function Vazio({
   titulo,
   descricao,
   acao,
   solto,
-  icone = Inbox,
-  tom = "cobalto",
+  tela,
 }: {
   titulo: ReactNode;
   descricao?: ReactNode;
   acao?: ReactNode;
   solto?: boolean;
+  tela?: boolean;
+  /** @deprecated Sem efeito: o estado do Lastro não leva ícone. */
   icone?: LucideIcon;
+  /** @deprecated Sem efeito: o estado do Lastro não leva cor. */
   tom?: TomDoEmblema;
   /** @deprecated Sem efeito: o filete saiu do kit. */
   filete?: boolean;
 }) {
-  return <Estado tom={tom} icone={icone} titulo={titulo} descricao={descricao} acao={acao} contorno={!solto} />;
+  return <Estado titulo={titulo} descricao={descricao} acao={acao} contorno={!solto && !tela} tela={tela} />;
 }

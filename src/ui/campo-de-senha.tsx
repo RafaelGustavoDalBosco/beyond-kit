@@ -9,14 +9,14 @@ import { cn } from "../lib/cn";
 
 import { Campo, type PropsDoCampo } from "./campo";
 
-// O olho, redondo, à direita, e o recuo que o texto ganha por causa dele.
+// O olho, à direita, no quadrado de raio 7 do `.btn-icon`, e o recuo que o texto ganha por causa dele.
 const OLHO = {
-  md: "right-1.5 size-8 [&_svg]:size-4",
+  md: "right-1 size-7 [&_svg]:size-4",
   lg: "right-2 size-9 [&_svg]:size-[18px]",
 } as const;
 
 const RECUO_DO_OLHO = {
-  md: "pr-11",
+  md: "pr-9",
   lg: "pr-12",
 } as const;
 
@@ -36,7 +36,7 @@ export function CampoDeSenha({ className, tamanho = "md", ...props }: Omit<Props
         disabled={props.disabled}
         onClick={() => setVisivel((v) => !v)}
         className={cn(
-          "absolute top-1/2 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-texto-2 outline-none transition-colors hover:bg-superficie-2 hover:text-texto focus-visible:ring-3 focus-visible:ring-cobalto-anel disabled:cursor-default disabled:text-texto-3 disabled:hover:bg-transparent disabled:hover:text-texto-3",
+          "absolute top-1/2 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-m text-texto-apoio hover:bg-hover hover:text-texto disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-texto-apoio",
           OLHO[tamanho],
         )}
       >

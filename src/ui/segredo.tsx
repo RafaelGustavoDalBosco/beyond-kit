@@ -1,7 +1,7 @@
 "use client";
 
-// O que aparece uma vez só (uma chave, um link, uma senha gerada): num bloco azul claro,
-// copiável e com o aviso que o consumidor manda.
+// O que aparece uma vez só (uma chave, um link, uma senha gerada): na caixa recuada (`bg-mesa` com borda), o valor
+// no fundo do campo, copiável, e o aviso que o consumidor manda. O Lastro não o desenha: sai dos tokens dele.
 
 import { Check, Copy, KeyRound, X, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -27,12 +27,12 @@ export function Segredo({
 }) {
   const [ok, setOk] = useState(false);
   return (
-    <div className="flex items-start gap-3 rounded-cartao bg-cobalto-suave p-4">
-      <Emblema icone={Icone} tamanho="sm" className="bg-superficie" />
+    <div className="flex items-start gap-3 rounded-g border border-borda bg-mesa p-3.5">
+      <Emblema icone={Icone} tamanho="sm" className="bg-campo" />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="text-[13px] font-bold text-cobalto-tinta">{nome}</div>
-        <div className="flex items-start gap-2 rounded-controle bg-superficie py-1.5 pr-1.5 pl-3">
-          <span className="numero min-w-0 flex-1 py-1 text-sm leading-relaxed font-semibold [overflow-wrap:anywhere] select-all">{valor}</span>
+        <div className="text-base font-forte text-texto">{nome}</div>
+        <div className="flex items-start gap-2 rounded-m border border-borda bg-campo py-0.5 pr-0.5 pl-2.5">
+          <span className="numero min-w-0 flex-1 py-1 text-base leading-texto [overflow-wrap:anywhere] select-all">{valor}</span>
           <Botao
             tipo="fantasma"
             tamanho="icone-sm"
@@ -43,10 +43,10 @@ export function Segredo({
               setTimeout(() => setOk(false), 1400);
             }}
           >
-            {ok ? <Check className="text-ganho" /> : <Copy />}
+            {ok ? <Check className="text-ok" /> : <Copy />}
           </Botao>
         </div>
-        {aviso && <p className="m-0 text-[12.5px] leading-normal font-semibold text-texto-2">{aviso}</p>}
+        {aviso && <p className="m-0 text-apoio text-texto-apoio">{aviso}</p>}
       </div>
       {aoFechar && (
         <Botao tipo="fantasma" tamanho="icone-sm" aria-label="Fechar" onClick={aoFechar}>
@@ -60,9 +60,9 @@ export function Segredo({
 /** A senha que sai em claro uma vez só (criar ou redefinir), com o login de quem é. */
 export function SenhaGerada({ usuario, senha, aviso }: { usuario: string; senha: string; aviso?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2.5 rounded-cartao bg-cobalto-suave p-4">
-      <div className="flex items-center gap-2.5 text-sm font-extrabold text-cobalto-tinta">
-        <Emblema icone={KeyRound} tamanho="xs" className="bg-superficie" />
+    <div className="flex flex-col gap-2.5 rounded-g border border-borda bg-mesa p-3.5">
+      <div className="flex items-center gap-2.5 text-base font-forte text-texto">
+        <Emblema icone={KeyRound} tamanho="xs" className="bg-campo" />
         <span>
           Senha de <span className="numero">{usuario}</span>
         </span>
@@ -70,7 +70,7 @@ export function SenhaGerada({ usuario, senha, aviso }: { usuario: string; senha:
       <div>
         <Codigo nome="Senha" valor={senha} copiavel={senha} />
       </div>
-      {aviso && <p className="m-0 text-[12.5px] leading-normal font-semibold text-texto-2">{aviso}</p>}
+      {aviso && <p className="m-0 text-apoio text-texto-apoio">{aviso}</p>}
     </div>
   );
 }
