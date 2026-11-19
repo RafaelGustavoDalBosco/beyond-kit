@@ -1,8 +1,9 @@
 "use client";
 
-// O menu lateral da casca (`.lateral` do Lastro): fundo de mesa, a borda à direita e só a navegação, em texto, sem
-// ícone. O grupo é o rótulo pequeno (`.lateral-grupo`) com os itens embaixo; ele abre e fecha, um aberto por vez. O
-// item ativo vai na ficha, com o texto em azul e a sombra pequena; a contagem fica à direita, em texto de apoio. A
+// O menu lateral da casca (`.lateral`): fundo de mesa, a borda à direita e só a navegação, com o ícone pequeno antes
+// do texto quando o item traz um. O grupo é o rótulo pequeno (`.lateral-grupo`) com os itens embaixo; ele abre e
+// fecha, um aberto por vez. O item ativo vai na pílula azul clara, com o texto em azul escuro; a contagem fica à
+// direita, em texto de apoio. A
 // marca, o contexto, o usuário, o Sair e a versão moram no `CabecalhoDoApp`, fixo em cima dele. Até 960px ele vira
 // gaveta, aberta por `aberto` (o ☰ do cabeçalho ou um item "Menu" da `BarraDeNavegacao`). O kit não conhece o
 // roteador: o consumidor passa o `Link` dele e diz qual item está ativo.
@@ -23,7 +24,7 @@ export const RECUO_DO_MENU = "min-[961px]:pl-[200px]";
  * e sem clique. */
 export type ItemDoMenu = {
   rotulo: string;
-  /** @deprecated Sem efeito: o menu do Lastro é só texto. */
+  /** O ícone pequeno antes do texto (16px, no traço do texto). */
   icone?: LucideIcon;
   href?: string;
   /** Decidido pelo app; sem ele vale a função `ativo` do menu. */
@@ -96,7 +97,7 @@ export function MenuLateral(props: PropsDoMenuLateral) {
 type Interno = PropsDoMenuLateral & { fechar: () => void };
 
 // O `.lateral a` desenha o link; o ativo também vai por classe, para o `Link` que não repassa o `aria-current`.
-const ATIVO = "bg-ficha font-medio text-acao-texto shadow-p [&>span]:[color:inherit]";
+const ATIVO = "bg-acao-200 font-medio text-acao-800 shadow-none [&>span]:[color:inherit]";
 // O grupo fechado com o item ativo dentro acende o rótulo.
 const GRUPO = "lateral-grupo flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent text-left hover:text-texto";
 
@@ -117,14 +118,15 @@ function Conteudo(props: Interno) {
   const link = (item: ItemDoMenu) => {
     const miolo = (
       <>
-        <span className="min-w-0 truncate [color:inherit]">{item.rotulo}</span>
+        {item.icone && <item.icone aria-hidden className="size-4 shrink-0" strokeWidth={1.7} />}
+        <span className="min-w-0 flex-1 truncate [color:inherit]">{item.rotulo}</span>
         {!!item.contagem && <span className="numero shrink-0 pl-2">{item.contagem}</span>}
       </>
     );
     // O item sem tela fica à mostra, apagado e sem clique.
     if (!item.href)
       return (
-        <div key={item.rotulo} className="flex cursor-default justify-between rounded-[6px] px-2 py-1.5 text-texto-apoio">
+        <div key={item.rotulo} className="flex cursor-default items-center gap-2.5 rounded-m px-2.5 py-2 text-texto-apoio">
           {miolo}
         </div>
       );

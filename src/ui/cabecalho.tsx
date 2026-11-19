@@ -130,7 +130,8 @@ export function CabecalhoDoApp(props: PropsDoCabecalho) {
   );
 }
 
-/** A marca (`.topo-marca`): o quadrado azul com a sigla e o nome do produto. */
+/** A marca (`.topo-marca`): o quadrado com a sigla (o `--marca`, que a camada do produto troca; o azul por padrão) e o
+ * nome do produto. */
 function Marca({ sigla, nome, hrefDaMarca, aoClicarNaMarca, Link }: PropsDoCabecalho & { Link: LinkDoMenu }) {
   const desenho = (
     <>

@@ -252,11 +252,11 @@ export function Escolha({
   );
 }
 
-// A escolha segmentada: o `.seg` do Lastro. Cada opção é um radio escondido no rótulo; a marcada ganha o texto e o
-// contorno azul de dentro (o `.seg-opt.is-ativa`, pelo `has-checked`, que vale também sem `value`). O `.seg`
-// corta o que sai dele: o anel de foco vai por dentro.
+// A escolha segmentada: o `.seg`, o trilho recuado da mesa. Cada opção é um radio escondido no rótulo; a marcada
+// sobe para a ficha, com o texto azul e a sombra pequena (o `.seg-opt.is-ativa`, pelo `has-checked`, que vale também
+// sem `value`). O anel de foco vai por dentro.
 const SEGMENTO =
-  "seg-opt relative whitespace-nowrap has-checked:text-acao-texto has-checked:shadow-[inset_0_0_0_1px_var(--acao)] has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-acao has-disabled:cursor-default has-disabled:opacity-45";
+  "seg-opt relative whitespace-nowrap has-checked:bg-ficha has-checked:font-medio has-checked:text-acao-texto has-checked:shadow-p has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-acao has-disabled:cursor-default has-disabled:opacity-45";
 
 // Sem `name`, o nome gerado só agrupa os radios (é ele que dá a seta do teclado): o `form` vazio os deixa sem
 // formulário dono, fora do envio do `<form>` em volta, como o select sem nome.
@@ -324,11 +324,17 @@ export function SimNao({
   required,
   className,
   "aria-label": rotulo,
-}: Omit<SelectHTMLAttributes<HTMLSelectElement>, "children">) {
+  semDado,
+}: Omit<SelectHTMLAttributes<HTMLSelectElement>, "children"> & {
+  /** O terceiro estado à mostra, como a terceira opção (valor ""): "Sem dado", "Não informado". Sem ele, o vazio é
+   * o clique de novo no segmento marcado. */
+  semDado?: string;
+}) {
   const gerado = useId();
+  const opcoes: (readonly [string, string])[] = semDado ? [...SIM_NAO, ["", semDado]] : [...SIM_NAO];
   return (
     <div role="radiogroup" {...useGrupo(id)} aria-label={rotulo} className={cn("seg max-w-full", className)}>
-      {SIM_NAO.map(([v, r]) => (
+      {opcoes.map(([v, r]) => (
         <label key={v} className={SEGMENTO}>
           <input
             type="radio"
@@ -344,7 +350,7 @@ export function SimNao({
             // O vazio do select: o clique (ou o Espaço) no segmento já marcado desmarca. O clique no outro segmento
             // e a seta do teclado caem num radio ainda não marcado e saem pelo `onChange`.
             onClick={() => {
-              if (required || value === undefined || String(value) !== v) return;
+              if (semDado !== undefined || required || value === undefined || String(value) !== v) return;
               onChange?.({ target: { value: "" }, currentTarget: { value: "" } } as unknown as ChangeEvent<HTMLSelectElement>);
             }}
             disabled={disabled}

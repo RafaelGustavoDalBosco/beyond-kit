@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Slot } from "radix-ui";
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 
@@ -15,8 +15,10 @@ const EmCaixa = createContext(false);
 
 /** A lista à esquerda, o detalhe do escolhido à direita (o padrão de toda lista). Solto na tela, a lista vem numa
  * caixa, em linhas separadas pelo fio, e o detalhe ao lado no `.painel` do Lastro (a sombra média sobre a lista);
- * abaixo de `lg`, um embaixo do outro. Com `emCaixa` é o master/detail do modal de ficha: dentro de um `Bloco`, a
- * lista com o fio à direita e o detalhe ao lado; empilha no celular. */
+ * abaixo de `lg`, um embaixo do outro. Com `aoVoltar`, abaixo de `lg` mostra um dos dois: a lista, ou o detalhe aberto com
+ * o "← Voltar" no alto, que devolve à lista com a mesma seleção e os mesmos filtros (a lista não desmonta). Com
+ * `emCaixa` é o master/detail do modal de ficha: dentro de um `Bloco`, a lista com o fio à direita e o detalhe ao lado;
+ * empilha no celular. */
 export function MestreDetalhe({
   titulo,
   contagem,
@@ -27,6 +29,9 @@ export function MestreDetalhe({
   largura = 360,
   embutido = false,
   emCaixa = false,
+  aberto,
+  aoVoltar,
+  rotuloDoVoltar = "Voltar à lista",
   className,
 }: {
   /** O título da lista, com a `contagem` à direita; a `cabeca` (busca, filtros) vem embaixo. */
@@ -43,8 +48,24 @@ export function MestreDetalhe({
   /** Dentro de um `Bloco` (o modal de ficha): a lista sem caixa própria, com o fio à direita, e o detalhe com o
    * respiro dele. */
   emCaixa?: boolean;
+  /** Com `aoVoltar`: há um registro aberto no detalhe (abaixo de `lg`, o detalhe toma o lugar da lista). */
+  aberto?: boolean;
+  /** Liga o caminho de volta do celular e da tela estreita: o "← Voltar" sobre o detalhe, que fecha o registro. */
+  aoVoltar?: () => void;
+  rotuloDoVoltar?: string;
   className?: string;
 }) {
+  // um dos dois abaixo de `lg`, quando o app dá o caminho de volta
+  const soUm = !!aoVoltar && !emCaixa;
+  const escondeLista = soUm && aberto ? "max-lg:hidden" : undefined;
+  const escondeDetalhe = soUm && !aberto ? "max-lg:hidden" : undefined;
+  const voltar = soUm && aberto && (
+    <div className="lg:hidden">
+      <Botao tipo="fantasma" onClick={aoVoltar}>
+        <ArrowLeft aria-hidden className="size-4" /> {rotuloDoVoltar}
+      </Botao>
+    </div>
+  );
   const estilo = { "--largura-da-lista": `${largura}px` } as CSSProperties;
   const alto = (titulo || contagem != null) && (
     <div className={cn("flex items-baseline justify-between gap-3", emCaixa && "px-4 pt-4 pb-2")}>
@@ -74,7 +95,7 @@ export function MestreDetalhe({
   ) : (
     <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-[var(--largura-da-lista)_minmax(0,1fr)]", className)} style={estilo}>
       <EmCaixa.Provider value={false}>
-        <div className="flex min-h-0 min-w-0 flex-col gap-3">
+        <div className={cn("flex min-h-0 min-w-0 flex-col gap-3", escondeLista)}>
           {alto}
           {cabeca && <div className="flex flex-col gap-3">{cabeca}</div>}
           <div className="min-h-0 flex-1 overflow-y-auto rounded-g border border-borda bg-ficha shadow-p">
@@ -85,10 +106,16 @@ export function MestreDetalhe({
       </EmCaixa.Provider>
       {embutido ? (
         // os filhos não encolhem: o detalhe maior que a altura rola, em vez de cortar o que tem overflow-hidden
-        <div className="flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto *:shrink-0">{detalhe}</div>
+        <div className={cn("flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto *:shrink-0", escondeDetalhe)}>
+          {voltar}
+          {detalhe}
+        </div>
       ) : (
         // o `.painel` sem o respiro dele (o detalhe traz o seu), com a borda inteira e o raio da caixa
-        <div className="painel min-h-0 min-w-0 gap-0 overflow-y-auto rounded-g border border-borda p-0 *:shrink-0">{detalhe}</div>
+        <div className={cn("flex min-h-0 min-w-0 flex-col gap-2", escondeDetalhe)}>
+          {voltar}
+          <div className="painel min-h-0 min-w-0 flex-1 gap-0 overflow-y-auto rounded-g border border-borda p-0 *:shrink-0">{detalhe}</div>
+        </div>
       )}
     </div>
   );

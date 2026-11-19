@@ -22,31 +22,37 @@ export function BarraDeProgresso({
   parte,
   esperando,
   tom = "acao",
+  comPercentual,
 }: {
   rotulo?: string;
   valor?: string;
   parte: number;
   esperando?: boolean;
   tom?: keyof typeof COR_DA_BARRA;
+  /** Escreve o percentual à direita ("62%") quando o app conhece o avanço e não passa `valor`. */
+  comPercentual?: boolean;
 }) {
+  const pct = Math.min(100, Math.round(parte * 100));
+  const aDireita = valor ?? (comPercentual && !esperando ? `${pct}%` : undefined);
   return (
     <div>
-      {(rotulo || valor) && (
+      {(rotulo || aDireita) && (
         <div className="flex justify-between gap-3">
           <span className="font-medio">{rotulo}</span>
-          <span className="numero text-texto-apoio">{valor}</span>
+          <span className="numero text-texto-apoio">{aDireita}</span>
         </div>
       )}
       <div
         role="progressbar"
+        aria-label={rotulo}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={esperando ? undefined : Math.min(100, Math.round(parte * 100))}
+        aria-valuenow={esperando ? undefined : pct}
         className="barra"
       >
         <i
           className={cn("transition-[width] duration-500 motion-reduce:transition-none", COR_DA_BARRA[tom], esperando && "animate-pulse")}
-          style={{ width: `${Math.min(100, Math.round(parte * 100))}%` }}
+          style={{ width: `${pct}%` }}
         />
       </div>
     </div>

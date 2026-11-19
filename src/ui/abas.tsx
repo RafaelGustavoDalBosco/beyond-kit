@@ -93,8 +93,8 @@ export function Aba({
       className={cn(
         "shrink-0 whitespace-nowrap data-pelo-mouse:outline-none",
         segmentado
-          ? // o `.seg` corta o que sai dele: o anel de foco vai por dentro; a ativa é o `.seg-opt.is-ativa`
-            "seg-opt justify-center focus-visible:-outline-offset-2 data-[state=active]:text-acao-texto data-[state=active]:shadow-[inset_0_0_0_1px_var(--acao)]"
+          ? // o anel de foco vai por dentro; a ativa sobe para a ficha, como o `.seg-opt.is-ativa`
+            "seg-opt justify-center focus-visible:-outline-offset-2 data-[state=active]:bg-ficha data-[state=active]:font-medio data-[state=active]:text-acao-texto data-[state=active]:shadow-p"
           : // a ativa é o `.aba[aria-selected=true]`, que o Radix marca; no celular o trilho rola e o anel vai por dentro
             "aba inline-flex items-center gap-1.5 celular:focus-visible:-outline-offset-2",
         className,

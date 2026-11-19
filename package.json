@@ -1,7 +1,7 @@
 {
   "name": "@dalbosco/kit",
-  "version": "1.0.0",
-  "description": "Kit de UI da Dal Bosco Systems no desenho Lastro (Onest, tema claro e escuro): fonte TypeScript e CSS, sem build.",
+  "version": "2.0.0",
+  "description": "Kit de UI da Dal Bosco Systems: o Beyond Design System (Onest, tema claro e escuro), fonte TypeScript e CSS, sem build.",
   "type": "module",
   "sideEffects": [
     "*.css"

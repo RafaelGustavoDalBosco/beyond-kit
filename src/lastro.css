@@ -20,9 +20,9 @@ s{color:var(--texto-apoio)}
 
 /* ---------- CASCA ---------- */
 .app{display:grid;grid-template-columns:var(--lateral-largura) minmax(0,1fr);grid-template-rows:var(--topo-altura) var(--trilha-altura) 1fr;min-height:100vh}
-.topo{grid-column:1/3;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:0 20px;background:var(--superficie-ficha);border-bottom:1px solid var(--borda);box-shadow:var(--sombra-topo);white-space:nowrap}
+.topo{grid-column:1/3;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:0 20px;background:color-mix(in srgb,var(--superficie-ficha) 94%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--borda);box-shadow:var(--sombra-topo);white-space:nowrap}
 .topo-marca{display:flex;align-items:center;gap:8px;width:170px;font-weight:var(--peso-forte);font-size:var(--tam-enfase);color:var(--texto)}
-.topo-marca i{width:24px;height:24px;border-radius:6px;background:var(--acao);color:var(--acao-sobre);display:grid;place-items:center;font-style:normal;font-size:var(--tam-apoio)}
+.topo-marca i{width:24px;height:24px;border-radius:6px;background:var(--marca);color:var(--marca-sobre);display:grid;place-items:center;font-style:normal;font-size:var(--tam-apoio)}
 .topo-contexto{gap:10px;padding:5px 10px}
 .topo-contexto b{font-weight:var(--peso-forte)}.topo-contexto small{font-size:var(--tam-apoio);font-weight:var(--peso-normal);color:var(--texto-apoio)}
 .seletor-mes{display:flex;align-items:center;border:1px solid var(--borda);background:var(--superficie-campo);border-radius:var(--raio-m)}
@@ -40,11 +40,11 @@ s{color:var(--texto-apoio)}
 .icone{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
 
 .lateral{grid-row:2/4;position:sticky;top:var(--topo-altura);height:calc(100vh - var(--topo-altura));overflow:auto;background:var(--superficie-mesa);border-right:1px solid var(--borda);display:flex;flex-direction:column;gap:1px;padding:10px 12px 12px}
-.lateral-grupo{padding:10px 8px 4px;font-size:var(--tam-micro);font-weight:var(--peso-medio);color:var(--texto-apoio)}
-.lateral a{display:flex;justify-content:space-between;padding:6px 8px;border-radius:6px;color:var(--texto-secundario);text-decoration:none}
+.lateral-grupo{padding:16px 8px 4px;font-size:var(--tam-micro);font-weight:var(--peso-medio);color:var(--texto-apoio)}
+.lateral a{display:flex;justify-content:flex-start;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--raio-m);color:var(--texto-secundario);text-decoration:none}
 .lateral a span{color:var(--texto-apoio)}
 .lateral a:hover{background:var(--hover)}
-.lateral a[aria-current=page]{background:var(--superficie-ficha);color:var(--acao-texto);font-weight:var(--peso-medio);box-shadow:var(--sombra-p)}
+.lateral a[aria-current=page]{background:var(--acao-200);color:var(--acao-800);font-weight:var(--peso-medio);box-shadow:none}
 .lateral a[aria-current=page] span{color:inherit}
 .lateral-pe{margin-top:auto;padding:8px 8px 0;font-size:var(--tam-apoio);color:var(--texto-apoio)}
 .lateral-pe::before{content:'● ';color:var(--ok)}
@@ -102,10 +102,11 @@ s{color:var(--texto-apoio)}
 .aba[aria-selected=true]{padding-bottom:8px;border-bottom:2px solid var(--acao);font-weight:var(--peso-forte);color:var(--acao-800)}
 .aba.is-desligada{color:var(--neutro-500);cursor:default}
 .aba i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
-.seg{display:inline-flex;overflow:hidden;border:1px solid var(--borda);border-radius:var(--raio-m);background:var(--superficie-campo)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:2px;max-width:100%;padding:3px;border:1px solid var(--borda);border-radius:var(--raio-m);background:var(--superficie-mesa)}
 .seg-opt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:var(--tam-base);cursor:pointer}
-.seg-opt+.seg-opt{border-left:1px solid var(--borda)}
-.seg-opt.is-ativa{color:var(--acao-texto);box-shadow:inset 0 0 0 1px var(--acao)}
+.seg-opt{border-radius:calc(var(--raio-m) - 3px)}
+.seg-opt.is-ativa{color:var(--acao-texto);font-weight:var(--peso-medio);background:var(--superficie-ficha);box-shadow:var(--sombra-p)}
+.seg-opt:focus-visible{outline-offset:-2px}.seg-opt:has(input:focus-visible){outline:2px solid var(--acao);outline-offset:-2px}
 .tag{display:inline-flex;align-items:center;gap:4px;font-size:var(--tam-apoio);font-weight:var(--peso-medio);padding:2px 10px;border-radius:var(--raio-pilula);white-space:nowrap}
 .tag-neutral{background:var(--neutro-200);color:var(--texto-secundario)}
 .filtro{border:1px solid var(--borda);color:var(--texto-secundario);cursor:pointer;background:transparent}
@@ -132,7 +133,7 @@ s{color:var(--texto-apoio)}
 .sem-dado{font-style:italic;color:var(--texto-apoio)}
 
 /* ---------- CARTÃO DE NÚMERO ---------- */
-.cartao-numero{display:block;border:1px solid var(--borda);border-radius:var(--raio-m);padding:14px 16px;background:var(--superficie-ficha);color:inherit;text-decoration:none}
+.cartao-numero{display:block;border:1px solid var(--borda);border-radius:var(--raio-g);box-shadow:var(--sombra-p);padding:14px 16px;background:var(--superficie-ficha);color:inherit;text-decoration:none}
 a.cartao-numero:hover,.cartao-numero.is-hover{border-color:var(--borda-forte);box-shadow:var(--sombra-p);text-decoration:none}
 .cartao-numero.is-selecionado{border-color:var(--acao);box-shadow:var(--sombra-p)}
 .cartao-numero.is-sem-dado{border-style:dashed;border-color:var(--neutro-500);background:transparent}
@@ -174,7 +175,7 @@ a.cartao-numero:hover,.cartao-numero.is-hover{border-color:var(--borda-forte);bo
 .painel>.painel-rodape{position:sticky;bottom:0;margin:auto -22px -18px;padding:12px 22px 18px;background:var(--superficie-ficha)}
 
 /* ---------- MODAL ---------- */
-.modal-fundo{position:fixed;inset:0;display:grid;place-items:center;padding:var(--esp-4);background:var(--veu-modal);z-index:50}
+.modal-fundo{position:fixed;inset:0;display:grid;place-items:center;padding:var(--esp-4);background:var(--veu-modal);backdrop-filter:blur(4px);z-index:50}
 .dialog{width:min(540px,100%);display:flex;flex-direction:column;gap:14px;padding:24px 26px;border-radius:var(--raio-g);background:var(--superficie-ficha);box-shadow:var(--sombra-g);border:1px solid var(--borda)}
 .dialog-title{font-weight:var(--peso-forte);font-size:var(--tam-titulo);letter-spacing:var(--entreletra-titulo)}
 .dialog-actions{display:flex;justify-content:flex-end;gap:var(--esp-2)}
@@ -401,3 +402,35 @@ a.topo-usuario{color:inherit;text-decoration:none}
   .de-para-seta{display:none}
   .registro-celular .painel{border-left:0;box-shadow:none;padding:18px;min-height:0}
 }
+
+/* ============================================================
+   BEYOND DESIGN SYSTEM (CLAUDE.md, KIT-28): o que a camada aprovada do Beyond Data acrescentou ao Lastro.
+   ============================================================ */
+
+/* A seção que abre e fecha (`Expansivel`, ou um <details> solto): o indicador de abertura antes do título. */
+details>summary{cursor:pointer;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";display:inline-block;width:.5em;height:.5em;margin:0 .7em .1em .2em;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);transition:transform .15s}
+details[open]>summary::before{transform:rotate(45deg)}
+
+/* O seletor (`Escolha`, o <select class="input">): onde o navegador já desenha o painel, o painel de opções na
+   ficha, com a escolhida em azul claro; o teclado é o do próprio select. */
+@supports (appearance:base-select){
+  select.input,select.input::picker(select){appearance:base-select}
+  select.input::picker(select){padding:4px;border:1px solid var(--borda);border-radius:var(--raio-m);background:var(--superficie-ficha);color:var(--texto);box-shadow:var(--sombra-m)}
+  select.input option{padding:7px 10px;border-radius:var(--raio-p)}
+  select.input option:checked{color:var(--acao-texto);background:var(--acao-100)}
+  select.input option:hover,select.input option:focus-visible{background:var(--hover)}
+}
+
+/* A prévia contextual (`PreviaContextual`): a referência sublinhada em pontos e o cartão que abre por cima. */
+.referencia-contextual{display:inline;padding:0;border:0;background:none;font:inherit;color:var(--acao-texto);text-decoration:underline dotted;text-underline-offset:.2em;cursor:pointer;text-align:start}
+.referencia-contextual[aria-expanded=true]{text-decoration-style:solid}
+.previa-contextual{display:none;position:fixed;inset:auto;margin:0;width:min(300px,calc(100vw - 16px));padding:var(--esp-4);border:1px solid var(--borda);border-radius:var(--raio-g);color:var(--texto);background:var(--superficie-ficha);box-shadow:var(--sombra-m);text-align:start;white-space:normal;font-size:var(--tam-base);line-height:var(--linha-texto)}
+.previa-contextual:popover-open{display:grid;gap:var(--esp-2)}
+.previa-contextual .btn{justify-self:start}
+
+@media (prefers-reduced-motion:reduce){
+  details>summary::before{transition:none}
+}
+

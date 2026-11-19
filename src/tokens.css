@@ -1,20 +1,21 @@
 /* ============================================================
-   @dalbosco/kit · TOKENS (desenho Lastro)
-   Os valores são os do tokens.css da entrega do Lastro; os nomes do que era fiscal
-   viraram genéricos (CLAUDE.md, "Nomes das cores"). Nenhum hex fora deste arquivo.
+   @dalbosco/kit · TOKENS (Beyond Design System)
+   A base é o Lastro com a camada aprovada no Beyond Data (o beyond-data.css dele, "data-produto=data")
+   já aplicada; os nomes são os genéricos (CLAUDE.md, "Nomes das cores"). Nenhum hex fora deste arquivo.
+   O produto liga a camada dele com data-produto no <html> e só troca a marca e os tons de dado.
    ============================================================ */
 :root{
   /* ---------- FUNDO E SUPERFÍCIES ----------
-     Três tons próximos separam "onde navego / onde percorro / onde decido"
-     sem blocos de cor. */
-  --fundo:#f1f3f6;              /* chão da aplicação, atrás de tudo */
-  --superficie-mesa:#e9ecf1;    /* barra lateral, valor "de", áreas recuadas */
-  --superficie-ficha:#fafbfc;   /* cabeçalho, painéis, cartões, painel de detalhe */
+     Três profundidades: a lista de origem no fundo, o painel de detalhe na ficha (com a sombra média)
+     e o modal ativo por cima (a sombra grande e o véu). */
+  --fundo:#f3f6fa;              /* chão da aplicação, atrás de tudo */
+  --superficie-mesa:#edf2f8;    /* barra lateral, valor "de", áreas recuadas */
+  --superficie-ficha:#ffffff;   /* cabeçalho, painéis, cartões, painel de detalhe */
   --superficie-campo:#ffffff;   /* campos de formulário e botões secundários */
-  --superficie-sub:#f6f7f9;     /* faixa da trilha, cabeçalho de tabela dentro de painel */
+  --superficie-sub:#f6f8fc;     /* faixa da trilha, cabeçalho de tabela dentro de painel */
 
   /* ---------- TEXTO ---------- */
-  --texto:#1c2433;              /* valores oficiais, títulos, corpo */
+  --texto:#162840;              /* valores oficiais, títulos, corpo */
   --texto-secundario:#3d4657;   /* códigos sob o título da linha, itens de navegação */
   --texto-apoio:#5b6577;        /* rótulos, legendas, origem do número (mín. 4,5:1 no fundo) */
   --texto-inverso:#fafbfc;      /* texto sobre fundo escuro (barra de lote, selo confirmada) */
@@ -30,23 +31,29 @@
 
   /* ---------- AÇÃO (azul) ----------
      Azul é só interação: link, botão, seleção, foco. Nenhum dado é azul. */
-  --acao:#2747d8;               /* botão principal, borda de seleção, foco */
-  --acao-texto:#1d37ad;         /* links e texto de ação (contraste de texto pequeno) */
+  --acao:#1855bd;               /* botão principal, borda de seleção, foco */
+  --acao-texto:#184c9e;         /* links e texto de ação (contraste de texto pequeno) */
   --acao-sobre:#ffffff;         /* texto sobre --acao */
-  --acao-100:#eef1fd;           /* fundo da linha selecionada, hover de botão-texto */
-  --acao-200:#e2e7f8;           /* fundo de selo de ação, seleção de texto */
+  --acao-100:#eaf1ff;           /* fundo da linha selecionada, hover de botão-texto */
+  --acao-200:#dbe8ff;           /* fundo de selo de ação, item ativo do menu, seleção de texto */
   --acao-300:#b9c4f3;           /* texto de ação sobre fundo escuro */
   --acao-400:#8fa0ec;           /* borda de ação sobre fundo escuro */
-  --acao-600:#2747d8;
-  --acao-700:#1d37ad;           /* hover do botão principal */
-  --acao-800:#182c8a;           /* texto da aba e do filtro selecionados */
-  --acao-pressionado:#182c8a;   /* botão principal pressionado */
+  --acao-600:#1855bd;
+  --acao-700:#17499f;           /* hover do botão principal */
+  --acao-800:#163e80;           /* texto da aba, do filtro e do item de menu selecionados */
+  --acao-pressionado:#163e80;   /* botão principal pressionado */
+
+  /* ---------- MARCA ----------
+     O quadrado da sigla no cabeçalho: a única cor que o produto troca na camada dele (data-produto). */
+  --marca:var(--acao);
+  --marca-sobre:var(--acao-sobre);
 
   /* ---------- OS TRÊS TONS DE SENTIDO ----------
-     Cada um com cor e, onde couber, sinal em texto, para não depender só de cor. */
+     Verde para o favorável, vermelho (vinho) para o risco e o desfavorável. Cada um com cor e sinal em
+     texto, para não depender só de cor. O produto diz o que o valor significa; o kit só apresenta. */
   --positivo:#0f7a57;  --positivo-fundo:#e3f4ec;  /* entrou, deu certo, ganho */
-  --destaque:#6b3fd4;  --destaque-fundo:#efe9fb;  /* o segundo realce, que não é ação (violeta, longe do azul) */
-  --atencao:#a45308;   --atencao-fundo:#fbeedd;   /* vencido, atrasado, pede olho (◇) */
+  --destaque:#136244;  --destaque-fundo:#e0f4e9;  /* o segundo realce favorável, que não é ação */
+  --atencao:#91384a;   --atencao-fundo:#faeaf0;   /* risco, vencido, atrasado, desfavorável (◇) */
   --positivo-sobre-escuro:#a8d5b8; /* número positivo sobre a barra escura de lote */
 
   /* ---------- ERRO ----------
@@ -79,36 +86,36 @@
   --fonte:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
   --tam-micro:11px;         /* cabeçalho de tabela, atalho de teclado, contagem */
   --tam-apoio:12px;         /* rótulos, legendas, linha de código sob o título */
-  --tam-base:13px;          /* corpo, tabelas, botões (desktop) */
+  --tam-base:14px;          /* corpo, tabelas, botões (desktop) */
   --tam-base-celular:14px;  /* corpo no celular */
   --tam-enfase:15px;        /* marca, título de bloco */
   --tam-botao-celular:16px; /* botões de 48px no celular */
   --tam-subtitulo:18px;     /* h3, contagem das pendências */
-  --tam-titulo:20px;        /* título de painel e de ficha */
+  --tam-titulo:22px;        /* título de painel e de ficha */
   --tam-numero-p:24px;      /* número de cartão secundário */
   --tam-numero-m:28px;      /* número de destaque, total de ficha */
   --tam-numero-g:34px;      /* número principal da tela */
   --tam-numero-xg:54px;     /* número único de uma leitura simples */
   --peso-normal:400; --peso-medio:500; --peso-forte:600;
   --linha-texto:1.45; --linha-titulo:1.2; --linha-numero:1.1;
-  --entreletra-titulo:-.02em;
+  --entreletra-titulo:-.035em;
   /* Números: sempre font-variant-numeric: tabular-nums (aplicado no body). */
 
   /* ---------- ESPAÇAMENTO (passo de 4px) ---------- */
   --esp-1:4px; --esp-2:8px; --esp-3:12px; --esp-4:16px; --esp-5:20px; --esp-6:24px; --esp-8:32px;
 
   /* ---------- RAIOS ---------- */
-  --raio-p:4px;    /* selo, caixa de seleção, tecla */
-  --raio-m:7px;    /* botão, campo, bloco de → para */
-  --raio-g:10px;   /* painel, cartão, modal */
+  --raio-p:6px;    /* selo, caixa de seleção, tecla, opção do seletor */
+  --raio-m:11px;   /* botão, campo, bloco de → para, item do menu */
+  --raio-g:18px;   /* painel, cartão, modal, prévia */
   --raio-pilula:99px; /* filtros */
 
   /* ---------- SOMBRAS ---------- */
-  --sombra-p:0 1px 2px rgba(28,36,51,.07);    /* cartão, item ativo da navegação */
-  --sombra-m:0 4px 14px rgba(28,36,51,.10);   /* painel de detalhe sobre a lista */
-  --sombra-g:0 16px 40px rgba(28,36,51,.20);  /* modal */
+  --sombra-p:0 2px 8px rgb(21 48 81 / 6%);    /* cartão, item ativo da navegação */
+  --sombra-m:0 4px 14px rgba(28,36,51,.10);   /* painel de detalhe sobre a lista, prévia, painel do seletor */
+  --sombra-g:0 20px 64px rgb(18 39 68 / 24%); /* modal */
   --sombra-topo:0 1px 3px rgba(28,36,51,.05); /* cabeçalho fixo */
-  --sombra-acao:0 1px 2px rgba(39,71,216,.35);/* botão principal */
+  --sombra-acao:0 1px 2px rgba(24,85,189,.35);/* botão principal */
   --veu-modal:rgba(28,36,51,.45);             /* fundo atrás do modal */
 
   /* ---------- APOIO ---------- */
@@ -139,17 +146,17 @@
    ============================================================ */
 :root[data-tema="escuro"]{
   color-scheme:dark;
-  --fundo:#0f131a; --superficie-mesa:#0a0d13; --superficie-ficha:#171c26; --superficie-campo:#1d2330; --superficie-sub:#131821;
-  --texto:#e6e9ef; --texto-secundario:#b9c0cc; --texto-apoio:#8e98a8; --texto-inverso:#f1f3f6;
+  --fundo:#101722; --superficie-mesa:#111b28; --superficie-ficha:#1a2534; --superficie-campo:#1d2330; --superficie-sub:#151f2b;
+  --texto:#e8eff9; --texto-secundario:#b9c0cc; --texto-apoio:#8e98a8; --texto-inverso:#f1f3f6;
   --borda:#262d3a; --borda-suave:#1f2531; --borda-forte:#3a4354;
   --neutro-200:#232a37; --neutro-300:#2e3646; --neutro-400:#465064; --neutro-500:#5f6a7e;
   --neutro-600:#7d8798; --neutro-700:#8e98a8; --neutro-800:#c3c9d4; --neutro-900:#2a3242;
-  --acao:#4664e8; --acao-texto:#93a5ff; --acao-sobre:#ffffff;
-  --acao-100:#1a2140; --acao-200:#232c57; --acao-300:#b9c4f3; --acao-400:#8fa0ec;
-  --acao-600:#4664e8; --acao-700:#3c58d6; --acao-800:#c5cffb; --acao-pressionado:#3049bd;
+  --acao:#355ecb; --acao-texto:#a8c6ff; --acao-sobre:#ffffff;
+  --acao-100:#213454; --acao-200:#2c4268; --acao-300:#b9c4f3; --acao-400:#8fa0ec;
+  --acao-600:#355ecb; --acao-700:#294daa; --acao-800:#cfddff; --acao-pressionado:#3049bd;
   --positivo:#3fbf8f;   --positivo-fundo:#12291f;
-  --destaque:#a78bfa; --destaque-fundo:#231a3d;
-  --atencao:#e0a04a;   --atencao-fundo:#2e2110;
+  --destaque:#84dab2; --destaque-fundo:#17382e;
+  --atencao:#f3a8b6;   --atencao-fundo:#39242e;
   --positivo-sobre-escuro:#8fd9b6;
   --erro:#f0736a; --erro-fundo:#331715; --ok:#3fbf8f;
   --estado-aberto:#b9c0cc;     --estado-aberto-fundo:#232a37;
@@ -160,7 +167,7 @@
   --estado-erro:#f0736a;       --estado-erro-fundo:#331715;
   --estado-cancelado:#8e98a8;  --estado-conferir:#b9c0cc;
   --serie-1:#a9b6cc; --serie-2:#6b7f99; --serie-3:#3db5a8; --serie-4:#5cc0d4; --serie-5:#c2ab8a;
-  --sombra-p:0 1px 2px rgba(0,0,0,.4); --sombra-m:0 4px 14px rgba(0,0,0,.45); --sombra-g:0 16px 40px rgba(0,0,0,.6);
+  --sombra-p:0 2px 8px rgb(0 0 0 / 20%); --sombra-m:0 4px 14px rgba(0,0,0,.45); --sombra-g:0 20px 64px rgb(0 0 0 / 50%);
   --sombra-topo:0 1px 3px rgba(0,0,0,.4); --sombra-acao:0 1px 2px rgba(0,0,0,.5); --veu-modal:rgba(0,0,0,.6);
   --hover:rgba(255,255,255,.05); --superficie-busca:#1d2330; --veu-painel:rgba(0,0,0,.45);
   --hint-fundo:#2a3242; --hint-titulo:#ffffff; --hint-texto:#c3c9d4;

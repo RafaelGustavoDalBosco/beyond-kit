@@ -5,10 +5,11 @@ import { useId, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
-// O interruptor (liga/desliga) e a linha de opção do cadastro do usuário. O Lastro não o desenha: sai dos tokens
-// dele (o azul de ação ligado, o cinza dos neutros desligado, o branco da bolinha nos dois temas).
+// O interruptor (o ToggleSwitch do Beyond Design System: o parâmetro binário; para marcar registro, a `Caixa`) e a
+// linha de opção do cadastro do usuário. 36×22: o azul de ação ligado, o cinza do texto de apoio desligado, o branco
+// da bolinha nos dois temas.
 
-const TRILHO = { acao: "data-[state=checked]:bg-acao", positivo: "data-[state=checked]:bg-positivo" };
+const TRILHO = { acao: "data-[state=checked]:border-acao data-[state=checked]:bg-acao", positivo: "data-[state=checked]:border-positivo data-[state=checked]:bg-positivo" };
 // O estado escrito ao lado: o dado nunca é azul; ligado fica no texto forte (ou no verde, com `positivo`).
 const ROTULO = { acao: "text-texto", positivo: "text-positivo" };
 
@@ -40,12 +41,12 @@ export function Interruptor({
       disabled={disabled}
       aria-label={rotulo}
       className={cn(
-        "relative inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full bg-neutro-400 transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none",
+        "relative inline-flex h-[22px] w-9 shrink-0 cursor-pointer items-center rounded-full border border-borda-forte bg-texto-apoio p-[2px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none",
         TRILHO[tom],
         className,
       )}
     >
-      <Switch.Thumb className="block size-3.5 translate-x-0.5 rounded-full bg-acao-sobre shadow-p transition-transform duration-150 data-[state=checked]:translate-x-4 motion-reduce:transition-none" />
+      <Switch.Thumb className="block size-4 translate-x-0 rounded-full bg-acao-sobre transition-transform duration-150 data-[state=checked]:translate-x-[14px] motion-reduce:transition-none" />
     </Switch.Root>
   );
 }

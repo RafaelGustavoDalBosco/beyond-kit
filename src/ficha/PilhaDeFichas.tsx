@@ -58,9 +58,20 @@ export function PilhaDeFichas<T extends string = string>({
   const voltarAgora = useRef(voltar);
   voltarAgora.current = voltar;
 
-  // o foco entra no painel só quando a pilha abre, nunca a cada render (tiraria o foco de um campo da ficha)
+  // O foco entra no painel só quando a pilha abre, nunca a cada render (tiraria o foco de um campo da ficha). Ao
+  // fechar tudo, volta para quem abriu (a linha, a referência da prévia), se ainda está na tela; os filtros, a
+  // seleção e a rolagem da tela de origem não mudam, porque a pilha abre por cima dela.
+  const origem = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    if (aberta && montado) painel.current?.focus({ preventScroll: true });
+    if (!montado) return;
+    if (aberta) {
+      const ativo = document.activeElement;
+      if (ativo instanceof HTMLElement && ativo !== document.body && !painel.current?.parentElement?.contains(ativo)) origem.current = ativo;
+      painel.current?.focus({ preventScroll: true });
+    } else if (origem.current) {
+      if (origem.current.isConnected) origem.current.focus({ preventScroll: true });
+      origem.current = null;
+    }
   }, [aberta, montado]);
 
   useEffect(() => {

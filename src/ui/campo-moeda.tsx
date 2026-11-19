@@ -17,8 +17,11 @@ const formato = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maxim
 const formatar = (v: number | null | undefined) => (v == null ? "" : formato.format(v));
 
 /** "1.234,56" → 1234.56; vazio → null; ilegível → undefined. */
+// O colado de outro lugar ("R$ 1.234,56", com espaço fino) vale o mesmo que o digitado: fica só o número.
+const soNumero = (texto: string) => texto.replace(/[^\d,.]/g, "");
+
 function interpretar(texto: string): number | null | undefined {
-  const limpo = texto.trim();
+  const limpo = soNumero(texto);
   if (limpo === "") return null;
   const n = Number(limpo.replace(/\./g, "").replace(",", "."));
   return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : undefined;
@@ -33,7 +36,7 @@ function formatarDecimal(v: string | null | undefined) {
 
 /** "1.234,56" → "1234.56"; vazio → null; ilegível → undefined. Só arredonda (pelo float) quando vêm mais de 2 casas. */
 function interpretarDecimal(texto: string): string | null | undefined {
-  const limpo = texto.trim().replace(/\./g, "").replace(",", ".");
+  const limpo = soNumero(texto).replace(/\./g, "").replace(",", ".");
   if (limpo === "") return null;
   const partes = /^(\d*)(?:\.(\d*))?$/.exec(limpo);
   const inteiro = partes?.[1] ?? "";
