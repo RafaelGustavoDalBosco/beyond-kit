@@ -1,8 +1,8 @@
 # @dalbosco/kit
 
-O kit de UI da Dal Bosco Systems: a implementação compartilhada do Beyond Design System, o desenho aprovado no Beyond Data sobre a base do Lastro. Onest, tons calmos, azul só para ação e seleção, verde para o favorável e vermelho para o risco, tema claro e escuro, com o claro como padrão. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 e Tailwind 4 (Next.js 15/16 ou Vite); projeto em React 18 ou Tailwind 3 sobe antes de adotar.
+O kit de UI da Dal Bosco Systems: a implementação compartilhada do Beyond Design System sobre a base do Lastro, para os apps que adotam o kit. Onest, tons calmos, azul só para ação e seleção, verde para o favorável e vermelho para o risco, tema claro e escuro, com o claro como padrão. Fonte TypeScript e CSS, sem build: cada projeto compila com o Tailwind 4 dele. Para React 19 e Tailwind 4 (Next.js 15/16 ou Vite); projeto em React 18 ou Tailwind 3 sobe antes de adotar.
 
-Adotam: dalbosco-systems (hub), beyond-payments, beyond-rewards e ethos-integra; Beyond Data, Beyond Fiscal e Beyond BIM entram na migração tela por tela, a começar pelo Beyond Data. Fora: Dor3D, beyond-archflow e beyond-metric.
+Adotam: dalbosco-systems (hub), beyond-payments, beyond-rewards e ethos-integra. Fora: Dor3D, beyond-archflow, beyond-metric e o beyond-data (Data e Fiscal), que tem UI própria e não adota versão do kit; o kit só lê de lá os valores do Beyond Design System.
 
 **O kit é o pai.** Tokens, casca e componentes são iguais em todo produto. Cada produto liga a camada dele com `data-produto` no `<html>`, no CSS do próprio repositório, e só acrescenta a marca, os tons de dado e os componentes de domínio:
 
@@ -23,7 +23,7 @@ A vitrine (o catálogo ao vivo) é a tela Kit do hub (`/kit`, aba Vitrine), na v
 1. **Instalar** o pacote pelo tarball da tag e os peers que faltarem:
 
    ```sh
-   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v2.0.0.tar.gz
+   npm i https://github.com/RafaelGustavoDalBosco/beyond-kit/archive/refs/tags/v2.0.1.tar.gz
    npm i radix-ui lucide-react clsx tailwind-merge
    npm i @tanstack/react-table   # se usar a Tabela
    ```

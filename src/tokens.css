@@ -1,8 +1,9 @@
 /* ============================================================
    @dalbosco/kit · TOKENS (Beyond Design System)
-   A base é o Lastro com a camada aprovada no Beyond Data (o beyond-data.css dele, "data-produto=data")
-   já aplicada; os nomes são os genéricos (CLAUDE.md, "Nomes das cores"). Nenhum hex fora deste arquivo.
-   O produto liga a camada dele com data-produto no <html> e só troca a marca e os tons de dado.
+   Os valores são os do Beyond Design System, lidos do tokens.css do beyond-data (o mesmo no Data e no Fiscal,
+   que ficam fora do kit); os nomes são os genéricos (CLAUDE.md, "Nomes das cores"). Nenhum hex fora deste
+   arquivo. O app que adota o kit liga a camada dele com data-produto no <html> e só troca a marca e os tons
+   de dado.
    ============================================================ */
 :root{
   /* ---------- FUNDO E SUPERFÍCIES ----------

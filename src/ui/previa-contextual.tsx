@@ -1,8 +1,8 @@
 "use client";
 
-// A prévia contextual (Beyond Design System, `docs/beyond-design-system.md` do Beyond Data): a referência vinculada,
-// sublinhada em pontos no meio de uma nota, de uma lista ou de uma apuração, abre um cartão com a consulta
-// complementar. O kit cuida da abertura, do posicionamento e do foco; o produto passa o que o cartão mostra e a ação
+// A prévia contextual (Beyond Design System; a regra de leitura é a do `.claude/rules/frontend.md` do beyond-data): a
+// referência vinculada, sublinhada em pontos no meio de uma nota, de uma lista ou de uma apuração, abre um cartão com
+// a consulta complementar. O kit cuida da abertura, do posicionamento e do foco; o produto passa o que o cartão mostra e a ação
 // de detalhe (abrir a ficha na pilha, que devolve o foco à referência quando fecha).
 //
 // - mouse: abre depois de uma pausa curta sobre a referência; o ponteiro pode descer para o cartão e ler, e clicar

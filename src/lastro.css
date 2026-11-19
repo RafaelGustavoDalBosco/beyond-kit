@@ -404,14 +404,16 @@ a.topo-usuario{color:inherit;text-decoration:none}
 }
 
 /* ============================================================
-   BEYOND DESIGN SYSTEM (CLAUDE.md, KIT-28): o que a camada aprovada do Beyond Data acrescentou ao Lastro.
+   BEYOND DESIGN SYSTEM (CLAUDE.md, KIT-28): o que o Beyond Design System acrescenta ao Lastro (o beyond-data.css
+   do beyond-data, igual no Data e no Fiscal, é a referência de leitura).
    ============================================================ */
 
-/* A seção que abre e fecha (`Expansivel`, ou um <details> solto): o indicador de abertura antes do título. */
-details>summary{cursor:pointer;list-style:none}
-details>summary::-webkit-details-marker{display:none}
-details>summary::before{content:"";display:inline-block;width:.5em;height:.5em;margin:0 .7em .1em .2em;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);transition:transform .15s}
-details[open]>summary::before{transform:rotate(45deg)}
+/* A seção que abre e fecha (o `Expansivel`): o indicador de abertura antes do título. Só nele: o <details> solto
+   do app fica com o marcador dele (o app que desenha a própria seta não ganha outra). */
+.expansivel>summary{cursor:pointer;list-style:none}
+.expansivel>summary::-webkit-details-marker{display:none}
+.expansivel>summary::before{content:"";display:inline-block;width:.5em;height:.5em;margin:0 .7em .1em .2em;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);transition:transform .15s}
+.expansivel[open]>summary::before{transform:rotate(45deg)}
 
 /* O seletor (`Escolha`, o <select class="input">): onde o navegador já desenha o painel, o painel de opções na
    ficha, com a escolhida em azul claro; o teclado é o do próprio select. */
@@ -431,6 +433,6 @@ details[open]>summary::before{transform:rotate(45deg)}
 .previa-contextual .btn{justify-self:start}
 
 @media (prefers-reduced-motion:reduce){
-  details>summary::before{transition:none}
+  .expansivel>summary::before{transition:none}
 }
 
