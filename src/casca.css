@@ -1,0 +1,191 @@
+/* ============================================================
+   @dalbosco/kit · CASCA (cabeçalho, lateral, trilha, barra do celular)
+   A lateral é presa à borda, opaca e tingida, ao lado do conteúdo e nunca por cima dele; o cabeçalho fica no chão,
+   à direita dela. A casca não é uma grade: o cabeçalho e a lateral são fixos, a página rola e o conteúdo recua
+   pelos RECUO_* (o alto pela altura do cabeçalho, a esquerda pela --coluna-lateral).
+   Vidro (material + desfoque) só na barra do celular e nos menus. Movimento só pelos tokens. Valores só de
+   tokens.css.
+   ============================================================ */
+
+/* ---------- A COLUNA DA LATERAL ----------
+   --coluna-lateral é a faixa que a lateral ocupa à esquerda: 248 aberta, 76 recolhida, 0 sem lateral e até 960px (lá ela é gaveta, sobre o véu). O cabeçalho começa nela e o RECUO_DO_MENU recua o conteúdo por
+   ela. A recolhida é o data-lateral="recolhida" no <html>, que o MenuLateral põe e lembra no navegador. */
+:root{--coluna-lateral:0px}
+@media (min-width:961px){
+  :root:has(.lateral){--coluna-lateral:var(--lateral-largura)}
+  :root[data-lateral=recolhida]:has(.lateral){--coluna-lateral:var(--lateral-recolhida)}
+}
+
+/* ---------- PEÇAS COMUNS ---------- */
+.tecla{font-size:var(--tam-micro);border:1px solid var(--neutro-300);border-radius:var(--raio-p);padding:0 5px}
+.ponto-aviso{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--erro);border:2px solid var(--superficie-ficha)}
+.icone{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
+.clicavel:hover{background:var(--hover);text-decoration:none}
+/* o foco da casca é mais forte que o dos componentes: o contorno e o anel */
+:is(.topo,.lateral,.trilha,.barra-celular) :focus-visible{outline:2px solid var(--acao-viva);outline-offset:1px;box-shadow:0 0 0 5px var(--acao-foco)}
+
+/* ---------- CABEÇALHO ----------
+   No chão, 68px, sem vidro nem fio, à direita da lateral. À esquerda o ☰ e a marca (só quando a lateral vira gaveta ou
+   quando ela não leva a marca) e o contexto do app; à direita a busca, os avisos, a ajuda, o tema e o usuário. */
+.topo{position:fixed;top:0;right:0;left:var(--coluna-lateral);z-index:40;container:topo/inline-size;display:flex;align-items:center;gap:10px;min-width:0;height:var(--topo-altura);padding:0 24px;white-space:nowrap;background:var(--fundo);transition:left var(--dur-2) var(--curva)}
+.topo .topo-menu{display:none}
+.topo-marca{display:flex;align-items:center;gap:8px;min-width:0;font-weight:var(--peso-forte);font-size:var(--tam-enfase);color:var(--texto);text-decoration:none}
+.topo-marca:hover{text-decoration:none}
+.topo-marca i{width:24px;height:24px;flex:none;border-radius:6px;background:var(--marca);color:var(--marca-sobre);display:grid;place-items:center;font-style:normal;font-size:var(--tam-micro);font-weight:700;letter-spacing:0}
+/* com a marca no alto da lateral, a do cabeçalho só aparece quando a lateral vira gaveta */
+@media (min-width:961px){:root:has(.lateral-marca) .topo>.topo-marca{display:none}}
+
+/* os botões de ícone do cabeçalho: redondos, 36px, o preenchimento sob o cursor e enquanto o flutuante está aberto */
+.topo .btn-icon{width:36px;height:36px;flex:none;padding:0;border:0;border-radius:50%;color:var(--texto-apoio);transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.topo .btn-icon:hover,.topo .btn-icon[aria-expanded=true]{background:var(--preenchimento);border-color:transparent;color:var(--texto)}
+.topo .btn-icon:active{transform:scale(.9)}
+.topo .btn-icon .icone{width:18px;height:18px;stroke-width:1.7}
+.topo .ponto-aviso{top:7px;right:8px;border:0;box-shadow:0 0 0 2px var(--fundo)}
+
+/* o contexto do app (a empresa, o seletor): a superfície branca de 48px sobre o chão */
+.topo .topo-contexto{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:360px;min-height:48px;flex-shrink:1;overflow:hidden;padding:6px 12px;border:0;border-radius:calc(var(--raio-m) + 2px);background:var(--superficie-ficha);color:var(--texto);text-align:left;box-shadow:none;transition:box-shadow var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.topo .topo-contexto:is(button,a){cursor:pointer}
+.topo .topo-contexto:is(button,a):hover{background:var(--superficie-ficha);box-shadow:var(--sombra-p),0 0 0 1px var(--borda-suave);text-decoration:none}
+.topo .topo-contexto:is(button,a):active{transform:scale(.98)}
+.topo .topo-contexto[aria-expanded=true]{background:var(--superficie-ficha);box-shadow:0 0 0 2px var(--acao-viva)}
+.topo-contexto b{font-weight:var(--peso-forte);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topo-contexto small{font-size:var(--tam-micro);font-weight:var(--peso-medio);color:var(--texto-apoio);overflow:hidden;text-overflow:ellipsis}
+
+/* o mês passo a passo (‹ mês ›): as setas redondas dentro da superfície branca de 48px */
+.seletor-mes{display:inline-flex;align-items:center;gap:2px;flex:none;min-height:48px;padding:0 6px;border-radius:calc(var(--raio-m) + 2px);background:var(--superficie-ficha);box-shadow:none;font-weight:var(--peso-forte)}
+.seletor-mes button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:none;color:var(--texto-apoio);cursor:pointer;transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.seletor-mes button:hover{background:var(--preenchimento);color:var(--texto)}
+.seletor-mes button:active{transform:scale(.9)}
+.seletor-mes button:disabled{opacity:.38;background:none;color:var(--texto-apoio);cursor:not-allowed;transform:none}
+.seletor-mes .icone{width:15px;height:15px;stroke-width:2}
+.seletor-mes span{padding:0 6px}
+
+/* a busca: a lupa, o exemplo e a tecla na superfície branca de 48px; encolhe antes dos outros itens */
+.busca{position:relative;margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 100 300px;min-width:120px;height:48px;padding:0 10px 0 14px;overflow:hidden;border-radius:calc(var(--raio-m) + 2px);background:var(--superficie-busca);color:var(--texto-apoio);cursor:text;transition:box-shadow var(--dur-1) var(--curva)}
+.busca:hover{box-shadow:var(--sombra-p),0 0 0 1px var(--borda-suave)}
+.busca span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.busca .tecla{flex:none;border-color:var(--borda-suave);background:var(--superficie-ficha);font-family:inherit;font-weight:var(--peso-forte)}
+
+/* o usuário: o círculo em tinta com as iniciais; o nome na dica e no alto do menu */
+.topo-usuario{display:grid;place-items:center;width:40px;height:40px;flex:none;padding:0;border:0;border-radius:50%;background:var(--texto);color:var(--fundo);font-size:var(--tam-micro);font-weight:700;cursor:pointer;transition:background var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.topo-usuario:hover,.topo-usuario[aria-expanded=true]{background:var(--neutro-800)}
+.topo-usuario:active{transform:scale(.94)}
+
+/* o menu do usuário: o flutuante de vidro do componentes.css (o `.flutuante`), com o nome, o papel e o e-mail no alto; o
+   item acende no azul da ação também pelo teclado (o `data-highlighted` do Radix) */
+.topo-flutuante .flut-usuario{padding:8px 8px 10px;margin-bottom:4px;border-bottom:1px solid var(--borda-suave);line-height:1.3}
+.topo-flutuante .flut-usuario b{display:block;font-weight:var(--peso-forte);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topo-flutuante .flut-usuario small{display:block;font-size:var(--tam-apoio);color:var(--texto-apoio);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topo-flutuante .flut-item{transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva)}
+.topo-flutuante .flut-item[data-highlighted]{background:var(--acao);color:var(--acao-sobre);text-decoration:none}
+.topo-flutuante .flut-item[data-highlighted] :is(i,small,.numero){color:color-mix(in srgb,var(--acao-sobre) 88%,transparent)}
+
+/* ---------- LATERAL ----------
+   Presa à borda, opaca e tingida (--lateral-fundo), sem sombra nem vidro, ao lado do conteúdo. No alto a marca do
+   produto e o botão redondo de recolher; embaixo a navegação, com os grupos que abrem e fecham; o pé é a linha de
+   situação. O item marcado é o azul cheio com o texto branco. Recolhida (76px), mostra só os ícones, com o nome na
+   dica. */
+.lateral{position:fixed;top:0;bottom:0;left:0;z-index:30;display:flex;flex-direction:column;gap:2px;width:var(--lateral-largura);padding:16px 12px 18px;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;background:var(--lateral-fundo);transition:width var(--dur-2) var(--curva)}
+.lateral-topo{display:flex;align-items:center;gap:10px;flex:none;min-height:44px;padding-left:8px;margin-bottom:8px}
+.lateral-topo .topo-marca{position:relative;flex:1;min-width:0;gap:10px;font-weight:700;letter-spacing:var(--entreletra-titulo)}
+.lateral-topo .topo-marca i{width:30px;height:30px;border-radius:9px;font-size:var(--tam-base)}
+.lateral-topo .topo-marca span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lateral .lateral-recolher{width:28px;height:28px;flex:none;margin-left:auto;padding:0;border:0;border-radius:50%;background:var(--preenchimento);color:var(--texto-apoio);transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.lateral .lateral-recolher:hover{background:var(--preenchimento-forte);color:var(--texto)}
+.lateral .lateral-recolher:active{transform:scale(.9)}
+.lateral .lateral-recolher .icone{width:15px;height:15px;stroke-width:2.2}
+.lateral-nav{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
+.lateral-secao{display:flex;flex-direction:column;gap:2px}
+
+/* o grupo: o rótulo de apoio que abre e fecha, com a seta; fechado com o item marcado dentro, acende */
+.lateral-grupo{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin:18px 0 6px;padding:0 14px;border:0;background:none;font:inherit;font-size:var(--tam-apoio);font-weight:var(--peso-forte);line-height:1.4;color:var(--texto-apoio);text-align:left;white-space:nowrap;cursor:pointer;transition:color var(--dur-1) var(--curva),background var(--dur-1) var(--curva)}
+.lateral-grupo:hover{color:var(--texto)}
+.lateral-grupo.is-com-ativo{color:var(--acao-texto)}
+.lateral-grupo .lateral-rotulo{flex:1}
+.lateral-grupo-icone{display:none}
+.lateral-seta{width:12px;height:12px;flex:none;transition:transform var(--dur-2) var(--curva)}
+.lateral-grupo[aria-expanded=true] .lateral-seta{transform:rotate(180deg)}
+
+/* o item: 40px, raio do botão, o ícone na cor do texto; o marcado em azul cheio */
+.lateral-item{position:relative;display:flex;align-items:center;gap:12px;min-height:40px;padding:0 14px;border-radius:var(--raio-m);color:var(--texto-secundario);font-weight:var(--peso-forte);text-decoration:none;white-space:nowrap;transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.lateral-item:hover{background:var(--lateral-hover);color:var(--texto);text-decoration:none}
+.lateral-item:active{transform:scale(.985)}
+.lateral-item svg{flex:none;color:currentColor}
+.lateral-item:is([aria-current=page],.is-ativo){background:var(--lateral-ativo);color:var(--lateral-ativo-texto)}
+.lateral-item:is([aria-current=page],.is-ativo) .lateral-contagem{color:var(--lateral-ativo-texto)}
+.lateral-item.is-sem-tela{color:var(--texto-apoio);cursor:default}
+.lateral-item.is-sem-tela:hover{background:none;color:var(--texto-apoio)}
+.lateral-item.is-sem-tela:active{transform:none}
+.lateral-rotulo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.lateral-contagem{flex:none;font-size:var(--tam-micro);font-weight:var(--peso-medio);color:var(--texto-apoio)}
+/* a inicial só aparece recolhida, no item sem ícone */
+.lateral-inicial{display:none}
+
+/* o pé: a linha de situação, com o ponto verde */
+.lateral-pe{display:flex;align-items:center;gap:8px;flex:none;margin-top:auto;padding:16px 14px 0;font-size:var(--tam-apoio);color:var(--texto-apoio);white-space:nowrap}
+.lateral-pe::before{content:'';width:8px;height:8px;flex:none;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 14%,transparent)}
+.lateral-pe>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+.lateral-veu{display:none}
+
+@media (min-width:961px){
+  :root[data-lateral=recolhida] .lateral{width:var(--lateral-recolhida)}
+  :root[data-lateral=recolhida] .lateral-topo{flex-direction:column;gap:6px;padding-left:0}
+  :root[data-lateral=recolhida] .lateral-topo .topo-marca{flex:none}
+  :root[data-lateral=recolhida] .lateral .lateral-recolher{margin-left:0}
+  :root[data-lateral=recolhida] :is(.lateral-rotulo,.lateral-contagem,.lateral-topo .topo-marca span,.lateral-pe>span){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  :root[data-lateral=recolhida] .lateral-item{justify-content:center;align-self:center;width:44px;padding:0}
+  :root[data-lateral=recolhida] .lateral-inicial{display:block;font-weight:var(--peso-forte)}
+  /* o grupo recolhido é o ícone dele, no formato do item, com o nome na dica; sem ícone, fica a seta */
+  :root[data-lateral=recolhida] .lateral-grupo{justify-content:center;align-self:center;width:44px;min-height:40px;margin:10px 0 2px;padding:0;border-radius:var(--raio-m)}
+  :root[data-lateral=recolhida] .lateral-grupo:hover{background:var(--lateral-hover)}
+  :root[data-lateral=recolhida] .lateral-grupo.is-com-ativo{color:var(--acao-viva)}
+  :root[data-lateral=recolhida] .lateral-grupo-icone{display:block;flex:none}
+  :root[data-lateral=recolhida] .lateral-grupo:has(.lateral-grupo-icone) .lateral-seta{display:none}
+  :root[data-lateral=recolhida] .lateral-pe{justify-content:center;padding-inline:0}
+}
+
+/* ---------- TRILHA ----------
+   Discreta, sem faixa: o chão por trás (para o que rola não aparecer por baixo), presa sob o cabeçalho; o passo
+   atual em tinta. */
+.trilha{position:sticky;top:var(--topo-altura);z-index:20;display:flex;align-items:center;gap:6px;min-width:0;height:var(--trilha-altura);padding:0 24px;overflow:hidden;white-space:nowrap;background:var(--fundo);font-size:var(--tam-apoio);font-weight:var(--peso-medio);color:var(--texto-apoio)}
+.trilha a{color:var(--texto-apoio);transition:color var(--dur-1) var(--curva)}.trilha a:hover{color:var(--acao-texto);text-decoration:none}
+.trilha b{font-weight:var(--peso-forte);color:var(--texto)}
+.trilha small{font-size:inherit;font-weight:var(--peso-normal)}
+
+/* ---------- CASCA RESPONSIVA ----------
+   O cabeçalho nunca rola de lado: a busca encolhe primeiro e depois os itens somem por ordem de importância (a linha
+   de apoio do contexto e a tecla, o texto da busca), pela largura do cabeçalho, que muda com a lateral recolhida, não
+   pela da janela. Até 960px a lateral vira gaveta, aberta pelo ☰, e a marca passa ao cabeçalho. */
+@container topo (max-width:900px){.topo-contexto small,.busca .tecla{display:none}}
+/* a busca vira só o ícone; o texto sai da vista, mas segue sendo o nome do botão */
+@container topo (max-width:800px){.busca{flex:0 0 36px;min-width:36px;justify-content:center;padding:0}.busca span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
+@media (max-width:1180px){.trilha small{display:none}}
+@media (max-width:960px){
+  .topo{gap:6px;padding:0 12px}
+  .topo .topo-menu{display:inline-flex}
+  .topo>.topo-marca{gap:0;margin-right:4px;font-size:0}
+  .topo>.topo-marca i{font-size:var(--tam-micro)}
+  /* a gaveta: a mesma lateral, sob o cabeçalho, que desliza da esquerda sobre o véu; fechada, sai da vista e do Tab */
+  .lateral{top:var(--topo-altura);z-index:35;max-width:calc(100vw - 48px);visibility:hidden;transform:translateX(-100%);box-shadow:var(--sombra-g);transition:transform var(--dur-2) var(--curva-saida),visibility 0s linear var(--dur-2)}
+  .lateral.is-aberta{visibility:visible;transform:none;transition:transform var(--dur-2) var(--curva-saida)}
+  .lateral-topo{display:none}
+  .lateral-veu{display:block;position:fixed;inset:var(--topo-altura) 0 0 0;z-index:34;background:var(--veu-modal);-webkit-backdrop-filter:var(--desfoque-veu);backdrop-filter:var(--desfoque-veu)}
+  .trilha{padding:0 12px}
+}
+@media (max-width:639px){.topo .tema-botao{display:none}.busca-rodape{display:none}}
+
+/* ---------- CELULAR (< 640px): a barra de navegação ----------
+   Presa embaixo, de vidro, com o fio em cima; só o rótulo, o item marcado no azul com o fio azul em cima. */
+.barra-celular{display:none}
+@media (max-width:639px){
+  .barra-celular{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);background:var(--material-barra);-webkit-backdrop-filter:var(--desfoque-barra);backdrop-filter:var(--desfoque-barra);box-shadow:0 -1px 0 var(--borda-suave);font-size:var(--tam-micro);text-align:center;padding-bottom:env(safe-area-inset-bottom)}
+  .barra-celular a,.barra-celular button{padding:16px 0;color:var(--texto-secundario);text-decoration:none;border:0;background:none;font:inherit;cursor:pointer;transition:color var(--dur-1) var(--curva)}
+  .barra-celular :is(a[aria-current=page],button[aria-pressed=true],.is-ativo){color:var(--acao-800);font-weight:var(--peso-forte);box-shadow:inset 0 2px 0 var(--acao)}
+}
+
+/* ---------- MOVIMENTO ----------
+   Com "reduzir movimento" ligado, a casca troca sem animação nem transição. */
+@media (prefers-reduced-motion:reduce){
+  :is(.topo,.lateral,.trilha,.barra-celular,.topo-flutuante),:is(.topo,.lateral,.trilha,.barra-celular,.topo-flutuante) *{transition:none !important;animation:none !important}
+}

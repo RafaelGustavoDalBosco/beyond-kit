@@ -1,0 +1,473 @@
+/* ============================================================
+   @dalbosco/kit · COMPONENTES
+   Reset e componentes-base. Cada bloco é o visual de um componente React de src/ui; o layout de cada tela fica em
+   utilitários do Tailwind. Valores só de tokens.css. A casca mora em casca.css e o modal em modal.css.
+   Superfície é branca, sem borda e sem sombra; vidro só no que flutua (menus, toast, busca); azul só para interação;
+   a cor carrega o sentido (os blocos tingidos).
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--fundo)}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:var(--fonte);font-size:var(--tam-base);line-height:var(--linha-texto);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-weight:var(--peso-forte);line-height:var(--linha-titulo);letter-spacing:var(--entreletra-titulo);margin:0 0 var(--esp-2)}
+h1{font-size:var(--tam-numero-m)}h2{font-size:var(--tam-numero-p)}h3{font-size:var(--tam-subtitulo)}h4{font-size:var(--tam-enfase)}
+p{margin:0 0 var(--esp-3)}
+a{color:var(--acao-texto);text-decoration:none}a:hover{text-decoration:underline}
+button{font:inherit}
+/* o foco é o anel da ação, só pelo teclado; os controles (botão, campo, caixa) desenham o anel deles por sombra */
+:focus{outline:none}:focus-visible{outline:4px solid var(--acao-foco);outline-offset:1px}
+::selection{background:var(--acao-200)}
+s{color:var(--texto-apoio);text-decoration-color:var(--texto-fraco)}
+
+/* ---------- CELULAR ---------- */
+.celular{max-width:430px;min-height:100vh;margin:0 auto;font-size:var(--tam-base-celular)}
+
+/* ---------- BOTÃO ----------
+   Principal no azul da ação, um por contexto, sem sombra; neutro no preenchimento; tonal para a ação de apoio; texto
+   para a navegação; perigo cheio só na ação sem volta e perigo tonal para a saída que descarta. Alturas 28 (-p),
+   36, 44 (-m) e 50 (-g). Ao apertar encolhe 3% e volta; o foco é o anel; desligado fica a 38%. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 16px;border:0;border-radius:var(--raio-m);background:transparent;color:var(--texto);font-family:var(--fonte);font-size:var(--tam-base);font-weight:var(--peso-forte);line-height:1.2;letter-spacing:-.005em;white-space:nowrap;text-decoration:none;cursor:pointer;transition:transform var(--dur-1) var(--curva),background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),box-shadow var(--dur-1) var(--curva),opacity var(--dur-1) var(--curva)}
+.btn:hover{text-decoration:none}
+.btn:not(:disabled):active{transform:scale(.97)}
+.btn:disabled,.btn.is-desligado{opacity:.38;cursor:not-allowed}
+.btn.is-desligado{pointer-events:none}
+.btn-primary{background:var(--acao);color:var(--acao-sobre);box-shadow:var(--sombra-acao)}
+.btn-primary:not(:disabled):hover,.btn-primary.is-hover{background:var(--acao-700)}
+.btn-primary:not(:disabled):active{background:var(--acao-pressionado)}
+.btn-secondary{background:var(--preenchimento)}
+.btn-secondary:not(:disabled):hover,.btn-secondary.is-hover{background:var(--preenchimento-forte)}
+.btn-tonal{background:var(--acao-100);color:var(--acao-texto)}
+.btn-tonal:not(:disabled):hover,.btn-tonal.is-hover{background:var(--acao-200)}
+.btn-ghost{padding-inline:8px;color:var(--acao-texto)}
+.btn-ghost:not(:disabled):hover,.btn-ghost.is-hover{background:var(--acao-100)}
+.btn-perigo{background:var(--erro-forte);color:var(--acao-sobre)}
+.btn-perigo:not(:disabled):hover,.btn-perigo.is-hover{background:color-mix(in srgb,var(--erro-forte) 90%,var(--acao-sobre))}
+.btn-perigo-tonal{background:var(--erro-fundo);color:var(--erro)}
+.btn-perigo-tonal:not(:disabled):hover,.btn-perigo-tonal.is-hover{background:color-mix(in srgb,var(--erro) 18%,transparent)}
+.btn-p{min-height:28px;padding:0 10px;border-radius:var(--raio-p);font-size:var(--tam-apoio)}
+.btn-m{min-height:44px;padding:0 20px;border-radius:calc(var(--raio-m) + 2px);font-size:var(--tam-enfase)}
+.btn-g{min-height:50px;padding:0 22px;border-radius:calc(var(--raio-m) + 4px);font-size:var(--tam-botao-celular)}
+.btn-largo{width:100%}
+/* o botão de ícone: redondo, 36px (28px com o -p); cheio (32px, no preenchimento) no cabeçalho do modal */
+.btn-icon{position:relative;flex:none;width:36px;height:36px;min-height:0;padding:0;border-radius:50%;color:var(--texto-apoio)}
+.btn-icon:not(:disabled):hover,.btn-icon[aria-expanded=true]{background:var(--preenchimento);color:var(--texto)}
+.btn-icon:not(:disabled):active{transform:scale(.9)}
+.btn-icon.btn-p{width:28px;height:28px;padding:0;border-radius:50%}
+.btn-icon.is-cheio{width:32px;height:32px;background:var(--preenchimento)}
+.btn-icon.is-cheio:not(:disabled):hover{background:var(--preenchimento-forte)}
+/* o foco é o anel; no cabeçalho e na lateral vale o foco da casca, mais forte, por isso o :where */
+.btn:where(:focus-visible){outline:none;box-shadow:0 0 0 4px var(--acao-foco)}
+/* a tecla do atalho, num selinho dentro do botão, na tinta dele */
+.btn-tecla{padding:1px 6px;border-radius:5px;background:color-mix(in srgb,currentColor 18%,transparent);font:inherit;font-size:var(--tam-micro);font-weight:var(--peso-forte);line-height:1.4}
+/* carregando: o girador entra antes do texto, na tinta do botão */
+.btn.is-carregando{pointer-events:none}
+.btn.is-carregando::before{content:'';flex:none;width:16px;height:16px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 35%,transparent);border-top-color:currentColor;animation:girar .8s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+
+/* ---------- CAMPO ----------
+   O contorno é por dentro (sombra, não borda): o campo não muda de tamanho ao focar. No formulário (.field) tem 44px;
+   solto numa barra de filtros fica na altura dos botões (36px). O foco leva o contorno da ação e o anel; o erro, o
+   contorno e a frase em vermelho. */
+.field>label{display:block;margin-bottom:6px;font-size:var(--tam-apoio);font-weight:var(--peso-forte);color:var(--texto-apoio)}
+.input{width:100%;min-height:36px;padding:7px 12px;border:0;border-radius:var(--raio-m);background:var(--superficie-campo);color:var(--texto);caret-color:var(--acao-viva);font:inherit;font-size:var(--tam-base);box-shadow:inset 0 0 0 1px var(--borda);transition:box-shadow var(--dur-1) var(--curva)}
+.field .input{min-height:44px;padding:10px 14px;font-size:var(--tam-enfase)}
+/* o seletor fica numa linha só; o que não cabe é cortado com reticências */
+select.input{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* na barra de filtros o seletor tem a largura do que mostra, até 280px */
+.barra-filtros select.input{width:auto;max-width:280px}
+.input::placeholder{color:var(--texto-fraco)}
+.input:hover,.input.is-hover{box-shadow:inset 0 0 0 1px var(--borda-forte)}
+.input:focus,.input:focus-visible,.input.is-foco{outline:none;box-shadow:inset 0 0 0 1.5px var(--acao-viva),0 0 0 4px var(--acao-foco)}
+.input.is-erro,.input[aria-invalid=true]{box-shadow:inset 0 0 0 1.5px var(--erro),0 0 0 4px var(--erro-fundo)}
+.input:disabled{background:var(--superficie-mesa);color:var(--texto-apoio);box-shadow:inset 0 0 0 1px var(--borda-suave);cursor:not-allowed}
+.field-ajuda{margin-top:6px;font-size:var(--tam-apoio);color:var(--texto-apoio)}
+.field-erro{margin-top:6px;font-size:var(--tam-apoio);font-weight:var(--peso-medio);color:var(--erro)}
+/* a busca: a lupa e o campo no preenchimento, na altura dos botões */
+.campo-busca{display:inline-flex;align-items:center;gap:8px;min-width:0;height:36px;padding:0 10px;border-radius:var(--raio-m);background:var(--preenchimento);color:var(--texto-apoio);cursor:text;transition:background var(--dur-1) var(--curva),box-shadow var(--dur-1) var(--curva)}
+.campo-busca:hover{background:var(--preenchimento-forte)}
+.campo-busca:focus-within{box-shadow:0 0 0 4px var(--acao-foco)}
+.campo-busca>svg{flex:none;width:16px;height:16px}
+.campo-busca input{flex:1;min-width:0;height:100%;padding:0;border:0;outline:0;background:transparent;color:var(--texto);font:inherit}
+.campo-busca input::placeholder{color:var(--texto-apoio)}
+.campo-busca input:focus-visible{outline:none}
+/* a caixa de seleção (o input nativo): 20px, raio 6; marcada, o fundo no azul vivo e o traço que se desenha */
+.caixa{appearance:none;position:relative;display:inline-grid;place-items:center;flex:none;width:20px;height:20px;margin:0;border:0;border-radius:6px;background:var(--superficie-campo);box-shadow:inset 0 0 0 1.5px var(--borda-forte);cursor:pointer;vertical-align:middle;transition:background var(--dur-1) var(--curva),box-shadow var(--dur-1) var(--curva),transform var(--dur-2) var(--curva-mola)}
+.caixa:active{transform:scale(.86)}
+.caixa:checked,.caixa:indeterminate{background:var(--acao-viva);box-shadow:none}
+.caixa:focus-visible{outline:none;box-shadow:inset 0 0 0 1.5px var(--acao-viva),0 0 0 4px var(--acao-foco)}
+.caixa:checked:focus-visible,.caixa:indeterminate:focus-visible{box-shadow:0 0 0 4px var(--acao-foco)}
+.caixa:disabled{opacity:.38;cursor:not-allowed;transform:none}
+.caixa-traco{position:absolute;width:14px;height:14px;color:var(--acao-sobre);pointer-events:none;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset var(--dur-2) var(--curva) 40ms}
+.caixa:checked+.caixa-traco{stroke-dashoffset:0}
+/* a alternativa (o radio): o círculo de 20px; marcada, o azul vivo com o miolo branco */
+.alternativa{appearance:none;flex:none;width:20px;height:20px;margin:0;border:0;border-radius:50%;background:var(--superficie-campo);box-shadow:inset 0 0 0 1.5px var(--borda-forte);cursor:pointer;vertical-align:middle;transition:box-shadow var(--dur-2) var(--curva-mola)}
+.alternativa:checked{background:var(--acao-sobre);box-shadow:inset 0 0 0 6px var(--acao-viva)}
+.alternativa:focus-visible{outline:none;box-shadow:inset 0 0 0 1.5px var(--acao-viva),0 0 0 4px var(--acao-foco)}
+.alternativa:checked:focus-visible{box-shadow:inset 0 0 0 6px var(--acao-viva),0 0 0 4px var(--acao-foco)}
+.alternativa:disabled{opacity:.38;cursor:not-allowed}
+/* o interruptor (o Switch do Radix: o botão e a bolinha): 51×31; ligado, no azul vivo; a bolinha desliza com mola e
+   alarga enquanto apertada */
+.interruptor{position:relative;display:inline-block;flex:none;width:51px;height:31px;padding:0;border:0;border-radius:var(--raio-pilula);background:var(--preenchimento-forte);cursor:pointer;transition:background var(--dur-2) var(--curva)}
+.interruptor[data-state=checked]{background:var(--acao-viva)}
+.interruptor.is-positivo[data-state=checked]{background:var(--ok)}
+.interruptor:focus-visible{outline:none;box-shadow:0 0 0 4px var(--acao-foco)}
+.interruptor:disabled{opacity:.38;cursor:not-allowed}
+.interruptor-bolinha{position:absolute;top:2px;left:2px;display:block;width:27px;height:27px;border-radius:var(--raio-pilula);background:var(--acao-sobre);box-shadow:var(--sombra-controle);transition:transform var(--dur-3) var(--curva-mola),width var(--dur-2) var(--curva)}
+.interruptor:enabled:active .interruptor-bolinha{width:32px}
+.interruptor-bolinha[data-state=checked]{transform:translateX(20px)}
+.interruptor:enabled:active .interruptor-bolinha[data-state=checked]{transform:translateX(15px)}
+@media (forced-colors:active){.interruptor{border:1px solid}.interruptor[data-state=checked]{background:Highlight}}
+
+/* ---------- ABAS, SEGMENTADO, FILTRO, ETIQUETA ---------- */
+.abas{display:flex;gap:24px;border-bottom:1px solid var(--borda-suave)}
+.aba{padding-bottom:10px;color:var(--texto-apoio);font-weight:var(--peso-medio);cursor:pointer;text-decoration:none;transition:color var(--dur-1) var(--curva)}
+.aba:hover,.aba.is-hover{color:var(--texto);text-decoration:none}
+.aba[aria-selected=true]{padding-bottom:8px;border-bottom:2px solid var(--acao-viva);font-weight:var(--peso-forte);color:var(--acao-texto)}
+.aba.is-desligada,.aba:disabled{color:var(--texto-fraco);cursor:default}
+.aba i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+/* O segmentado troca a visão. Deslizante (.is-deslizante), as opções têm a mesma largura e o indicador (.seg-ind)
+   desliza com mola: --n é quantas são e --i a escolhida. Quem não sabe a escolhida (as abas do Radix) deixa o --i
+   para o CSS, pela opção ativa (até a oitava). Montado à mão, a escolhida leva o fundo. */
+.seg{position:relative;display:inline-flex;flex-wrap:wrap;gap:2px;max-width:100%;padding:2px;border-radius:var(--raio-m);background:var(--preenchimento)}
+.seg-opt{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;height:32px;padding:0 14px;border:0;border-radius:var(--raio-p);background:transparent;color:var(--texto);font-size:var(--tam-apoio);font-weight:var(--peso-medio);white-space:nowrap;cursor:pointer;transition:opacity var(--dur-1) var(--curva)}
+.seg-opt:active{opacity:.6}
+.seg-opt:is(.is-ativa,[data-state=active],[aria-checked=true]),.seg-opt:has(input:checked){font-weight:var(--peso-forte)}
+.seg-opt:disabled,.seg-opt.is-desligada,.seg-opt:has(input:disabled){opacity:.38;cursor:not-allowed}
+.seg-opt:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--acao-viva)}
+.seg-opt:has(input:focus-visible){box-shadow:inset 0 0 0 2px var(--acao-viva)}
+a.seg-opt:hover{text-decoration:none}
+.seg:not(.is-deslizante) .seg-opt:is(.is-ativa,[data-state=active],[aria-checked=true]),.seg:not(.is-deslizante) .seg-opt:has(input:checked){background:var(--seg-indicador);box-shadow:var(--sombra-p)}
+.seg.is-deslizante{display:inline-grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:0;min-width:0}
+.seg.is-deslizante .seg-opt{display:block;overflow:hidden;text-overflow:ellipsis;line-height:32px;text-align:center}
+.seg-ind{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n));border-radius:var(--raio-p);background:var(--seg-indicador);box-shadow:var(--sombra-p);transform:translateX(calc(var(--i,0) * 100%));transition:transform var(--dur-3) var(--curva-mola)}
+.seg.is-deslizante:not(:has(>.is-ativa,>[data-state=active],>[aria-checked=true],>* input:checked))>.seg-ind{opacity:0}
+.seg.is-deslizante:has(>:nth-child(2):is([data-state=active],[aria-checked=true]),>:nth-child(2) input:checked){--i:1}
+.seg.is-deslizante:has(>:nth-child(3):is([data-state=active],[aria-checked=true]),>:nth-child(3) input:checked){--i:2}
+.seg.is-deslizante:has(>:nth-child(4):is([data-state=active],[aria-checked=true]),>:nth-child(4) input:checked){--i:3}
+.seg.is-deslizante:has(>:nth-child(5):is([data-state=active],[aria-checked=true]),>:nth-child(5) input:checked){--i:4}
+.seg.is-deslizante:has(>:nth-child(6):is([data-state=active],[aria-checked=true]),>:nth-child(6) input:checked){--i:5}
+.seg.is-deslizante:has(>:nth-child(7):is([data-state=active],[aria-checked=true]),>:nth-child(7) input:checked){--i:6}
+.seg.is-deslizante:has(>:nth-child(8):is([data-state=active],[aria-checked=true]),>:nth-child(8) input:checked){--i:7}
+.tag{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+/* a etiqueta é neutra: não leva cor de estado nem de sentido */
+.tag-neutral{height:22px;padding:0 8px;border-radius:6px;background:var(--preenchimento);color:var(--texto-apoio);font-size:var(--tam-micro);font-weight:var(--peso-forte)}
+/* o filtro é a pílula: a marcada fica em tinta (fundo do texto, texto do fundo) */
+.filtro{height:32px;padding:0 12px;border:1px solid var(--borda-suave);border-radius:var(--raio-pilula);background:var(--superficie-ficha);color:var(--texto);font-size:var(--tam-apoio);font-weight:var(--peso-medio);cursor:pointer;transition:background var(--dur-1) var(--curva),color var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+.filtro:hover,.filtro.is-hover{background:var(--superficie-mesa)}
+.filtro:active{transform:scale(.96)}
+.filtro.is-ativo{border-color:transparent;background:var(--texto);color:var(--fundo);font-weight:var(--peso-forte)}
+.filtro.is-desligado,.filtro:disabled{opacity:.38;cursor:default;transform:none}
+.filtro-conta{opacity:.7}
+
+/* ---------- SELO ----------
+   Sinal + texto, sem pílula colorida. O estado de um registro é o círculo que enche conforme anda (em aberto vazio,
+   marcado um quarto no azul da seleção, aplicado metade, concluído cheio), a seta do que está a caminho, ✕ o erro e
+   ? o que é para conferir; o cancelado vem riscado. --p é o quanto o círculo encheu. O selo de sentido leva o sinal
+   no selinho tonal (✓ positivo, + destaque, ◇ atenção, ✕ erro, • ação); o neutro é a etiqueta. */
+.selo{--p:0%;display:inline-flex;align-items:center;gap:7px;font-size:var(--tam-apoio);font-weight:var(--peso-medio);color:var(--texto);white-space:nowrap}
+.selo::before{content:'';display:inline-grid;place-items:center;flex:none;width:13px;height:13px;border-radius:50%;color:var(--texto-apoio);background:conic-gradient(currentColor var(--p),transparent 0);box-shadow:inset 0 0 0 1.6px currentColor;font-size:var(--tam-micro);font-weight:700;line-height:1}
+.selo-aberto{color:var(--estado-aberto)}
+.selo-marcado{--p:25%;color:var(--estado-marcado)}.selo-marcado::before{color:var(--acao-viva)}
+.selo-aplicado{--p:50%;color:var(--estado-aplicado)}
+.selo-concluido{--p:100%;color:var(--estado-concluido)}.selo-concluido::before{color:var(--texto)}
+.selo-andamento{color:var(--estado-andamento)}
+.selo-andamento::before{content:'→';width:16px;height:16px;background:var(--preenchimento);box-shadow:none;color:var(--texto)}
+.selo-erro{color:var(--estado-erro)}
+.selo-erro::before{content:'✕';width:16px;height:16px;background:var(--estado-erro-fundo);box-shadow:none;color:var(--estado-erro)}
+.selo-conferir{color:var(--estado-conferir)}
+.selo-conferir::before{content:'?';width:16px;height:16px;background:transparent;box-shadow:inset 0 0 0 1.4px var(--texto-fraco);color:var(--texto)}
+.selo-cancelado{color:var(--estado-cancelado);text-decoration:line-through;text-decoration-color:var(--texto-fraco)}
+.selo-cancelado::before{content:none}
+/* os tons: o texto no tom e o sinal no selinho de raio 5, no fundo do tom */
+:is(.selo-positivo,.selo-destaque,.selo-atencao,.selo-acao)::before{width:16px;height:16px;border-radius:5px;background:var(--tom-fundo);box-shadow:none;color:var(--tom)}
+.selo-positivo{--tom:var(--positivo);--tom-fundo:var(--positivo-fundo);color:var(--positivo)}.selo-positivo::before{content:'✓'}
+.selo-destaque{--tom:var(--destaque);--tom-fundo:var(--destaque-fundo);color:var(--destaque)}.selo-destaque::before{content:'+'}
+.selo-atencao{--tom:var(--atencao);--tom-fundo:var(--atencao-fundo);color:var(--atencao)}.selo-atencao::before{content:'◇'}
+.selo-acao{--tom:var(--acao-texto);--tom-fundo:var(--acao-100);color:var(--acao-texto)}.selo-acao::before{content:'•'}
+.selo-neutro{height:22px;padding:0 8px;border-radius:6px;background:var(--preenchimento);color:var(--texto-apoio);font-size:var(--tam-micro);font-weight:var(--peso-forte)}
+.selo-neutro::before{content:none}
+/* o que ainda não existe: o círculo pontilhado, no texto de apoio */
+.selo-contorno{color:var(--texto-apoio)}
+.selo-contorno::before{box-shadow:none;background:transparent;border:1.4px dotted var(--texto-fraco)}
+/* com contorno: o texto no tom, sem o sinal, no fio de dentro */
+.selo.is-contornado{height:22px;padding:0 8px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--borda)}
+.selo.is-contornado::before{content:none}
+
+/* ---------- SENTIDO, ESTIMATIVA, SEM DADO ----------
+   O valor que leva sentido tem a cor e o sinal no selinho tonal (↓ positivo, + destaque, ◇ atenção); o produto diz o
+   que o valor significa. A estimativa leva o ≈ e o sublinhado pontilhado; o dado que falta é texto apagado, nunca 0. */
+.positivo{color:var(--positivo)}.destaque{color:var(--destaque)}.atencao{color:var(--atencao)}
+:is(.positivo,.destaque,.atencao)::before{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:6px;border-radius:7px;font-size:var(--tam-base);font-style:normal;font-weight:700;line-height:1;vertical-align:middle}
+.positivo::before{content:'↓';background:var(--positivo-fundo)}
+.destaque::before{content:'+';background:var(--destaque-fundo)}
+.atencao::before{content:'◇';background:var(--atencao-fundo)}
+.estimativa{text-decoration:underline dotted var(--texto-fraco);text-decoration-thickness:1.5px;text-underline-offset:.16em}.estimativa::before{content:'≈ '}
+.sem-dado{font-weight:var(--peso-medio);letter-spacing:0;color:var(--texto-apoio)}
+
+/* ---------- CARTÃO DE NÚMERO ----------
+   Superfície branca, sem borda colorida e sem sombra. O número é tinta. O cartão com tom de sentido (positivo,
+   destaque, atenção) é o bloco tingido do tom, com o rótulo no tom forte, também sem dado (nunca tracejado); o de
+   erro só colore o rótulo. O "R$" pequeno (.cartao-rs) vai no alto do número. A borda transparente guarda o lugar
+   da tracejada do cartão sem dado. Juntos (.cartoes-numero), os cartões dividem uma superfície só, separados pelo
+   fio. */
+.cartao-numero{display:block;padding:16px 18px;border:1px solid transparent;border-radius:var(--raio-g);background:var(--superficie-ficha);color:inherit;text-decoration:none;transition:box-shadow var(--dur-1) var(--curva),transform var(--dur-1) var(--curva)}
+:is(a,button).cartao-numero{cursor:pointer;font:inherit;text-align:left}
+:is(a,button).cartao-numero:hover,.cartao-numero.is-hover{box-shadow:inset 0 0 0 999px var(--hover);text-decoration:none}
+:is(a,button).cartao-numero:active{transform:scale(.985)}
+:is(a,button).cartao-numero:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--acao-viva)}
+.cartao-numero.is-selecionado{box-shadow:inset 0 0 0 1.5px var(--acao-viva)}
+:is(a,button).cartao-numero.is-selecionado:hover{box-shadow:inset 0 0 0 1.5px var(--acao-viva),inset 0 0 0 999px var(--hover)}
+.cartao-numero.is-sem-dado{border-style:dashed;border-color:var(--borda-forte);background:transparent}
+.cartao-numero.is-desligado{opacity:.5}
+.cartao-rotulo{font-size:var(--tam-apoio);font-weight:var(--peso-forte);color:var(--texto-apoio)}
+.cartao-valor{margin:4px 0 2px;font-size:var(--tam-numero-m);font-weight:var(--peso-forte);letter-spacing:-.035em;line-height:var(--linha-numero);white-space:nowrap}
+.cartao-rs{display:inline-block;margin:.2em .28em 0 0;font-size:max(.44em,var(--tam-micro));font-weight:var(--peso-medio);letter-spacing:0;line-height:1;color:var(--texto-apoio);vertical-align:top}
+.cartao-nota{font-size:var(--tam-apoio);color:var(--texto-apoio)}
+.cartao-numero.cartao-positivo{background:var(--positivo-bloco);border-color:transparent}
+.cartao-numero.cartao-destaque{background:var(--destaque-bloco);border-color:transparent}
+.cartao-numero.cartao-atencao{background:var(--atencao-bloco);border-color:transparent}
+.cartao-positivo .cartao-rotulo{color:var(--positivo-forte);font-weight:800}
+.cartao-destaque .cartao-rotulo{color:var(--destaque-forte);font-weight:800}
+.cartao-atencao .cartao-rotulo{color:var(--atencao-forte);font-weight:800}
+.cartao-positivo :is(.cartao-nota,.cartao-rs){color:var(--positivo-forte)}
+.cartao-destaque :is(.cartao-nota,.cartao-rs){color:var(--destaque-forte)}
+.cartao-atencao :is(.cartao-nota,.cartao-rs){color:var(--atencao-forte)}
+.cartao-erro .cartao-rotulo{color:var(--erro)}
+.cartoes-numero{display:grid;overflow:hidden;border-radius:var(--raio-g);background:var(--superficie-ficha)}
+.cartoes-numero>.cartao-numero{border-radius:0;box-shadow:-1px 0 0 var(--borda-suave),0 -1px 0 var(--borda-suave)}
+.cartoes-numero>:is(a,button).cartao-numero:hover{box-shadow:-1px 0 0 var(--borda-suave),0 -1px 0 var(--borda-suave),inset 0 0 0 999px var(--hover)}
+.cartoes-numero>:is(a,button).cartao-numero:active{transform:none}
+.cartoes-numero>.cartao-numero.is-selecionado{box-shadow:-1px 0 0 var(--borda-suave),0 -1px 0 var(--borda-suave),inset 0 0 0 1.5px var(--acao-viva)}
+.cartoes-numero>:is(a,button).cartao-numero.is-selecionado:hover{box-shadow:-1px 0 0 var(--borda-suave),0 -1px 0 var(--borda-suave),inset 0 0 0 1.5px var(--acao-viva),inset 0 0 0 999px var(--hover)}
+.cartoes-numero>:is(a,button).cartao-numero:focus-visible{box-shadow:inset 0 0 0 2px var(--acao-viva)}
+/* ---------- BLOCO DE NÚMERO ----------
+   O número grande, o título, o porquê e a ação no pé. Com tom de sentido, o bloco é tingido na cor do tom, com o
+   título e o porquê no tom forte; sem tom, é a superfície branca. A grade (.blocos-numero) quebra linha em colunas
+   de 260px. */
+.blocos-numero{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--esp-4)}
+.bloco-numero{display:flex;flex-direction:column;gap:10px;min-width:0;padding:22px 24px;border-radius:var(--raio-g);background:var(--superficie-ficha);color:var(--texto)}
+.bloco-numero-valor{font-size:var(--tam-numero-m);font-weight:800;letter-spacing:-.03em;line-height:var(--linha-numero);white-space:nowrap}
+.bloco-numero-titulo{font-size:var(--tam-enfase);font-weight:800}
+.bloco-numero-porque{font-size:var(--tam-apoio);color:var(--texto-apoio)}
+.bloco-numero-acao{margin-top:auto;padding-top:2px;align-self:flex-start}
+.bloco-numero.is-positivo{--bloco-forte:var(--positivo-forte);background:var(--positivo-bloco)}
+.bloco-numero.is-destaque{--bloco-forte:var(--destaque-forte);background:var(--destaque-bloco)}
+.bloco-numero.is-atencao{--bloco-forte:var(--atencao-forte);background:var(--atencao-bloco)}
+.bloco-numero:is(.is-positivo,.is-destaque,.is-atencao) :is(.bloco-numero-titulo,.bloco-numero-porque){color:var(--bloco-forte)}
+/* a barra que é desenho (a proporção), nunca número: tinta, nunca azul; a de comparação vai apagada */
+.barra-dado{display:block;height:6px;border-radius:var(--raio-pilula);background:var(--preenchimento);overflow:hidden}
+.barra-dado>i{display:block;height:100%;border-radius:inherit;background:var(--texto);transition:width var(--dur-3) var(--curva-saida)}
+.barra-dado.is-apagada>i{background:var(--neutro-400)}
+
+/* ---------- TABELA E LINHA DE LISTA ----------
+   A tabela da casa, densa: cabeçalho de 12px apagado que nunca quebra, fio só horizontal, a linha sob o cursor no
+   hover e a escolhida no azul claro. Número à direita e tabular (o corpo já é tabular). */
+.table{width:100%;border-collapse:collapse;font-size:var(--tam-tabela)}
+.table th{white-space:nowrap;text-align:left;font-size:var(--tam-micro);font-weight:var(--peso-forte);color:var(--texto-apoio);padding:8px 9px;border-bottom:1px solid var(--borda-suave)}
+.table td{padding:9px;border-bottom:1px solid var(--borda-suave)}
+.table tbody tr{transition:background var(--dur-1) var(--curva)}
+.table tbody tr:hover,.table tr.is-hover{background:var(--hover)}
+.table tr.is-selecionada,.table tr[aria-selected=true]{background:var(--acao-100)}
+.table tr.is-desligada{color:var(--texto-apoio)}
+.table tr.is-erro{background:var(--erro-fundo)}
+.table tbody tr:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--acao-viva)}
+.table .num{text-align:right;font-variant-numeric:tabular-nums}
+.linha-titulo{font-weight:var(--peso-forte)}
+.linha-sub{font-size:var(--tam-apoio);color:var(--texto-apoio)}
+
+/* ---------- DE → PARA ----------
+   Os dois lados em blocos de raio 14; só o "para" é tingido, de azul: é o que se vai autorizar. Sem valor certo a
+   sugerir (para conferir), o "para" fica sem tinta, com o contorno pontilhado. */
+.de-para{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:10px}
+.de-para-de,.de-para-para{display:flex;flex-direction:column;gap:4px;min-width:0;padding:12px 14px;border-radius:calc(var(--raio-m) + 4px);background:var(--superficie-mesa)}
+.de-para-para{background:var(--acao-100)}
+.de-para-de div,.de-para-para div{font-weight:var(--peso-forte)}
+.de-para-seta{display:grid;place-items:center;color:var(--texto-fraco)}
+.de-para small{font-size:var(--tam-micro);font-weight:var(--peso-forte);color:var(--texto-apoio)}
+.de-para.is-conferir .de-para-para{background:transparent;outline:1.5px dotted var(--borda-forte);outline-offset:-1.5px}
+.de-para.is-conferir .de-para-para div{font-weight:var(--peso-normal)}
+
+/* ---------- AVISO ----------
+   Faixa dentro do conteúdo, de fundo tonal e sem borda lateral colorida; o sinal diz o tipo (i, ✓, ◇, ✕). */
+.aviso{display:flex;gap:10px;align-items:baseline;padding:12px 14px;border-radius:calc(var(--raio-m) + 4px);background:var(--preenchimento);color:var(--texto)}
+.aviso::before{content:'i';flex:none;font-weight:700;color:var(--texto-apoio)}
+.aviso-erro{background:var(--erro-fundo)}.aviso-erro::before{content:'✕';color:var(--erro)}
+.aviso-ok{background:var(--positivo-fundo)}.aviso-ok::before{content:'✓';color:var(--ok)}
+.aviso-atencao{background:var(--atencao-fundo)}.aviso-atencao::before{content:'◇';color:var(--atencao)}
+.aviso .btn{margin-left:auto}
+
+/* ---------- ESTADOS DE TELA ----------
+   O ícone num quadrado de preenchimento, o título e a frase; no erro, o quadrado leva o tom do erro. */
+.estado-tela{min-height:calc(100vh - var(--topo-altura) - var(--trilha-altura));display:grid;place-items:center;padding:var(--esp-8)}
+.estado-caixa{max-width:420px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;color:var(--texto-apoio)}
+.estado-icone{display:grid;place-items:center;width:48px;height:48px;margin-bottom:6px;border-radius:calc(var(--raio-m) + 4px);background:var(--preenchimento);color:var(--texto-apoio)}
+.estado-icone svg{width:22px;height:22px}
+.estado-caixa h3{margin:0;font-size:var(--tam-subtitulo);letter-spacing:-.01em;color:var(--texto)}
+.estado-caixa p{margin:0}
+.estado-caixa>.btn{margin-top:10px}
+.estado-erro .estado-icone{background:var(--erro-fundo);color:var(--erro)}
+.esqueleto{padding:22px 24px;display:flex;flex-direction:column;gap:12px}
+/* Carregando = indicador de atividade + mensagem do que está sendo lido + barra + esqueleto com o brilho que passa.
+   O girador diz "estou trabalhando"; a mensagem diz em quê; o esqueleto guarda o lugar do conteúdo. */
+.carregando{position:relative}
+.carregando-topo{display:flex;align-items:center;gap:10px;padding:18px 24px 0;font-weight:var(--peso-medio);color:var(--texto-apoio)}
+.girador{display:inline-block;width:18px;height:18px;flex:none;border-radius:50%;border:2px solid var(--preenchimento-forte);border-top-color:var(--acao-viva);animation:girar .8s linear infinite}
+.girador-g{width:28px;height:28px;border-width:3px}
+.carregando-barra{position:absolute;left:0;right:0;top:0;height:2px;background:var(--acao-100);overflow:hidden}
+.carregando-barra i{position:absolute;inset:0 60% 0 0;background:var(--acao-viva);border-radius:2px;animation:correr 1.3s ease-in-out infinite}
+@keyframes correr{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+.esq{height:12px;border-radius:7px;background:linear-gradient(90deg,var(--preenchimento) 25%,var(--preenchimento-forte) 37%,var(--preenchimento) 63%);background-size:400% 100%;animation:brilho 1.4s ease infinite}
+.esq-numero{height:34px;width:260px}.esq-linha{height:38px}
+.esq-linha:nth-child(n+6){opacity:.8}.esq-linha:nth-child(n+8){opacity:.6}.esq-linha:nth-child(n+10){opacity:.45}
+@keyframes brilho{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.dialog .carregando-topo{padding:0 0 12px}.dialog .carregando-barra{display:none}
+
+.card-title{font-weight:var(--peso-forte);font-size:var(--tam-enfase);line-height:var(--linha-titulo)}
+.dialog .estado-tela{min-height:0;padding:var(--esp-4) 0}.dialog .esqueleto{padding:0}
+.celular .estado-tela{min-height:100vh}
+
+/* ---------- HINT (a janelinha escura, ao passar o mouse) ---------- */
+.hint{position:fixed;z-index:80;max-width:280px;padding:8px 12px;border-radius:var(--raio-m);background:var(--hint-fundo);color:var(--hint-texto);font-size:var(--tam-micro);line-height:1.4;box-shadow:var(--sombra-m);pointer-events:none;display:flex;flex-direction:column;gap:2px;animation:surgir var(--dur-1) var(--curva-saida)}
+.hint[hidden]{display:none}
+.hint b{font-weight:var(--peso-forte);font-size:var(--tam-apoio);color:var(--hint-titulo)}
+.hint kbd{align-self:flex-start;margin-top:4px;border-color:color-mix(in srgb,var(--hint-texto) 45%,transparent);color:var(--hint-texto)}
+.hint.is-estatico{position:static;pointer-events:auto;animation:none}
+.tem-hint{border-bottom:1px dotted var(--neutro-500);cursor:help}
+@keyframes surgir{from{opacity:0;transform:translateY(-3px)}}
+
+/* ---------- TOAST (o aviso que sobe no rodapé) ----------
+   Vidro, com o sinal do tipo no selinho tonal (✓ gravou, i aviso, ◇ atenção, ✕ não gravou) e, se houver, a ação;
+   entra com mola. */
+.toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;width:max-content;max-width:calc(100vw - 32px);pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:10px;max-width:min(640px,calc(100vw - 32px));min-height:48px;padding:8px 14px;border-radius:var(--raio-grupo);background:var(--material-menu);-webkit-backdrop-filter:var(--desfoque-menu);backdrop-filter:var(--desfoque-menu);color:var(--toast-texto);font-weight:var(--peso-medio);box-shadow:var(--sombra-m),var(--brilho);opacity:0;transform:translateY(16px) scale(.96);transition:opacity var(--dur-2) var(--curva),transform var(--dur-4) var(--curva-mola)}
+.toast.is-visivel,.toast.is-estatico{opacity:1;transform:none}
+.toast i{display:grid;place-items:center;flex:none;width:20px;height:20px;border-radius:50%;background:var(--preenchimento);color:var(--toast-info-fundo);font-style:normal;font-size:var(--tam-micro);font-weight:700;line-height:1}
+.toast-sucesso i{background:var(--positivo-fundo);color:var(--toast-sucesso-fundo)}
+.toast-aviso i{background:var(--atencao-fundo);color:var(--atencao)}
+.toast-erro i{background:var(--erro-fundo);color:var(--toast-erro-fundo)}
+.toast .btn{flex:none}
+.toast .btn:last-child{margin-right:-6px}
+
+/* ---------- AJUDA DA TELA (modal aberto pelo "?" do cabeçalho) ---------- */
+.ajuda{width:min(760px,100%);max-height:calc(100vh - 48px);overflow:auto;gap:12px}
+.ajuda-topo{display:flex;justify-content:space-between;align-items:flex-start}
+.ajuda-faz{font-size:var(--tam-enfase);line-height:1.5;margin:0;max-width:60ch}
+.ajuda-corpo{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;border-top:1px solid var(--borda-suave);padding-top:14px}
+.ajuda h4{font-size:var(--tam-apoio);font-weight:var(--peso-forte);color:var(--texto-apoio);letter-spacing:0;margin:0 0 6px}
+.ajuda h4:not(:first-child){margin-top:16px}
+.ajuda-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:passo}
+.ajuda-lista li{display:grid;grid-template-columns:20px 1fr;gap:8px}
+ol.ajuda-lista li::before{counter-increment:passo;content:counter(passo);width:20px;height:20px;border-radius:50%;background:var(--acao-100);color:var(--acao-texto);display:grid;place-items:center;font-size:var(--tam-micro);font-weight:var(--peso-forte)}
+.ajuda-acoes li::before{content:'→';color:var(--texto-apoio);text-align:center}
+.ajuda-corpo aside{background:var(--superficie-mesa);border-radius:var(--raio-grupo);padding:12px 14px;align-self:start}
+.ajuda-atalhos{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:baseline}
+.ajuda-atalhos dt{white-space:nowrap}.ajuda-atalhos dd{margin:0;color:var(--texto-secundario)}
+.ajuda .tecla{background:var(--superficie-campo);font-family:inherit}
+.ajuda-rodape{display:flex;gap:18px;align-items:center;border-top:1px solid var(--borda-suave);padding-top:12px}
+.ajuda-rodape span{margin-left:auto;font-size:var(--tam-apoio);color:var(--texto-apoio)}
+
+/* ---------- BUSCA GLOBAL (Ctrl K) ----------
+   O véu e a caixa em vidro, no alto da janela; a linha ativa no azul claro da seleção. */
+.busca-veu{position:fixed;inset:0;z-index:70;display:flex;justify-content:center;align-items:flex-start;padding-top:12vh;background:var(--veu-modal);-webkit-backdrop-filter:var(--desfoque-veu);backdrop-filter:var(--desfoque-veu)}
+.busca-caixa{width:min(680px,calc(100vw - 32px));max-height:70vh;display:flex;flex-direction:column;overflow:hidden;border-radius:var(--raio-grupo);background:var(--material-menu);-webkit-backdrop-filter:var(--desfoque-menu);backdrop-filter:var(--desfoque-menu);box-shadow:var(--sombra-m),var(--brilho);animation:surgir var(--dur-2) var(--curva-saida)}
+.busca-campo{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--borda-suave);color:var(--texto-apoio);font-size:var(--tam-subtitulo)}
+.busca-campo input{flex:1;border:0;background:none;font:inherit;font-size:var(--tam-enfase);color:var(--texto);outline:none}
+.busca-campo input::placeholder{color:var(--texto-fraco)}
+.busca-lista{overflow:auto;padding:6px;position:relative}
+.busca-grupo{padding:10px 10px 4px;font-size:var(--tam-micro);font-weight:var(--peso-forte);color:var(--texto-apoio)}
+.busca-linha{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 12px;padding:7px 10px;border-radius:var(--raio-p);color:var(--texto);text-decoration:none}
+.busca-linha:hover{text-decoration:none}
+.busca-linha b{font-weight:var(--peso-medio);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.busca-linha span{grid-column:1;font-size:var(--tam-apoio);color:var(--texto-apoio);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.busca-linha i{grid-column:2;grid-row:1/3;align-self:center;font-style:normal;font-size:var(--tam-micro);color:var(--texto-apoio);visibility:hidden}
+.busca-linha.is-ativa{background:var(--acao-100)}.busca-linha.is-ativa i{visibility:visible}
+.busca-vazio{padding:28px 16px;text-align:center;display:flex;flex-direction:column;gap:4px}.busca-vazio span{color:var(--texto-apoio)}
+.busca-rodape{display:flex;gap:18px;padding:8px 16px;border-top:1px solid var(--borda-suave);font-size:var(--tam-apoio);color:var(--texto-apoio)}
+.busca-rodape span:last-child{margin-left:auto}
+
+/* ---------- FLUTUANTES E MENUS ----------
+   O que flutua sobre a tela (os avisos do sino, a troca de empresa, o painel de filtros, a ordenação): vidro, raio
+   do grupo, a sombra média e o reflexo na borda. O .flutuante se posiciona sozinho (fixed); o .menu-flutuante é o
+   mesmo vidro para o que o Radix posiciona. O item destacado, sob o cursor ou no foco do teclado, vai no azul da
+   ação, com tudo dentro dele em branco (o !important vence a cor posta em linha na segunda linha). */
+.menu-flutuante,.flutuante{border-radius:var(--raio-grupo);background:var(--material-menu);-webkit-backdrop-filter:var(--desfoque-menu);backdrop-filter:var(--desfoque-menu);color:var(--texto);box-shadow:var(--sombra-m),var(--brilho);animation:surgir var(--dur-2) var(--curva-saida)}
+.flutuante{position:fixed;z-index:60;max-height:calc(100vh - 80px);overflow:auto;padding:6px}
+.flut-topo{display:flex;align-items:center;gap:6px;padding:8px 8px 10px}.flut-topo b{font-weight:var(--peso-forte);font-size:var(--tam-enfase);margin-right:auto}
+.flut-busca{padding:4px 4px 6px}
+.flut-busca .input{background:var(--preenchimento);box-shadow:none}
+.flut-busca .input:focus{box-shadow:0 0 0 4px var(--acao-foco)}
+.flut-grupo{padding:8px 10px 4px;font-size:var(--tam-micro);font-weight:var(--peso-forte);color:var(--texto-apoio)}
+.flut-item{display:grid;grid-template-columns:18px minmax(0,1fr);align-items:center;gap:8px;min-height:34px;padding:6px 10px;border-radius:var(--raio-p);color:var(--texto);text-decoration:none}
+button.flut-item{width:100%;border:0;background:transparent;font:inherit;text-align:left;cursor:pointer}
+.flut-item i{font-style:normal;text-align:center;color:var(--texto-apoio)}
+.flut-item b{display:block;font-weight:var(--peso-normal)}
+.flut-item small{display:block;font-size:var(--tam-apoio);color:var(--texto-apoio)}
+.flut-item.is-novo b{font-weight:var(--peso-forte)}.flut-item.is-novo{background:var(--acao-100)}
+.flut-item.is-atual b{font-weight:var(--peso-forte)}.flut-item.is-atual i{color:var(--acao-texto)}
+.flut-item:is(:hover,:focus-visible){outline:none;background:var(--acao);color:var(--acao-sobre);text-decoration:none}
+.flut-item:is(:hover,:focus-visible) :is(i,small){color:color-mix(in srgb,var(--acao-sobre) 88%,transparent) !important}
+.flut-rodape{display:flex;justify-content:space-between;align-items:center;padding:10px 8px 6px;margin-top:4px;border-top:1px solid var(--borda-suave);font-size:var(--tam-apoio)}
+/* o item de um menu (a ordenação): 34px; o destacado no azul da ação; o marcado em peso forte */
+.menu-item{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;padding:0 10px;border-radius:var(--raio-p);color:var(--texto);font-size:var(--tam-base);text-align:left;cursor:pointer;outline:none;user-select:none}
+.menu-item:is(:hover,:focus-visible,[data-highlighted]){background:var(--acao);color:var(--acao-sobre)}
+.menu-item:is([aria-checked=true],[data-state=checked]){font-weight:var(--peso-forte)}
+.menu-fio{height:1px;margin:6px 10px;background:var(--borda-suave)}
+
+/* ---------- PASSOS (a tarefa longa) e BARRA DE PROGRESSO ----------
+   O passo feito em verde com o ✓, o atual no azul vivo, os que faltam apagados; o traço embaixo de cada um. */
+.passos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.passos li{display:flex;gap:10px;align-items:center;padding:0 16px 12px 0;border-bottom:2px solid var(--preenchimento);color:var(--texto-apoio)}
+.passos i{width:24px;height:24px;flex:none;border-radius:50%;background:var(--neutro-200);color:var(--texto-apoio);display:grid;place-items:center;font-style:normal;font-size:var(--tam-micro);font-weight:var(--peso-forte)}
+.passos b{display:block;font-weight:var(--peso-medio)}.passos small{display:block;font-size:var(--tam-apoio)}
+.passos .is-feito{border-bottom-color:var(--ok);color:var(--texto)}.passos .is-feito i{background:var(--ok);color:var(--acao-sobre)}
+.passos .is-atual{border-bottom-color:var(--acao-viva);color:var(--texto)}.passos .is-atual i{background:var(--acao-viva);color:var(--acao-sobre)}.passos .is-atual b{font-weight:var(--peso-forte)}
+.barra{height:6px;border-radius:var(--raio-pilula);background:var(--preenchimento);margin:5px 0 3px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--acao-viva);border-radius:inherit;transition:width var(--dur-2) var(--curva)}
+@media (max-width:860px){.passos{grid-template-columns:1fr 1fr;gap:10px 0}}
+
+/* ---------- CELULAR (< 640px): o que não é da casca nem do modal ---------- */
+@media (max-width:639px){
+  .flutuante{max-width:calc(100vw - 16px)}
+  [data-hint]{cursor:pointer}
+  .ajuda-corpo{grid-template-columns:minmax(0,1fr)}.ajuda-corpo aside{display:none}
+  .toasts{bottom:120px}
+  .toast{white-space:normal}
+  .de-para{grid-template-columns:minmax(0,1fr);gap:6px}
+  .de-para-seta{display:none}
+}
+
+/* ---------- A SEÇÃO QUE ABRE E FECHA, O SELETOR E A PRÉVIA CONTEXTUAL ---------- */
+/* A seção que abre e fecha (o `Expansivel`): o indicador de abertura antes do título. Só nele: o <details> solto
+   do app fica com o marcador dele (o app que desenha a própria seta não ganha outra). */
+.expansivel>summary{cursor:pointer;list-style:none}
+.expansivel>summary::-webkit-details-marker{display:none}
+.expansivel>summary::before{content:"";display:inline-block;width:.5em;height:.5em;margin:0 .7em .1em .2em;border:solid var(--texto-apoio);border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);transition:transform var(--dur-2) var(--curva)}
+.expansivel[open]>summary::before{transform:rotate(45deg)}
+
+/* O seletor (`Escolha`, o <select class="input">): onde o navegador já desenha o painel, o painel de opções em
+   vidro, com a escolhida em peso forte e a destacada no azul da ação, e a seta fina no tom de apoio, presa à
+   direita, que vira para cima aberto; o teclado é o do próprio select. */
+@supports (appearance:base-select){
+  select.input,select.input::picker(select){appearance:base-select}
+  select.input::picker(select){padding:6px;border:0;border-radius:var(--raio-grupo);background:var(--material-menu);-webkit-backdrop-filter:var(--desfoque-menu);backdrop-filter:var(--desfoque-menu);color:var(--texto);box-shadow:var(--sombra-m),var(--brilho)}
+  select.input option{min-height:34px;padding:7px 10px;border-radius:var(--raio-p)}
+  select.input option:checked{font-weight:var(--peso-forte);background:transparent}
+  select.input option:hover,select.input option:focus-visible{background:var(--acao);color:var(--acao-sobre)}
+  select.input::picker-icon{content:"";flex:none;width:7px;height:7px;margin:0 3px 4px auto;padding:0;border:solid var(--texto-apoio);border-width:0 1.5px 1.5px 0;transform:rotate(45deg);transition:transform var(--dur-1) var(--curva)}
+  select.input:open::picker-icon{transform:rotate(225deg);margin-bottom:-2px}
+}
+
+/* A prévia contextual (`PreviaContextual`): a referência sublinhada em pontos e o cartão que abre por cima. O
+   cartão é filho da referência: volta ao texto comum. */
+.referencia-contextual{display:inline;padding:0;border:0;background:none;font:inherit;color:var(--acao-texto);text-decoration:underline dotted;text-underline-offset:.2em;cursor:pointer;text-align:start}
+.referencia-contextual[aria-expanded=true]{text-decoration-style:solid}
+.previa-contextual{display:none;position:fixed;inset:auto;margin:0;width:min(300px,calc(100vw - 16px));padding:var(--esp-4);border:1px solid var(--borda-suave);border-radius:var(--raio-g);color:var(--texto);background:var(--superficie-ficha);box-shadow:var(--sombra-m);text-align:start;white-space:normal;font-size:var(--tam-base);font-weight:var(--peso-normal);letter-spacing:0;line-height:var(--linha-texto)}
+.previa-contextual:popover-open{display:grid;gap:var(--esp-2);animation:surgir var(--dur-2) var(--curva-saida)}
+.previa-contextual>strong{font-weight:var(--peso-forte)}
+.previa-contextual .btn{justify-self:start}
+
+/* ---------- REDUZIR MOVIMENTO ----------
+   Com "reduzir movimento" ligado no sistema, nenhuma animação nem transição: tudo vira troca imediata. A regra é
+   uma só, para o kit inteiro (casca e modal inclusive). */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;transition-delay:0s !important}
+}

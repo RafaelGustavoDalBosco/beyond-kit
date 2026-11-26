@@ -1,0 +1,239 @@
+/* @dalbosco/kit. Não importa o Tailwind: o projeto faz
+   `@import "tailwindcss"; @import "@dalbosco/kit/css";` e aponta o `@source` para `node_modules/@dalbosco/kit/src`.
+
+   - tokens.css: a fonte única de valores, nos dois temas (o escuro é só a troca das variáveis sob
+     `<html data-tema="escuro">`; nenhuma classe `dark:`). O tema padrão é o claro (tema/tema.ts).
+   - componentes.css: o visual dos componentes, um bloco por componente, na camada `components`. Os componentes React
+     do kit usam essas classes; o layout de cada tela fica em utilitários do Tailwind.
+   - casca.css: o cabeçalho, a lateral, a trilha e a barra do celular; modal.css: o modal, o alerta e o detalhe.
+   - publico.css: as telas sem login (home e acesso), sobre os mesmos tokens. */
+
+@import "./tokens.css";
+@import "./componentes.css" layer(components);
+@import "./casca.css" layer(components);
+@import "./modal.css" layer(components);
+@import "./publico.css" layer(components);
+
+/* A marca da Dal Bosco Systems (o dourado do fio da assinatura) e o painel de TV (a tela de ler de longe, sempre
+   escura, com os valores do tema escuro). */
+:root {
+  --brasao-ouro: #b08a4a;
+  --painel: #0b1220;
+  --painel-2: #151e30;
+  --painel-3: rgb(148 163 184 / 0.08);
+  --painel-linha: #2a3650;
+  --painel-texto: #e8edf5;
+  --painel-texto-2: #c5cedc;
+  --painel-texto-3: #9eaabd;
+  --painel-destaque: #7ea8ff;
+}
+:root[data-tema="escuro"] {
+  --brasao-ouro: #c9a55a;
+}
+
+/* O celular: abaixo de 640px a lateral sai, entra a barra de baixo e o modal ocupa a tela. `celular:` vale só nele e `mesa:` só acima dele. */
+@custom-variant celular (@media (max-width: 639px));
+@custom-variant mesa (@media (min-width: 640px));
+
+/* Só os valores dos tokens existem como utilitário: as paletas, os tamanhos de fonte, os pesos, os raios e as
+   sombras padrão do Tailwind saem, para nenhuma tela usar cor ou medida fora dos tokens. O passo de espaçamento
+   (4px) é o mesmo dos tokens. */
+@theme inline {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-fundo: var(--fundo);
+  --color-mesa: var(--superficie-mesa);
+  --color-ficha: var(--superficie-ficha);
+  --color-campo: var(--superficie-campo);
+  --color-sub: var(--superficie-sub);
+  --color-busca: var(--superficie-busca);
+  --color-texto: var(--texto);
+  --color-texto-secundario: var(--texto-secundario);
+  --color-texto-apoio: var(--texto-apoio);
+  --color-texto-inverso: var(--texto-inverso);
+  --color-borda: var(--borda);
+  --color-borda-suave: var(--borda-suave);
+  --color-borda-forte: var(--borda-forte);
+  --color-neutro-200: var(--neutro-200);
+  --color-neutro-300: var(--neutro-300);
+  --color-neutro-400: var(--neutro-400);
+  --color-neutro-500: var(--neutro-500);
+  --color-neutro-600: var(--neutro-600);
+  --color-neutro-700: var(--neutro-700);
+  --color-neutro-800: var(--neutro-800);
+  --color-neutro-900: var(--neutro-900);
+  --color-acao: var(--acao);
+  --color-acao-texto: var(--acao-texto);
+  --color-acao-sobre: var(--acao-sobre);
+  --color-acao-100: var(--acao-100);
+  --color-acao-200: var(--acao-200);
+  --color-acao-300: var(--acao-300);
+  --color-acao-400: var(--acao-400);
+  --color-acao-700: var(--acao-700);
+  --color-acao-800: var(--acao-800);
+  --color-positivo: var(--positivo);
+  --color-positivo-fundo: var(--positivo-fundo);
+  --color-positivo-bloco: var(--positivo-bloco);
+  --color-positivo-forte: var(--positivo-forte);
+  --color-positivo-sobre-escuro: var(--positivo-sobre-escuro);
+  --color-destaque: var(--destaque);
+  --color-destaque-fundo: var(--destaque-fundo);
+  --color-destaque-bloco: var(--destaque-bloco);
+  --color-destaque-forte: var(--destaque-forte);
+  --color-atencao: var(--atencao);
+  --color-atencao-fundo: var(--atencao-fundo);
+  --color-atencao-bloco: var(--atencao-bloco);
+  --color-atencao-forte: var(--atencao-forte);
+  --color-erro: var(--erro);
+  --color-erro-fundo: var(--erro-fundo);
+  --color-ok: var(--ok);
+  --color-estado-aberto: var(--estado-aberto);
+  --color-estado-aberto-fundo: var(--estado-aberto-fundo);
+  --color-estado-marcado: var(--estado-marcado);
+  --color-estado-marcado-fundo: var(--estado-marcado-fundo);
+  --color-estado-andamento: var(--estado-andamento);
+  --color-estado-andamento-fundo: var(--estado-andamento-fundo);
+  --color-estado-aplicado: var(--estado-aplicado);
+  --color-estado-aplicado-fundo: var(--estado-aplicado-fundo);
+  --color-estado-concluido: var(--estado-concluido);
+  --color-estado-concluido-fundo: var(--estado-concluido-fundo);
+  --color-estado-erro: var(--estado-erro);
+  --color-estado-erro-fundo: var(--estado-erro-fundo);
+  --color-estado-cancelado: var(--estado-cancelado);
+  --color-estado-conferir: var(--estado-conferir);
+  --color-serie-1: var(--serie-1);
+  --color-serie-2: var(--serie-2);
+  --color-serie-3: var(--serie-3);
+  --color-serie-4: var(--serie-4);
+  --color-serie-5: var(--serie-5);
+  --color-hover: var(--hover);
+  --color-preenchimento: var(--preenchimento);
+  --color-preenchimento-forte: var(--preenchimento-forte);
+  --color-texto-fraco: var(--texto-fraco);
+  --color-acao-viva: var(--acao-viva);
+  --color-acao-foco: var(--acao-foco);
+  --color-erro-forte: var(--erro-forte);
+  --color-erro-vivo: var(--erro-vivo);
+  --color-atencao-viva: var(--atencao-viva);
+  --color-neutro-vivo: var(--neutro-vivo);
+  --color-material-barra: var(--material-barra);
+  --color-material-menu: var(--material-menu);
+  --color-material-alerta: var(--material-alerta);
+  --color-lateral: var(--lateral-fundo);
+  --color-lateral-hover: var(--lateral-hover);
+  --color-seg-indicador: var(--seg-indicador);
+  --color-hint: var(--hint-fundo);
+  --color-hint-titulo: var(--hint-titulo);
+  --color-hint-texto: var(--hint-texto);
+  --color-veu: var(--veu-modal);
+  --color-brasao-ouro: var(--brasao-ouro);
+  --color-painel: var(--painel);
+  --color-painel-2: var(--painel-2);
+  --color-painel-3: var(--painel-3);
+  --color-painel-linha: var(--painel-linha);
+  --color-painel-texto: var(--painel-texto);
+  --color-painel-texto-2: var(--painel-texto-2);
+  --color-painel-texto-3: var(--painel-texto-3);
+  --color-painel-destaque: var(--painel-destaque);
+
+  --font-*: initial;
+  --font-sans: var(--fonte);
+
+  --text-*: initial;
+  --text-micro: var(--tam-micro);
+  --text-apoio: var(--tam-apoio);
+  --text-base: var(--tam-base);
+  --text-tabela: var(--tam-tabela);
+  --text-base-celular: var(--tam-base-celular);
+  --text-enfase: var(--tam-enfase);
+  --text-botao-celular: var(--tam-botao-celular);
+  --text-subtitulo: var(--tam-subtitulo);
+  --text-titulo: var(--tam-titulo);
+  --text-numero-p: var(--tam-numero-p);
+  --text-numero-m: var(--tam-numero-m);
+  --text-numero-g: var(--tam-numero-g);
+  --text-numero-xg: var(--tam-numero-xg);
+
+  --font-weight-*: initial;
+  --font-weight-normal: var(--peso-normal);
+  --font-weight-medio: var(--peso-medio);
+  --font-weight-forte: var(--peso-forte);
+
+  --leading-texto: var(--linha-texto);
+  --leading-titulo: var(--linha-titulo);
+  --leading-numero: var(--linha-numero);
+  --tracking-titulo: var(--entreletra-titulo);
+
+  --radius-*: initial;
+  --radius-p: var(--raio-p);
+  --radius-m: var(--raio-m);
+  --radius-g: var(--raio-g);
+  --radius-grupo: var(--raio-grupo);
+  --radius-modal: var(--raio-modal);
+  --radius-alerta: var(--raio-alerta);
+  --radius-pilula: var(--raio-pilula);
+
+  --shadow-*: initial;
+  --shadow-p: var(--sombra-p);
+  --shadow-m: var(--sombra-m);
+  --shadow-g: var(--sombra-g);
+  --shadow-acao: var(--sombra-acao);
+  --shadow-controle: var(--sombra-controle);
+
+  /* o movimento pelos tokens: a troca de estado em --dur-2, o que entra deslizando em --dur-3, desacelerando */
+  --animate-entrar: kit-entrar var(--dur-2) var(--curva-saida);
+  --animate-subir: kit-subir var(--dur-3) var(--curva-saida);
+  --animate-deslizar: kit-deslizar var(--dur-3) var(--curva-saida);
+  --animate-folha: kit-folha var(--dur-3) var(--curva-saida);
+  /* espera 200 ms invisível: a resposta rápida não chega a piscar */
+  --animate-surgir: kit-surgir var(--dur-2) var(--curva) 0.2s both;
+  --animate-correr: kit-correr 1.2s ease-in-out infinite;
+}
+
+@keyframes kit-entrar {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kit-subir {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kit-deslizar {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kit-folha {
+  from { opacity: 0.6; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kit-surgir {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes kit-correr {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+/* O brasão da Dal Bosco Systems (o `Brasao` do kit): inteiro, com o nome e o lema, ou só o escudo com os animais. */
+.brasao-inteiro {
+  background-image: url("./marca/brasao.webp");
+}
+.brasao-escudo {
+  background-image: url("./marca/escudo.webp");
+}
+
+/* Número e código (CNPJ, chave, valor): algarismos de largura fixa, para as colunas alinharem. O body já liga o
+   tabular-nums; a classe fica para o que vem de fora do fluxo. */
+@utility numero {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A rolagem de lado sem a barra (as abas no celular). */
+@utility sem-barra {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
